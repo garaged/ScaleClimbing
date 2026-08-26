@@ -55,7 +55,7 @@ public struct PianoKeyButton: View {
                 Spacer(minLength: 0)
             }
             .frame(width: key.isNatural ? 48 : 36, height: key.isNatural ? 160 : 108)
-            .background(background)
+            .background(key.isNatural ? Color.white : Color.black)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .strokeBorder(isHighlighted ? Color.accentColor : Color.secondary.opacity(0.35), lineWidth: isHighlighted ? 3 : 1)
@@ -66,15 +66,5 @@ public struct PianoKeyButton: View {
         .accessibilityLabel(key.accessibilityLabel)
         .accessibilityHint("Tap to answer \(key.pitchClass.accessibilityName)")
         .accessibilityAddTraits(isHighlighted ? [.isSelected] : [])
-    }
-
-    private var background: some View {
-        Group {
-            if key.isNatural {
-                Color(.systemBackground)
-            } else {
-                Color(.label)
-            }
-        }
     }
 }

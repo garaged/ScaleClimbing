@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-scan_paths=(Package.swift Sources Tests .github Makefile)
+scan_paths=(Package.swift Sources Tests Apps .github Makefile scripts)
 
 for path in "${scan_paths[@]}"; do
   [[ -e "$path" ]] || continue
@@ -11,7 +11,7 @@ for path in "${scan_paths[@]}"; do
   fi
 done
 
-if grep -RIn 'http://' Sources Tests Package.swift 2>/dev/null; then
+if grep -RIn 'http://' Sources Tests Apps Package.swift 2>/dev/null; then
   echo "Plain HTTP URL found in source/package files. Use HTTPS or document a test-only exception." >&2
   exit 1
 fi
