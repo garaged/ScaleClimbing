@@ -48,23 +48,61 @@ public struct PianoKeyButton: View {
 
     public var body: some View {
         Button(action: onTap) {
-            VStack(spacing: 8) {
-                Text(key.shortLabel)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(key.isNatural ? .primary : .white)
-                Spacer(minLength: 0)
-            }
-            .frame(width: key.isNatural ? 48 : 36, height: key.isNatural ? 160 : 108)
-            .background(key.isNatural ? Color.white : Color.black)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .strokeBorder(isHighlighted ? Color.accentColor : Color.secondary.opacity(0.35), lineWidth: isHighlighted ? 3 : 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            keyFace
         }
         .buttonStyle(.plain)
         .accessibilityLabel(key.accessibilityLabel)
-        .accessibilityHint("Tap to answer \(key.pitchClass.accessibilityName)")
-        .accessibilityAddTraits(isHighlighted ? [.isSelected] : [])
+        .accessibilityHint(accessibilityHint)
+        .accessibilityAddTraits(accessibilityTraits)
+    }
+
+    private var keyFace: some View {
+        VStack(spacing: 8) {
+            keyLabel
+            Spacer(minLength: 0)
+        }
+        .frame(width: keyWidth, height: keyHeight)
+        .background(keyBackground)
+        .overlay(selectionOverlay)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    private var keyLabel: some View {
+        Text(key.shortLabel)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(key.isNatural ? Color.primary : Color.white)
+    }
+
+    private var keyBackground: Color {
+        key.isNatural ? Color.white : Color.black
+    }
+
+    private var selectionOverlay: some View {
+        RoundedRectangle(cornerRadius: 10)
+            .strokeBorder(selectionColor, lineWidth: selectionLineWidth)
+    }
+
+    private var selectionColor: Color {
+        isHighlighted ? Color.accentColor : Color.secondary.opacity(0.35)
+    }
+
+    private var selectionLineWidth: CGFloat {
+        isHighlighted ? 3 : 1
+    }
+
+    private var keyWidth: CGFloat {
+        key.isNatural ? 48 : 36
+    }
+
+    private var keyHeight: CGFloat {
+        key.isNatural ? 160 : 108
+    }
+
+    private var accessibilityHint: String {
+        "Tap to answer \(key.pitchClass.accessibilityName)"
+    }
+
+    private var accessibilityTraits: AccessibilityTraits {
+        isHighlighted ? [.isSelected] : []
     }
 }
