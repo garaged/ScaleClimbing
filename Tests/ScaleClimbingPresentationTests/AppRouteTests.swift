@@ -1,12 +1,12 @@
 @testable import ScaleClimbingPresentation
 import Testing
 
-@Test func homeListsAvailableRoutesFromRouteCatalog() async {
-    let viewModel = await HomeViewModel()
-    let routes = await viewModel.availableRoutes
+@MainActor
+@Test func homeListsAvailableRoutesFromRouteCatalog() {
+    let viewModel = HomeViewModel()
 
-    #expect(routes == AppRoute.allCases)
-    #expect(routes.contains(.noteHunter))
+    #expect(viewModel.availableRoutes == AppRoute.allCases)
+    #expect(viewModel.availableRoutes.contains(.noteHunter))
 }
 
 @Test func noteHunterRouteHasBeginnerFacingLabels() {
