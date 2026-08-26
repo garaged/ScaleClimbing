@@ -15,6 +15,7 @@ required=(
   docs/engineering/security.md
   docs/engineering/manual-testing.md
   docs/engineering/manual-testing-m1.md
+  docs/engineering/manual-testing-m2.md
   docs/engineering/decision-log.md
   docs/engineering/adr/0001-ios-first-portable-core.md
 )
@@ -30,6 +31,7 @@ grep -q 'make check' README.md || { echo "README must document make check" >&2; 
 grep -q 'OpenSpec' README.md || { echo "README must mention OpenSpec" >&2; exit 1; }
 grep -q 'Threat model' docs/engineering/security.md || { echo "security.md must include threat model" >&2; exit 1; }
 grep -q 'Intent' docs/engineering/sdd-tdd-idd.md || { echo "SDD/TDD/IDD doc must include intent guidance" >&2; exit 1; }
+grep -q 'one branch and one draft PR per coherent milestone' docs/engineering/sdd-tdd-idd.md || { echo "SDD/TDD/IDD doc must document milestone PR cadence" >&2; exit 1; }
 grep -q 'Architecture enforcement' docs/engineering/component-architecture.md || { echo "component architecture doc must define enforcement" >&2; exit 1; }
 
 echo "Documentation structure OK"

@@ -3,7 +3,7 @@ import SwiftUI
 
 public struct PianoKeyboardView: View {
     public let model: PianoKeyboardModel
-    public let highlightedPitchClass: PitchClass?
+    public let highlightedPitchClasses: Set<PitchClass>
     public let onKeyTap: (PianoKeyModel) -> Void
 
     public init(
@@ -12,7 +12,17 @@ public struct PianoKeyboardView: View {
         onKeyTap: @escaping (PianoKeyModel) -> Void
     ) {
         self.model = model
-        self.highlightedPitchClass = highlightedPitchClass
+        self.highlightedPitchClasses = highlightedPitchClass.map { [$0] } ?? []
+        self.onKeyTap = onKeyTap
+    }
+
+    public init(
+        model: PianoKeyboardModel,
+        highlightedPitchClasses: Set<PitchClass>,
+        onKeyTap: @escaping (PianoKeyModel) -> Void
+    ) {
+        self.model = model
+        self.highlightedPitchClasses = highlightedPitchClasses
         self.onKeyTap = onKeyTap
     }
 
@@ -22,7 +32,7 @@ public struct PianoKeyboardView: View {
                 ForEach(model.keys) { key in
                     PianoKeyButton(
                         key: key,
-                        isHighlighted: highlightedPitchClass == key.pitchClass,
+                        isHighlighted: highlightedPitchClasses.contains(key.pitchClass),
                         onTap: { onKeyTap(key) }
                     )
                 }

@@ -39,6 +39,8 @@ public struct ScaleClimbingRootView: View {
         switch route {
         case .noteHunter:
             NoteHunterGameView()
+        case .chordForge:
+            ChordForgeGameView()
         }
     }
 }
