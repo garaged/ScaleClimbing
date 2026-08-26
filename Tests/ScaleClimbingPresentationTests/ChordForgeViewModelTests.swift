@@ -69,3 +69,42 @@ import Testing
     #expect(viewModel.selectedPitchClasses.isEmpty)
     #expect(viewModel.lastEvaluation == nil)
 }
+
+@MainActor
+@Test func chordForgeReportsRoundProgressAndAccuracy() {
+    let viewModel = ChordForgeViewModel(
+        chord: Chord(root: .c, definition: .majorTriad),
+        chordSequence: [
+            Chord(root: .c, definition: .majorTriad),
+            Chord(root: .a, definition: .minorTriad)
+        ]
+    )
+
+    #expect(viewModel.roundProgressText == "Round 1 of 2")
+    #expect(viewModel.accuracyText == "Accuracy: —")
+
+    viewModel.toggle(PianoKeyModel(pitch: Pitch(.c, octave: 4)))
+    viewModel.toggle(PianoKeyModel(pitch: Pitch(.e, octave: 4)))
+    viewModel.toggle(PianoKeyModel(pitch: Pitch(.g, octave: 4)))
+    viewModel.submitSelection()
+
+    #expect(viewModel.roundSummaryText == "Round complete. Ready for the next chord.")
+    #expect(viewModel.sessionSummaryText == "1/1 correct · Accuracy: 100%")
+
+    viewModel.advanceToNextChord()
+
+    #expect(viewModel.roundProgressText == "Round 2 of 2")
+    #expect(viewModel.roundSummaryText == "Build the triad, then check your chord.")
+}
+
+@MainActor
+@Test func chordForgeSelectionProgressCountsSelectedPitchClasses() {
+    let viewModel = ChordForgeViewModel(chord: Chord(root: .c, definition: .majorTriad))
+
+    #expect(viewModel.selectionProgressText == "0/3 notes selected")
+
+    viewModel.toggle(PianoKeyModel(pitch: Pitch(.c, octave: 4)))
+    viewModel.toggle(PianoKeyModel(pitch: Pitch(.e, octave: 4)))
+
+    #expect(viewModel.selectionProgressText == "2/3 notes selected")
+}

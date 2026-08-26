@@ -1,36 +1,35 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
-### Requirement: Visual triad construction
+### Requirement: Skill-based varied gameplay
 
-The app SHALL provide a visual chord-construction game for beginner major and minor triads before generated audio or microphone recognition are introduced.
+The app SHALL provide visual triad construction as a playable route before generated audio is introduced.
 
-#### Scenario: Chord Forge is available from the app shell
+#### Scenario: M2 home shell lists Chord Forge
 
-- **GIVEN** the app shell is displayed
-- **WHEN** the practice route list is shown
-- **THEN** Chord Forge is available as a route
-- **AND** it is grouped under Triad Cliffs
+- **GIVEN** the app shell is launched
+- **WHEN** the home screen is displayed
+- **THEN** Chord Forge is available as a practice route
+- **AND** the route identifies its region as Triad Cliffs
+- **AND** selecting the route opens the Chord Forge game screen
 
-#### Scenario: Correct major triad is accepted
+#### Scenario: Chord Forge evaluates selected triad tones
 
-- **GIVEN** the Chord Forge prompt asks for C Major Triad
-- **WHEN** the player selects C, E, and G across any octaves
-- **AND** submits the chord
+- **GIVEN** a player is prompted to build C Major Triad
+- **WHEN** they select C, E, and G in any order across supported octaves
 - **THEN** the answer is accepted
-- **AND** the correct and attempt counts increment
+- **AND** the score increments
 
-#### Scenario: Incomplete triad is rejected
+#### Scenario: Chord Forge rejects incomplete triads
 
-- **GIVEN** the Chord Forge prompt asks for C Major Triad
-- **WHEN** the player selects only C and E
-- **AND** submits the chord
+- **GIVEN** a player is prompted to build C Major Triad
+- **WHEN** they select only C and E
 - **THEN** the answer is rejected
-- **AND** the prompt remains active
+- **AND** the player can adjust the selection and try again
 
-#### Scenario: Next chord preserves score
+#### Scenario: Chord Forge shows round progress and summary
 
-- **GIVEN** the player has answered a Chord Forge prompt
-- **WHEN** they request the next chord
-- **THEN** the next beginner triad prompt is shown
-- **AND** cumulative score remains visible
+- **GIVEN** a player is in Chord Forge
+- **WHEN** they check a chord answer
+- **THEN** the screen shows cumulative score, accuracy, selection progress, and round feedback
+- **AND** advancing to the next chord preserves cumulative score
 - **AND** transient selection and feedback state are cleared

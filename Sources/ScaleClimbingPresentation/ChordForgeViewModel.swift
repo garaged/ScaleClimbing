@@ -49,9 +49,30 @@ public final class ChordForgeViewModel: ObservableObject {
     public var targetPitchClasses: [PitchClass] { currentChord.pitchClasses }
     public var selectedPitchClassList: [PitchClass] { selectedPitchClasses.sorted() }
 
+    public var roundProgressText: String {
+        "Round \(chordIndex + 1) of \(chordSequence.count)"
+    }
+
+    public var accuracyText: String {
+        guard attemptCount > 0 else { return "Accuracy: —" }
+        let percentage = Int((Double(correctCount) / Double(attemptCount) * 100).rounded())
+        return "Accuracy: \(percentage)%"
+    }
+
+    public var selectionProgressText: String {
+        "\(selectedPitchClasses.count)/\(targetPitchClasses.count) notes selected"
+    }
+
     public var selectedSummaryText: String {
         guard !selectedPitchClassList.isEmpty else { return "No notes selected yet." }
         return "Selected: " + selectedPitchClassList.map(\.sharpName).joined(separator: " ")
+    }
+
+    public var roundSummaryText: String {
+        guard let lastEvaluation else {
+            return "Build the triad, then check your chord."
+        }
+        return lastEvaluation.isCorrect ? "Round complete. Ready for the next chord." : "Round still open. Change the selected notes and check again."
     }
 
     public var feedbackText: String {
@@ -63,6 +84,10 @@ public final class ChordForgeViewModel: ObservableObject {
 
     public var scoreText: String {
         "\(correctCount)/\(attemptCount) correct"
+    }
+
+    public var sessionSummaryText: String {
+        "\(scoreText) · \(accuracyText)"
     }
 
     public func toggle(_ key: PianoKeyModel) {

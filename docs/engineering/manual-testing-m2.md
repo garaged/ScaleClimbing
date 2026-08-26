@@ -2,27 +2,35 @@
 
 ## Purpose
 
-Confirm that the visual major/minor triad gameplay loop is usable before generated audio work starts.
+Confirm that visual triad construction feels like a small game loop before generated audio work starts.
 
 ## Automated prerequisite
 
 - [ ] Run `make check` and confirm specs, docs, architecture, security, Swift tests, and smoke pass.
 
+## Source-level app shell checklist
+
+- [ ] Confirm `Chord Forge` appears on the home screen under `Triad Cliffs`.
+- [ ] Confirm selecting `Chord Forge` opens the visual triad construction screen.
+- [ ] Confirm `Apps/iOS/ScaleClimbingApp.swift` remains a thin Composition Root and does not contain gameplay rules.
+
 ## Chord Forge checklist
 
-- [ ] Launch the source-level app shell and confirm `Chord Forge` appears under `Triad Cliffs`.
-- [ ] Open Chord Forge and confirm the screen shows title, instructions, score, keyboard, selected-note summary, feedback, and controls.
-- [ ] Tap C, E, and G for C Major Triad and confirm `Check chord` marks it correct.
-- [ ] Select an incomplete or wrong triad and confirm it is rejected without changing the prompt.
-- [ ] Tap the same pitch class in another octave and confirm it toggles the selected pitch class rather than duplicating it.
-- [ ] Tap `Clear` and confirm transient selection and feedback clear.
-- [ ] Tap `Next chord` and confirm the prompt advances while cumulative score remains visible.
-- [ ] Enable VoiceOver and confirm selected note summaries and keyboard keys are understandable.
+- [ ] Confirm the screen shows the target chord, round progress, cumulative score, and accuracy.
+- [ ] Confirm tapping keyboard notes toggles selected pitch classes across octaves.
+- [ ] Confirm selected notes are highlighted on the keyboard.
+- [ ] Confirm the selection progress text updates, for example `2/3 notes selected`.
+- [ ] Select C, E, and G for C major and confirm `Check chord` marks the round correct.
+- [ ] Select an incomplete or wrong chord and confirm retry feedback appears without advancing automatically.
+- [ ] Confirm the round summary changes after a correct answer.
+- [ ] Confirm `Clear` removes the selected notes and transient feedback.
+- [ ] Confirm `Next chord` advances to another major/minor triad without clearing the cumulative score.
+- [ ] Confirm feedback, score, selected-note summary, and route rows are VoiceOver-friendly text.
 
 ## Non-goals to re-check
 
-- [ ] No audio engine, microphone permission, MIDI input, persistence, network service, account flow, analytics, payment, cloud sync, or licensed song content is present.
+- [ ] No audio engine, microphone permission, MIDI access, network service, account flow, analytics, payment, cloud sync, persistence prompt, or licensed song content is present.
 
 ## Expected result
 
-M2 source-level acceptance passes when Chord Forge can build and evaluate major/minor triads visually with accessible feedback while keeping the app offline-first and architecture boundaries enforced.
+M2 source-level acceptance passes when the app exposes Chord Forge as a visual triad route, supports deterministic multi-note triad construction, provides clear score/round feedback, and preserves architecture boundaries. Full generated audio remains deferred to M3.

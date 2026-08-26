@@ -13,6 +13,7 @@ public struct ChordForgeGameView: View {
             keyboard
             selectedSummary
             feedback
+            roundSummary
             controls
             Spacer(minLength: 0)
         }
@@ -26,11 +27,14 @@ public struct ChordForgeGameView: View {
                 .font(.largeTitle.bold())
             Text(viewModel.instructions)
                 .font(.headline)
-            Text(viewModel.scoreText)
+            Text(viewModel.roundProgressText)
+                .font(.subheadline.weight(.semibold))
+            Text(viewModel.sessionSummaryText)
                 .font(.subheadline.monospacedDigit())
                 .foregroundStyle(.secondary)
         }
         .padding(.horizontal)
+        .accessibilityElement(children: .combine)
     }
 
     private var keyboard: some View {
@@ -42,10 +46,16 @@ public struct ChordForgeGameView: View {
     }
 
     private var selectedSummary: some View {
-        Text(viewModel.selectedSummaryText)
-            .font(.subheadline.monospaced())
-            .padding(.horizontal)
-            .accessibilityLabel(viewModel.selectedSummaryText)
+        VStack(alignment: .leading, spacing: 4) {
+            Text(viewModel.selectionProgressText)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(viewModel.selectedSummaryText)
+                .font(.subheadline.monospaced())
+        }
+        .padding(.horizontal)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(viewModel.selectionProgressText). \(viewModel.selectedSummaryText)")
     }
 
     private var feedback: some View {
@@ -56,6 +66,13 @@ public struct ChordForgeGameView: View {
             .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal)
             .accessibilityLabel(viewModel.feedbackText)
+    }
+
+    private var roundSummary: some View {
+        Text(viewModel.roundSummaryText)
+            .font(.callout.weight(.semibold))
+            .padding(.horizontal)
+            .accessibilityLabel(viewModel.roundSummaryText)
     }
 
     private var controls: some View {
