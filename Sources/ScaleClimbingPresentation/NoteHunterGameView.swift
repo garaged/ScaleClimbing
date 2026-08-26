@@ -12,6 +12,7 @@ public struct NoteHunterGameView: View {
             header
             keyboard
             feedback
+            controls
             Spacer(minLength: 0)
         }
         .padding(.vertical)
@@ -48,18 +49,13 @@ public struct NoteHunterGameView: View {
             .padding(.horizontal)
             .accessibilityLabel(viewModel.feedbackText)
     }
-}
 
-public struct ScaleClimbingRootView: View {
-    public init() {}
-
-    public var body: some View {
-        NavigationStack {
-            NoteHunterGameView()
+    private var controls: some View {
+        Button("Next note") {
+            viewModel.advanceToNextPrompt()
         }
+        .buttonStyle(.borderedProminent)
+        .padding(.horizontal)
+        .accessibilityHint("Move to the next note hunter prompt")
     }
-}
-
-#Preview {
-    ScaleClimbingRootView()
 }

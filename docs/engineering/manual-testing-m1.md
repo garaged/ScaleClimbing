@@ -2,18 +2,31 @@
 
 ## Purpose
 
-Confirm the first visual Note Hunter surface is understandable and accessible before adding generated audio.
+Confirm that the first iOS-facing visual keyboard and shell flow are usable before audio work starts.
 
-## Checklist
+## Automated prerequisite
 
-- [ ] Run `make check` and confirm specs, docs, architecture, security, tests, and smoke checks pass.
-- [ ] Open the iOS app scaffold in Xcode or attach the package views to a temporary app target.
-- [ ] Confirm the Note Hunter screen shows a title, instructions, score, keyboard, and feedback area.
-- [ ] Tap a wrong key and confirm the attempt count increments with retry feedback.
-- [ ] Tap any matching target pitch class in another octave and confirm it is accepted.
-- [ ] Enable VoiceOver and confirm keys are announced with note name and octave.
-- [ ] Confirm no microphone, account, cloud, analytics, payment, or network prompt appears.
+- [ ] Run `make check` and confirm specs, docs, architecture, security, Swift tests, and smoke pass.
+
+## Source-level app shell checklist
+
+- [ ] Open `Apps/iOS/ScaleClimbingApp.swift` and confirm the app composition root only launches `ScaleClimbingRootView`.
+- [ ] Confirm `ScaleClimbingRootView` presents a home list with `Note Hunter` under `Note Harbor`.
+- [ ] Confirm route definitions live in `AppRoute` and do not embed music-theory business rules in the app target.
+
+## Note Hunter checklist
+
+- [ ] Confirm the beginner keyboard spans C4 through C6.
+- [ ] Confirm natural and accidental keys are visually distinct.
+- [ ] Confirm tapping any matching pitch class across octaves is accepted.
+- [ ] Confirm tapping a different pitch class is rejected and keeps the player in the same prompt.
+- [ ] Confirm `Next note` advances to a new target without clearing the cumulative score.
+- [ ] Confirm feedback text and key labels have VoiceOver-friendly labels rather than symbol-only labels.
+
+## Non-goals to re-check
+
+- [ ] No microphone permission, network service, account flow, analytics, payment, cloud sync, or licensed song content is present.
 
 ## Expected result
 
-M1 passes when the first keyboard-driven Note Hunter loop is usable and the component architecture rules remain enforced.
+M1 source-level acceptance passes when the app has an explicit home-to-Note-Hunter route, a usable accessible keyboard model, deterministic answer evaluation, and documented architecture boundaries. A full Xcode project/build scheme remains deferred to the app-packaging milestone.
