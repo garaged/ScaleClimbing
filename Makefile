@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: help check ci test smoke specs docs architecture security clean manual-m0 manual-m1
+.PHONY: help check ci test smoke specs docs architecture security clean manual-m0 manual-m1 manual-m2
 
 help:
 	@echo "ScaleClimbing development commands"
@@ -14,6 +14,7 @@ help:
 	@echo "  make security     Run repository security baseline checks"
 	@echo "  make manual-m0    Print the M0 manual acceptance checklist"
 	@echo "  make manual-m1    Print the M1 manual acceptance checklist"
+	@echo "  make manual-m2    Print the M2 manual acceptance checklist"
 	@echo "  make clean        Remove Swift build artifacts"
 
 check: specs docs architecture security test smoke
@@ -43,6 +44,9 @@ manual-m0:
 
 manual-m1:
 	@cat docs/engineering/manual-testing-m1.md
+
+manual-m2:
+	@cat docs/engineering/manual-testing-m2.md
 
 clean:
 	rm -rf .build
