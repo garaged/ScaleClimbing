@@ -38,3 +38,26 @@ import Testing
     #expect(viewModel.attemptCount == 0)
     #expect(viewModel.lastEvaluation == nil)
 }
+
+@MainActor
+@Test func noteHunterAdvancesThroughNaturalNotePromptsWithoutResettingScore() {
+    let viewModel = NoteHunterViewModel(target: .c, targetSequence: [.c, .d])
+    viewModel.submit(PianoKeyModel(pitch: Pitch(.c, octave: 4)))
+
+    viewModel.advanceToNextPrompt()
+
+    #expect(viewModel.targetPitchClass == .d)
+    #expect(viewModel.correctCount == 1)
+    #expect(viewModel.attemptCount == 1)
+    #expect(viewModel.selectedPitchClass == nil)
+    #expect(viewModel.lastEvaluation == nil)
+}
+
+@MainActor
+@Test func noteHunterAdvanceWrapsToFirstPrompt() {
+    let viewModel = NoteHunterViewModel(target: .d, targetSequence: [.c, .d])
+
+    viewModel.advanceToNextPrompt()
+
+    #expect(viewModel.targetPitchClass == .c)
+}
