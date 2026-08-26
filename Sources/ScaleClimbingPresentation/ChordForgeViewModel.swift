@@ -17,11 +17,12 @@ public final class ChordForgeViewModel: ObservableObject {
     public init(
         chord: Chord = Chord(root: .c, definition: .majorTriad),
         keyboard: PianoKeyboardModel = .beginnerTwoOctaves,
-        chordSequence: [Chord] = ChordForgeViewModel.beginnerTriads,
+        chordSequence: [Chord]? = nil,
         correctCount: Int = 0,
         attemptCount: Int = 0
     ) {
-        let resolvedSequence = chordSequence.isEmpty ? [chord] : chordSequence
+        let requestedSequence = chordSequence ?? ChordForgeViewModel.beginnerTriads
+        let resolvedSequence = requestedSequence.isEmpty ? [chord] : requestedSequence
         let resolvedIndex = resolvedSequence.firstIndex(of: chord) ?? 0
         self.chordSequence = resolvedSequence
         self.chordIndex = resolvedIndex
