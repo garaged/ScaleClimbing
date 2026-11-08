@@ -9,6 +9,7 @@ import Testing
     #expect(routes == AppRoute.allCases)
     #expect(routes.contains(.noteHunter))
     #expect(routes.contains(.chordForge))
+    #expect(routes.contains(.earTraining))
 }
 
 @Test func noteHunterRouteHasBeginnerFacingLabels() {
@@ -21,4 +22,9 @@ import Testing
     #expect(AppRoute.chordForge.title == "Chord Forge")
     #expect(AppRoute.chordForge.regionTitle == "Triad Cliffs")
     #expect(AppRoute.chordForge.subtitle.contains("triads"))
+}
+
+@Test func earTrainingRouteExplainsAuditorySkill() {
+    #expect(AppRoute.earTraining.title == "Ear Training")
+    #expect(AppRoute.earTraining.regionTitle == "Triad Cliffs")
 }

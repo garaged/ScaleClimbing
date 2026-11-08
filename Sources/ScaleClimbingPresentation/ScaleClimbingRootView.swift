@@ -47,6 +47,8 @@ public struct ScaleClimbingRootView: View {
             NoteHunterGameView()
         case .chordForge:
             ChordForgeGameView(onPlayChord: onPlayChord)
+        case .earTraining:
+            EarTrainingGameView(onPlayChord: onPlayChord)
         }
     }
 }
