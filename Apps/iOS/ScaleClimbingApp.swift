@@ -1,4 +1,3 @@
-import MusicTheoryCore
 import ScaleClimbingAudio
 import ScaleClimbingPresentation
 import SwiftUI
