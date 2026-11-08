@@ -36,6 +36,12 @@ Voicing Lab extends chord construction with exact MIDI pitches and the lowest ba
 
 Use `make manual-m6` for the short simulator acceptance checklist.
 
+## M7 — Chord Atlas
+
+Chord Atlas adds two training families: **Triads & Suspensions** and **Seventh Chords**, with **Listen** and **Build** modes. The app-generated audio stays offline. Listening conceals the correct chord quality until an answer; construction plays the submitted notes when checked, preserves the last attempt for replay and permits corrections. The reference uses root-position voicing, while pitch-class construction remains octave-independent; use Voicing Lab for exact inversion challenges.
+
+For the short acceptance script run `make manual-m7`.
+
 ## MVP direction
 
 The first playable slice should focus on **major/minor triads** because it exercises the core systems without requiring risky microphone transcription:

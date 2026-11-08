@@ -134,4 +134,48 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["voicing.progress"].label.contains("Round 2"))
     }
 
+    @MainActor
+    func testChordAtlasListeningAnswersAndFamilySwitch() {
+        let app = XCUIApplication()
+        app.launch()
+        app.staticTexts["Chord Atlas"].firstMatch.tap()
+        let prompt = app.staticTexts["atlas.prompt"]
+        XCTAssertTrue(prompt.waitForExistence(timeout: 10))
+        XCTAssertTrue(prompt.label.contains("Which quality"))
+        XCTAssertFalse(prompt.label.contains("Major Triad"))
+        XCTAssertTrue(app.staticTexts["atlas.progress"].label.contains("0/0"))
+        app.buttons["atlas.hear"].tap()
+        XCTAssertTrue(app.staticTexts["atlas.progress"].label.contains("0/0"))
+
+        app.buttons["atlas.quality.major-triad"].tap()
+        XCTAssertTrue(app.staticTexts["atlas.feedback"].label.contains("Correct"))
+        XCTAssertTrue(app.staticTexts["atlas.feedback"].label.contains("Semitones"))
+        XCTAssertTrue(app.staticTexts["atlas.progress"].label.contains("1/1"))
+        XCTAssertFalse(app.buttons["atlas.quality.major-triad"].isEnabled)
+        app.buttons["atlas.next"].tap()
+        XCTAssertTrue(app.staticTexts["atlas.prompt"].label.contains("Which quality"))
+        XCTAssertTrue(app.staticTexts["atlas.progress"].label.contains("1/1"))
+    }
+
+    @MainActor
+    func testChordAtlasConstructionCanReplayWrongAttempt() {
+        let app = XCUIApplication()
+        app.launch()
+        app.staticTexts["Chord Atlas"].firstMatch.tap()
+        app.segmentedControls["atlas.mode"].buttons["Build"].tap()
+        XCTAssertTrue(app.staticTexts["atlas.prompt"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["atlas.prompt"].label.contains("Build C Major Triad"))
+        XCTAssertFalse(app.buttons["atlas.check"].isEnabled)
+        let c = app.buttons["C in octave 4"]
+        XCTAssertTrue(c.waitForExistence(timeout: 10))
+        c.tap()
+        XCTAssertTrue(app.buttons["atlas.check"].isEnabled)
+        app.buttons["atlas.check"].tap()
+        XCTAssertTrue(app.buttons["atlas.replay"].isEnabled)
+        XCTAssertTrue(app.staticTexts["atlas.feedback"].label.contains("Not yet"))
+        app.buttons["atlas.replay"].tap()
+        app.buttons["atlas.clear"].tap()
+        XCTAssertFalse(app.buttons["atlas.replay"].isEnabled)
+    }
+
 }

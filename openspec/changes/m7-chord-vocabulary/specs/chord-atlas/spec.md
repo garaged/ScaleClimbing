@@ -4,7 +4,7 @@
 The music domain SHALL define interval structures for major, minor, diminished, augmented, sus2, sus4, power, dominant seventh, major seventh, minor seventh, half-diminished seventh and fully diminished seventh.
 
 - Each chord SHALL expose interval offsets from root, a name, a stable ID, and pitch classes.
-- All four seventh structures must use correct semitone offsets: dominant [0,4,7,10], major [0,4,7,11], minor [0,3,7,10], half-diminished [0,3,6,10], fully diminished [0,3,6,9].
+- All five seventh structures must use correct semitone offsets: dominant [0,4,7,10], major [0,4,7,11], minor [0,3,7,10], half-diminished [0,3,6,10], fully diminished [0,3,6,9].
 - A two-tone power chord SHALL not be mistaken for a three-tone triad.
 - Harmonic function requires context and is NOT inferred from an isolated chord.
 

@@ -17,12 +17,18 @@
 - Deterministic offline audio notes, silence gap, scored answers and explanation only after answer; Swift/domain/audio/XCUITest coverage.
 - Manual audio and accessibility acceptance before merge.
 
-## M6 — Chord inversions and voiced-pitch construction (active)
+## M6 — Chord inversions and voiced-pitch construction (completed)
 - New **Voicing Lab** constructs root, first and second inversions using exact notes and octaves.
 - Offline **Hear voicing**, **Check voicing**, and **Replay attempt** facilitate listening comparison and correction.
 - Beginner catalog (12 rounds) and All keys (72 rounds): twelve chromatic roots × major/minor × three inversions.
 - Chord identity, inversion bass and strict close-position scoring remain separate so octave displacements and doubled notes are explained rather than silently accepted.
 - CI, iPhone UI regression and brief in-app listening acceptance gate.
+
+## M7 — Chord vocabulary and construction (active)
+- **Chord Atlas** supports ear identification and keyboard construction for major/minor/diminished/augmented triads, sus2/sus4, power chords and five seventh qualities.
+- Two practice families, generated reference voicings, feedback exposing intervals, retry and replay of attempted notes.
+- MusicTheoryCore chord catalog is shared; Chord Atlas construction remains pitch-class-based, while Voicing Lab owns inversion and octave-sensitive scoring.
+- Domain, presentation, simulator regression and short audible acceptance gates.
 
 ## Planned learning milestones
 
@@ -30,7 +36,7 @@
 |---|---|---|
 | M5 — Pitch and interval ear training | Active: Interval Trail implements semitones, direction, octave equivalence vs exact pitch | Distinguish interval distance, direction, pitch class and actual octave |
 | M6 — Chord foundations and inversions | Active: canonical triads, all 12 keys, major/minor, root/first/second inversion, octave-sensitive voicing and doubled-tone classification | Hear and construct the same chord with different bass notes and octave placement |
-| M7 — Chord vocabulary | Diminished and augmented triads, sus2/sus4, power chords, dominant/major/minor/diminished sevenths | Recognize chord quality and harmonic function beyond basic triads |
+| M7 — Chord vocabulary | Active: twelve qualities including diminished/augmented, sus2/sus4, power, dominant/major/minor/half-diminished/fully diminished sevenths | Recognize chord quality; harmonic function requires progression context in M9 |
 | M8 — Scales, modes and keys | Major, natural/harmonic/melodic minor; pentatonic and blues; diatonic modes; key signatures and circle of fifths | Build, recognize and hear fundamental scales and modes |
 | M9 — Harmony and progressions | Diatonic triads and sevenths, Roman numerals, cadences, tonic/dominant, inversions in context, transposition | Recognize relationships and harmonic movement instead of isolated chords |
 | M10 — Rhythm and meter | Pulse, note/rest values, subdivisions, time signatures, syncopation, simple/compound meters | Learn timing through tapping and listening |

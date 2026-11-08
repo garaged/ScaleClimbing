@@ -62,6 +62,8 @@ public struct ScaleClimbingRootView: View {
             IntervalTrailGameView(onPlayInterval: onPlayInterval)
         case .voicingLab:
             VoicingLabGameView(onPlayVoicing: onPlayVoicing)
+        case .chordAtlas:
+            ChordAtlasGameView(onPlayVoicing: onPlayVoicing)
         }
     }
 }
