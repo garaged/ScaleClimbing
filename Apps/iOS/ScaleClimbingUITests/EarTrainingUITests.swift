@@ -42,6 +42,7 @@ final class EarTrainingUITests: XCTestCase {
 
         app.staticTexts["Note Hunter"].firstMatch.tap()
         XCTAssertTrue(app.buttons["Next note"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "C4")).firstMatch.exists)
 
         // Restart to navigate from a fresh home screen rather than relying on OS back-button labels.
         app.terminate()
@@ -49,6 +50,10 @@ final class EarTrainingUITests: XCTestCase {
         app.staticTexts["Chord Forge"].firstMatch.tap()
         XCTAssertTrue(app.buttons["Hear chord"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["Check chord"].exists)
+        XCTAssertTrue(app.buttons["Clear"].exists)
+        XCTAssertTrue(app.buttons["Next chord"].exists)
+        XCTAssertTrue(app.buttons["Clear"].isHittable)
+        XCTAssertTrue(app.buttons["Next chord"].isHittable)
     }
 
 }

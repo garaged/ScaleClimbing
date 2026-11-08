@@ -9,3 +9,7 @@ Prerequisite: CI `make check`, `make ios-build` and `make ios-ui-test` green.
 5. Briefly verify readable controls and VoiceOver labels. There must be no microphone, account or network permissions.
 
 Automated XCUITest checks navigation into Note Hunter and Chord Forge as regressions, plus Ear Training disclosure, playback action, answer lock, scoring and next-round behavior. The brief manual portion covers audible sound, VoiceOver on a real device when practical, and ergonomics.
+
+## M4 usability fixes
+- In **Chord Forge**, verify all four controls are visible at once in a two-column grid on iPhone 17 without horizontal scrolling or cut-off buttons.
+- In **Note Hunter**, tap C4 and then C5. Both should produce audible generated tones, with C5 an octave higher; note scoring remains unchanged from M3.

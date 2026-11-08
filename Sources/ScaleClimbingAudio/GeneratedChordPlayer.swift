@@ -17,7 +17,19 @@ public enum GeneratedChordTones {
         duration: Double = 1.2
     ) -> [Float] {
         guard sampleRate > 0, duration > 0, !notes.isEmpty else { return [] }
-        let tones = frequencies(for: notes)
+        return samples(frequencies: frequencies(for: notes), sampleRate: sampleRate, duration: duration)
+    }
+
+    public static func samples(for pitch: Pitch, sampleRate: Double = 44_100, duration: Double = 0.65) -> [Float] {
+        samples(frequencies: [frequency(for: pitch)], sampleRate: sampleRate, duration: duration)
+    }
+
+    public static func frequency(for pitch: Pitch) -> Double {
+        440.0 * pow(2.0, (Double(pitch.midiNumber) - 69.0) / 12.0)
+    }
+
+    private static func samples(frequencies tones: [Double], sampleRate: Double, duration: Double) -> [Float] {
+        guard sampleRate > 0, duration > 0, !tones.isEmpty else { return [] }
         let frameCount = Int((sampleRate * duration).rounded(.down))
         return (0..<frameCount).map { frame in
             let time = Double(frame) / sampleRate
@@ -47,7 +59,14 @@ public final class GeneratedChordPlayer {
     }
 
     public func play(_ pitchClasses: [PitchClass]) {
-        let samples = GeneratedChordTones.samples(for: pitchClasses, sampleRate: sampleRate)
+        playSamples(GeneratedChordTones.samples(for: pitchClasses, sampleRate: sampleRate))
+    }
+
+    public func play(_ pitch: Pitch) {
+        playSamples(GeneratedChordTones.samples(for: pitch, sampleRate: sampleRate))
+    }
+
+    private func playSamples(_ samples: [Float]) {
         guard !samples.isEmpty else { return }
         let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1)!
         guard let buffer = AVAudioPCMBuffer(

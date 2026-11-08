@@ -82,8 +82,7 @@ public struct ChordForgeGameView: View {
     }
 
     private var controls: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 12) {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             Button("Hear chord") {
                 onPlayChord(viewModel.targetPitchClasses)
             }
@@ -104,10 +103,12 @@ public struct ChordForgeGameView: View {
                 viewModel.advanceToNextChord()
             }
             .buttonStyle(.bordered)
-            }
-            .padding(.horizontal)
         }
+        .controlSize(.large)
+        .padding(.horizontal)
+        .accessibilityIdentifier("chord.controls")
     }
+
 }
 
 #Preview {

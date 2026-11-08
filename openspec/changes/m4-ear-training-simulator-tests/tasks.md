@@ -4,6 +4,8 @@
 - [x] Wire SwiftUI route and generated playback
 - [x] Add XCUITest target and automated simulator test
 - [ ] CI passing on exact PR head
+- [x] Fix Chord Forge button overflow on iPhone 17
+- [x] Add exact-octave audio feedback for Note Hunter and synthesis tests
 - [x] Add simulator navigation regression for existing M2/M3 exercises
 - [x] Create minimal vector-based 1024px app icon and wire Xcode asset catalog
 - [ ] User manual acceptance (short audio / accessibility check)

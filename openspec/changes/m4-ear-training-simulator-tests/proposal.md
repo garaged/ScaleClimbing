@@ -14,3 +14,8 @@ Players learn to recognize a major or minor triad by ear without being shown its
 
 ## Non-goals
 Adaptive scheduling, recording/microphone, MIDI, cloud sync, monetization, account/login, third-party audio.
+
+## M4 acceptance refinements
+- Chord Forge action controls SHALL be arranged in a screen-width-adaptive two-column grid, so no button must be discovered through horizontal scrolling on iPhone 17.
+- Note Hunter SHALL play the exact octave of each tapped piano key with generated offline audio while still evaluating its pitch class.
+- UI simulator assertions SHALL cover visibility and hit-target accessibility of the Chord Forge action buttons.
