@@ -120,7 +120,7 @@
     outputPaths = ();
     runOnlyForDeploymentPostprocessing = 0;
     shellPath = /bin/sh;
-    shellScript = "set -eu\\n/usr/bin/xcrun swift \\"\u0024{PROJECT_DIR}/../../scripts/generate-app-icon.swift\\" \\"\u0024{PROJECT_DIR}/Assets.xcassets/AppIcon.appiconset/AppIcon.png\\"\\n";
+    shellScript = "set -eu\n/usr/bin/xcrun swift \"${PROJECT_DIR}/../../scripts/generate-app-icon.swift\" \"${PROJECT_DIR}/Assets.xcassets/AppIcon.appiconset/AppIcon.png\"\n";
   };
 /* End PBXShellScriptBuildPhase section */
 
