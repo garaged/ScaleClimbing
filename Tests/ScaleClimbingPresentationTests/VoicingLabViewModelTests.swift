@@ -22,7 +22,7 @@ import Testing
     #expect(vm.selectedText.contains("C4"))
     #expect(vm.selectedText.contains("C5"))
     vm.toggle(Pitch(.c, octave: 5))
-    #expect(vm.selectedPitches == [Pitch(.c, octave: 4)])
+    #expect(vm.selectedPitches == Set([Pitch(.c, octave: 4)]))
 }
 
 @MainActor

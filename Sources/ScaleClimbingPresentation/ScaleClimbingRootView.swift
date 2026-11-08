@@ -6,17 +6,20 @@ public struct ScaleClimbingRootView: View {
     private let onPlayChord: ([PitchClass]) -> Void
     private let onPlayPitch: (Pitch) -> Void
     private let onPlayInterval: ([Pitch]) -> Void
+    private let onPlayVoicing: ([Pitch]) -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
         onPlayChord: @escaping ([PitchClass]) -> Void = { _ in },
         onPlayPitch: @escaping (Pitch) -> Void = { _ in },
-        onPlayInterval: @escaping ([Pitch]) -> Void = { _ in }
+        onPlayInterval: @escaping ([Pitch]) -> Void = { _ in },
+        onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in }
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
         self.onPlayChord = onPlayChord
         self.onPlayPitch = onPlayPitch
         self.onPlayInterval = onPlayInterval
+        self.onPlayVoicing = onPlayVoicing
     }
 
     public var body: some View {
@@ -57,6 +60,8 @@ public struct ScaleClimbingRootView: View {
             EarTrainingGameView(onPlayChord: onPlayChord)
         case .intervalTrail:
             IntervalTrailGameView(onPlayInterval: onPlayInterval)
+        case .voicingLab:
+            VoicingLabGameView(onPlayVoicing: onPlayVoicing)
         }
     }
 }

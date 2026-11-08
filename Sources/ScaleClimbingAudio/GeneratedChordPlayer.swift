@@ -20,6 +20,18 @@ public enum GeneratedChordTones {
         return samples(frequencies: frequencies(for: notes), sampleRate: sampleRate, duration: duration)
     }
 
+    /// Simultaneous chord tones retaining exact octaves (unlike pitch-class-only playback).
+    public static func voicedSamples(
+        for pitches: [Pitch], sampleRate: Double = 44_100, duration: Double = 1.2
+    ) -> [Float] {
+        guard !pitches.isEmpty else { return [] }
+        return samples(
+            frequencies: pitches.map { frequency(for: $0) },
+            sampleRate: sampleRate,
+            duration: duration
+        )
+    }
+
     public static func samples(for pitch: Pitch, sampleRate: Double = 44_100, duration: Double = 0.65) -> [Float] {
         samples(frequencies: [frequency(for: pitch)], sampleRate: sampleRate, duration: duration)
     }
@@ -82,6 +94,10 @@ public final class GeneratedChordPlayer {
 
     public func playInterval(_ pitches: [Pitch]) {
         playSamples(GeneratedChordTones.melodicSamples(for: pitches, sampleRate: sampleRate))
+    }
+
+    public func playVoicing(_ pitches: [Pitch]) {
+        playSamples(GeneratedChordTones.voicedSamples(for: pitches, sampleRate: sampleRate))
     }
 
     private func playSamples(_ samples: [Float]) {
