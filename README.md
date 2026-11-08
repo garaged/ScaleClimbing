@@ -9,7 +9,7 @@ ScaleClimbing is an offline-first iOS music learning game for notes and triads.
 3. Choose the shared **ScaleClimbing** scheme and an iPhone simulator.
 4. Press **Cmd-R**.
 
-The app includes **Note Hunter** and **Chord Forge**. Chord Forge can play the current target triad using locally generated tones; it does not require microphone permission, a network connection, or third-party audio assets.
+The app includes **Note Hunter**, **Chord Forge**, **Ear Training**, and **Interval Trail**. Chord Forge can play the current target triad using locally generated tones; it does not require microphone permission, a network connection, or third-party audio assets.
 
 ### CLI build and test
 
@@ -20,9 +20,15 @@ make ios-build
 
 CI runs both gates. To review the short combined M2/M3 manual check, use `make manual-m3`. Full M2 scenarios remain in `docs/engineering/manual-testing-m2.md`.
 
-**Pull request workflow:** One draft PR per milestone. M3 is stacked on unmerged M2; after combined manual acceptance, merge M2 and then M3. Never merge an unaccepted milestone solely to make downstream work easier.
+**Pull request workflow:** One draft PR per milestone; merge only after green CI and short manual acceptance.
 
 ---
+
+## M5 — Interval Trail
+
+Interval Trail is a blind, two-note listening exercise. It trains melodic direction (up/down/same), the semitone distance from unison to octave, and the distinction between exact pitch and the same note name in another octave. Replay never changes scoring; feedback identifies both notes only after answering. The app synthesizes all sounds offline.
+
+For a short simulator checklist, run `make manual-m5`.
 
 ## MVP direction
 

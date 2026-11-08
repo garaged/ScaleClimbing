@@ -77,4 +77,34 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Not yet")).firstMatch.exists)
         XCTAssertTrue(app.buttons["Hear chord"].isHittable)
     }
+    @MainActor
+    func testIntervalTrailBlindPlaybackAndProgression() {
+        let app = XCUIApplication()
+        app.launch()
+        app.staticTexts["Interval Trail"].firstMatch.tap()
+
+        let prompt = app.staticTexts["interval.prompt"]
+        XCTAssertTrue(prompt.waitForExistence(timeout: 10))
+        XCTAssertTrue(prompt.label.contains("second note"))
+        XCTAssertFalse(prompt.label.contains("C4"))
+        XCTAssertTrue(app.staticTexts["interval.score"].label.contains("0/0"))
+
+        app.buttons["interval.play"].tap()
+        XCTAssertTrue(app.staticTexts["interval.score"].label.contains("0/0"))
+        XCTAssertFalse(app.buttons["interval.next"].isEnabled)
+
+        app.buttons["interval.answer.Up"].tap()
+        XCTAssertTrue(app.staticTexts["interval.feedback"].label.contains("Correct"))
+        XCTAssertTrue(app.staticTexts["interval.feedback"].label.contains("C4 to D4"))
+        XCTAssertFalse(app.buttons["interval.answer.Up"].isEnabled)
+        XCTAssertTrue(app.staticTexts["interval.score"].label.contains("1/1"))
+
+        app.buttons["interval.next"].tap()
+        XCTAssertTrue(app.staticTexts["interval.round"].label.contains("Round 2"))
+        XCTAssertFalse(app.staticTexts["interval.feedback"].label.contains("G4"))
+        app.buttons["interval.answer.Down"].tap()
+        XCTAssertTrue(app.staticTexts["interval.feedback"].label.contains("Correct"))
+        XCTAssertTrue(app.staticTexts["interval.score"].label.contains("2/2"))
+    }
+
 }

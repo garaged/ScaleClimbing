@@ -1,8 +1,8 @@
 SHELL := /bin/bash
 
-.PHONY: help check ci test smoke specs docs architecture security clean manual-m0 manual-m1 manual-m2 manual-m3 manual-m4 ios-build ios-ui-test
+.PHONY: help check ci test smoke specs docs architecture security clean manual-m0 manual-m1 manual-m2 manual-m3 manual-m4 manual-m5 ios-build ios-ui-test
 help:
-	@echo "ScaleClimbing: make check | make ios-build | make manual-m2 | make manual-m3"
+	@echo "ScaleClimbing: make check | make ios-build | make ios-ui-test | make manual-m5"
 
 check: specs docs architecture security test smoke
 ci: check
@@ -27,6 +27,8 @@ ios-ui-test:
 
 manual-m4:
 	@cat docs/engineering/manual-testing-m4.md
+manual-m5:
+	@cat docs/engineering/manual-testing-m5.md
 
 manual-m0:
 	@cat docs/engineering/manual-testing.md

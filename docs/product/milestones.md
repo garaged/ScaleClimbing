@@ -6,17 +6,22 @@
 - **M2** — Chord Forge: major/minor triad construction and feedback.
 - **M3** — Runnable Xcode iOS app and generated offline chord audio.
 
-## M4 — Ear training, feedback and accessibility (active)
+## M4 — Ear training, feedback and accessibility (completed)
 - Blind generated-audio major/minor recognition, scoring and replay.
 - Compare **Hear chord** (target) with the learner's **Check chord** audio and **Replay attempt**.
 - Responsive Chord Forge controls, exact-octave Note Hunter key sounds, minimal app icon.
 - Simulator UI regression coverage and short manual audio/accessibility acceptance.
 
+## M5 — Pitch and interval ear training (active)
+- Interval Trail: blind sequential two-note ear training with ordered absolute pitch and three skills: up/down/same, semitone distance, and pitch equality across octaves.
+- Deterministic offline audio notes, silence gap, scored answers and explanation only after answer; Swift/domain/audio/XCUITest coverage.
+- Manual audio and accessibility acceptance before merge.
+
 ## Planned learning milestones
 
 | Stage | Skills and variants | Learning outcome |
 |---|---|---|
-| M5 — Pitch and interval ear training | Semitones/whole tones, ascending and descending intervals, octave equivalence versus register, pitch matching | Distinguish interval distance, direction, pitch class and actual octave |
+| M5 — Pitch and interval ear training | Active: Interval Trail implements semitones, direction, octave equivalence vs exact pitch | Distinguish interval distance, direction, pitch class and actual octave |
 | M6 — Chord foundations and inversions | Major/minor in every key, root position, first and second inversions, voicing and doubling | Hear and construct the same chord with different bass notes and octave placement |
 | M7 — Chord vocabulary | Diminished and augmented triads, sus2/sus4, power chords, dominant/major/minor/diminished sevenths | Recognize chord quality and harmonic function beyond basic triads |
 | M8 — Scales, modes and keys | Major, natural/harmonic/melodic minor; pentatonic and blues; diatonic modes; key signatures and circle of fifths | Build, recognize and hear fundamental scales and modes |
