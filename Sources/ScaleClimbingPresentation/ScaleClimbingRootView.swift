@@ -1,10 +1,16 @@
+import MusicTheoryCore
 import SwiftUI
 
 public struct ScaleClimbingRootView: View {
     @StateObject private var viewModel: HomeViewModel
+    private let onPlayChord: ([PitchClass]) -> Void
 
-    public init(viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel()) {
+    public init(
+        viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
+        onPlayChord: @escaping ([PitchClass]) -> Void = { _ in }
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel())
+        self.onPlayChord = onPlayChord
     }
 
     public var body: some View {
@@ -40,7 +46,7 @@ public struct ScaleClimbingRootView: View {
         case .noteHunter:
             NoteHunterGameView()
         case .chordForge:
-            ChordForgeGameView()
+            ChordForgeGameView(onPlayChord: onPlayChord)
         }
     }
 }

@@ -10,13 +10,16 @@ let package = Package(
     products: [
         .library(name: "MusicTheoryCore", targets: ["MusicTheoryCore"]),
         .library(name: "ScaleClimbingPresentation", targets: ["ScaleClimbingPresentation"]),
+        .library(name: "ScaleClimbingAudio", targets: ["ScaleClimbingAudio"]),
         .executable(name: "scaleclimbing-smoke", targets: ["ScaleClimbingCLI"])
     ],
     targets: [
         .target(name: "MusicTheoryCore"),
         .target(name: "ScaleClimbingPresentation", dependencies: ["MusicTheoryCore"]),
+        .target(name: "ScaleClimbingAudio", dependencies: ["MusicTheoryCore"]),
         .executableTarget(name: "ScaleClimbingCLI", dependencies: ["MusicTheoryCore"]),
         .testTarget(name: "MusicTheoryCoreTests", dependencies: ["MusicTheoryCore"]),
-        .testTarget(name: "ScaleClimbingPresentationTests", dependencies: ["ScaleClimbingPresentation"])
+        .testTarget(name: "ScaleClimbingPresentationTests", dependencies: ["ScaleClimbingPresentation"]),
+        .testTarget(name: "ScaleClimbingAudioTests", dependencies: ["ScaleClimbingAudio"])
     ]
 )
