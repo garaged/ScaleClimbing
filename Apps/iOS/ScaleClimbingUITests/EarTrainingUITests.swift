@@ -35,4 +35,20 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["ear.feedback"].label.contains("Correct"))
         XCTAssertTrue(app.staticTexts["ear.score"].label.contains("2/2"))
     }
+    @MainActor
+    func testExistingNoteHunterAndChordForgeRoutesStillOpen() {
+        let app = XCUIApplication()
+        app.launch()
+
+        app.staticTexts["Note Hunter"].firstMatch.tap()
+        XCTAssertTrue(app.buttons["Next note"].waitForExistence(timeout: 10))
+
+        // Restart to navigate from a fresh home screen rather than relying on OS back-button labels.
+        app.terminate()
+        app.launch()
+        app.staticTexts["Chord Forge"].firstMatch.tap()
+        XCTAssertTrue(app.buttons["Hear chord"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Check chord"].exists)
+    }
+
 }
