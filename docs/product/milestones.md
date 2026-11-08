@@ -1,29 +1,37 @@
 # Milestone Roadmap
 
-## M0 — Foundation
+## Completed foundation
+- **M0** — OpenSpec, Swift package, CI, domain and security baseline.
+- **M1** — iOS shell, accessible visual keyboard and Note Hunter.
+- **M2** — Chord Forge: major/minor triad construction and feedback.
+- **M3** — Runnable Xcode iOS app and generated offline chord audio.
 
-- Establish OpenSpec, SDD/TDD/IDD workflow, Swift package, CI, security baseline, and pure music-theory model.
+## M4 — Ear training, feedback and accessibility (active)
+- Blind generated-audio major/minor recognition, scoring and replay.
+- Compare **Hear chord** (target) with the learner's **Check chord** audio and **Replay attempt**.
+- Responsive Chord Forge controls, exact-octave Note Hunter key sounds, minimal app icon.
+- Simulator UI regression coverage and short manual audio/accessibility acceptance.
 
-## M1 — iOS shell and visual keyboard
+## Planned learning milestones
 
-- Add iPhone/iPad app shell, route model, accessible piano keyboard, and first Note Hunter interaction.
+| Stage | Skills and variants | Learning outcome |
+|---|---|---|
+| M5 — Pitch and interval ear training | Semitones/whole tones, ascending and descending intervals, octave equivalence versus register, pitch matching | Distinguish interval distance, direction, pitch class and actual octave |
+| M6 — Chord foundations and inversions | Major/minor in every key, root position, first and second inversions, voicing and doubling | Hear and construct the same chord with different bass notes and octave placement |
+| M7 — Chord vocabulary | Diminished and augmented triads, sus2/sus4, power chords, dominant/major/minor/diminished sevenths | Recognize chord quality and harmonic function beyond basic triads |
+| M8 — Scales, modes and keys | Major, natural/harmonic/melodic minor; pentatonic and blues; diatonic modes; key signatures and circle of fifths | Build, recognize and hear fundamental scales and modes |
+| M9 — Harmony and progressions | Diatonic triads and sevenths, Roman numerals, cadences, tonic/dominant, inversions in context, transposition | Recognize relationships and harmonic movement instead of isolated chords |
+| M10 — Rhythm and meter | Pulse, note/rest values, subdivisions, time signatures, syncopation, simple/compound meters | Learn timing through tapping and listening |
+| M11 — Timbre, overtones and tuning | Harmonic series/partials, overtones versus harmonics, consonance/beating, tuning and temperaments, octave displacement, instrument timbre | Separate fundamental pitch, spectral content and timbre; hear octave and tuning differences |
+| M12 — Reading and musicianship | Staff, clefs, accidentals/enharmonics, chord symbols, sight reading, solfege and melodic dictation | Connect notation, sound, theory and playing |
+| M13 — Adaptive learning | Per-skill mastery, spaced repetition, mixed daily practice, saved progress, accessibility settings | Consolidate knowledge with persistent and personalized practice |
 
-## M2 — Triad visual gameplay
+## Design principles for all variants
+1. Keep separate **pitch-class / unordered chord identity**, **voiced pitches with octaves**, and **ordered melodic intervals**. Do not retrofit inversion or octave-sensitive scoring onto the current pitch-class set.
+2. Distinguish **harmonic series / partials** from chord progressions and harmonic function; teach both explicitly.
+3. Always make *listen → attempt → compare → correct → retry* available where appropriate, with feedback explaining the reason.
+4. Introduce controlled audio comparisons (same loudness/timbre; isolate one variable) before mixed, realistic exercises.
+5. Deliver each stage using OpenSpec, deterministic Swift tests, simulator UI automation and a short human listening/accessibility check.
 
-- Add Chord Forge, major/minor triad slice, scoring, round summaries, and visual feedback.
-
-## M3 — Generated audio ear training
-
-- Add AVAudioEngine-backed generated prompts for pitch direction and major/minor recognition.
-
-## M4 — Learning progression
-
-- Add skill graph, mastery model, daily mix, local persistence, and unlockable regions.
-
-## M5 — Polish and accessibility
-
-- Improve animations, haptics, VoiceOver, Dynamic Type, reduced motion, and manual device validation.
-
-## Later
-
-- MIDI input, microphone monophonic pitch recognition, guitar/staff views, macOS, and broader desktop strategy.
+## Later platform and input expansion
+- MIDI keyboard input; microphone monophonic pitch detection with permission/privacy review; guitar/fretboard exercises; macOS; desktop platforms.

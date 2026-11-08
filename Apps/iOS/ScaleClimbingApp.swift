@@ -11,6 +11,8 @@ struct ScaleClimbingApp: App {
         WindowGroup {
             ScaleClimbingRootView(onPlayChord: { notes in
                 chordPlayer.play(notes)
+            }, onPlayPitch: { pitch in
+                chordPlayer.play(pitch)
             })
         }
     }

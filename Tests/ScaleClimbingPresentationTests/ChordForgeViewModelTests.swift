@@ -108,3 +108,52 @@ import Testing
 
     #expect(viewModel.selectionProgressText == "2/3 notes selected")
 }
+
+
+// A failed answer must preserve an audible snapshot for comparison while permitting a retry.
+@MainActor
+@Test func chordForgeRetainsSubmittedNotesForReplayAndRetry() {
+    let vm = ChordForgeViewModel(chord: Chord(root: .c, definition: .majorTriad))
+    vm.toggle(PianoKeyModel(pitch: Pitch(.c, octave: 4)))
+    vm.toggle(PianoKeyModel(pitch: Pitch(.e, octave: 4)))
+    vm.toggle(PianoKeyModel(pitch: Pitch(.a, octave: 4)))
+    vm.submitSelection()
+
+    #expect(vm.lastEvaluation?.isCorrect == false)
+    #expect(vm.lastSubmittedPitchClasses == [.c, .e, .a])
+    #expect(vm.attemptCount == 1)
+
+    vm.toggle(PianoKeyModel(pitch: Pitch(.a, octave: 4)))
+    vm.toggle(PianoKeyModel(pitch: Pitch(.g, octave: 4)))
+    #expect(vm.lastSubmittedPitchClasses == [.c, .e, .a])
+    #expect(vm.lastEvaluation == nil)
+
+    vm.submitSelection()
+    #expect(vm.lastSubmittedPitchClasses == [.c, .e, .g])
+    #expect(vm.lastEvaluation?.isCorrect == true)
+    #expect(vm.correctCount == 1)
+    #expect(vm.attemptCount == 2)
+}
+
+@MainActor
+@Test func chordForgeEmptySelectionDoesNotPlayOrCountAttempt() {
+    let vm = ChordForgeViewModel()
+    vm.submitSelection()
+    #expect(vm.lastSubmittedPitchClasses == nil)
+    #expect(vm.attemptCount == 0)
+    #expect(vm.canCheckSelection == false)
+}
+
+@MainActor
+@Test func chordForgeReplayResetsAcrossRoundsAndClear() {
+    let vm = ChordForgeViewModel()
+    vm.toggle(PianoKeyModel(pitch: Pitch(.c, octave: 4)))
+    vm.submitSelection()
+    #expect(vm.lastSubmittedPitchClasses != nil)
+    vm.clearSelection()
+    #expect(vm.lastSubmittedPitchClasses == nil)
+    vm.toggle(PianoKeyModel(pitch: Pitch(.c, octave: 4)))
+    vm.submitSelection()
+    vm.advanceToNextChord()
+    #expect(vm.lastSubmittedPitchClasses == nil)
+}

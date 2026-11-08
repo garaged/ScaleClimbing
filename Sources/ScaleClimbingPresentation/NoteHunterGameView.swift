@@ -1,10 +1,16 @@
+import MusicTheoryCore
 import SwiftUI
 
 public struct NoteHunterGameView: View {
     @StateObject private var viewModel: NoteHunterViewModel
+    private let onPlayPitch: (Pitch) -> Void
 
-    public init(viewModel: @autoclosure @escaping () -> NoteHunterViewModel = NoteHunterViewModel()) {
+    public init(
+        viewModel: @autoclosure @escaping () -> NoteHunterViewModel = NoteHunterViewModel(),
+        onPlayPitch: @escaping (Pitch) -> Void = { _ in }
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel())
+        self.onPlayPitch = onPlayPitch
     }
 
     public var body: some View {
@@ -36,7 +42,10 @@ public struct NoteHunterGameView: View {
         PianoKeyboardView(
             model: viewModel.keyboard,
             highlightedPitchClass: viewModel.selectedPitchClass,
-            onKeyTap: { key in viewModel.submit(key) }
+            onKeyTap: { key in
+                onPlayPitch(key.pitch)
+                viewModel.submit(key)
+            }
         )
     }
 
