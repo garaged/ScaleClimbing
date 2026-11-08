@@ -9,7 +9,7 @@ ScaleClimbing is an offline-first iOS music learning game for notes and triads.
 3. Choose the shared **ScaleClimbing** scheme and an iPhone simulator.
 4. Press **Cmd-R**.
 
-The app includes **Note Hunter**, **Chord Forge**, **Ear Training**, and **Interval Trail**. Chord Forge can play the current target triad using locally generated tones; it does not require microphone permission, a network connection, or third-party audio assets.
+The app includes **Note Hunter**, **Chord Forge**, **Ear Training**, and **Interval Trail**, and **Voicing Lab**. Chord Forge can play the current target triad using locally generated tones; it does not require microphone permission, a network connection, or third-party audio assets.
 
 ### CLI build and test
 
@@ -29,6 +29,12 @@ CI runs both gates. To review the short combined M2/M3 manual check, use `make m
 Interval Trail is a blind, two-note listening exercise. It trains melodic direction (up/down/same), the semitone distance from unison to octave, and the distinction between exact pitch and the same note name in another octave. Replay never changes scoring; feedback identifies both notes only after answering. The app synthesizes all sounds offline.
 
 For a short simulator checklist, run `make manual-m5`.
+
+## M6 — Voicing Lab
+
+Voicing Lab extends chord construction with exact MIDI pitches and the lowest bass tone: C major root position C4–E4–G4, first inversion E4–G4–C5, second inversion G4–C5–E5. **Beginner** covers four major/minor roots and three inversions (12 rounds); **All keys** covers 12 roots × two triad qualities × three inversions (72 rounds). Use the keyboard to select exact pitches, **Hear voicing** to play the target, **Check voicing** to play the attempted notes and receive feedback, and **Replay attempt** to compare. Incorrect voicings can be revised and checked again. The strict canonical exercise rejects octave displacement and extra doubled notes; these can still be classified as the same chord identity with a different voicing.
+
+Use `make manual-m6` for the short simulator acceptance checklist.
 
 ## MVP direction
 

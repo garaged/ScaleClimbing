@@ -4,6 +4,7 @@ import SwiftUI
 public struct PianoKeyboardView: View {
     public let model: PianoKeyboardModel
     public let highlightedPitchClasses: Set<PitchClass>
+    public let highlightedPitches: Set<Pitch>
     public let onKeyTap: (PianoKeyModel) -> Void
 
     public init(
@@ -13,6 +14,7 @@ public struct PianoKeyboardView: View {
     ) {
         self.model = model
         self.highlightedPitchClasses = highlightedPitchClass.map { [$0] } ?? []
+        self.highlightedPitches = []
         self.onKeyTap = onKeyTap
     }
 
@@ -23,6 +25,18 @@ public struct PianoKeyboardView: View {
     ) {
         self.model = model
         self.highlightedPitchClasses = highlightedPitchClasses
+        self.highlightedPitches = []
+        self.onKeyTap = onKeyTap
+    }
+
+    public init(
+        model: PianoKeyboardModel,
+        highlightedPitches: Set<Pitch>,
+        onKeyTap: @escaping (PianoKeyModel) -> Void
+    ) {
+        self.model = model
+        self.highlightedPitchClasses = []
+        self.highlightedPitches = highlightedPitches
         self.onKeyTap = onKeyTap
     }
 
@@ -32,7 +46,7 @@ public struct PianoKeyboardView: View {
                 ForEach(model.keys) { key in
                     PianoKeyButton(
                         key: key,
-                        isHighlighted: highlightedPitchClasses.contains(key.pitchClass),
+                        isHighlighted: highlightedPitchClasses.contains(key.pitchClass) || highlightedPitches.contains(key.pitch),
                         onTap: { onKeyTap(key) }
                     )
                 }

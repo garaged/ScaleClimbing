@@ -107,4 +107,31 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["interval.score"].label.contains("2/2"))
     }
 
+    @MainActor
+    func testVoicingLabExactPitchesAndRetryNavigation() {
+        let app = XCUIApplication()
+        app.launch()
+        app.staticTexts["Voicing Lab"].firstMatch.tap()
+        let target = app.staticTexts["voicing.target"]
+        XCTAssertTrue(target.waitForExistence(timeout: 10))
+        XCTAssertTrue(target.label.contains("Root position"))
+        XCTAssertTrue(app.staticTexts["voicing.progress"].label.contains("Round 1 of 12"))
+        XCTAssertFalse(app.buttons["voicing.check"].isEnabled)
+        XCTAssertFalse(app.buttons["voicing.replay"].isEnabled)
+
+        let c4 = app.buttons["C in octave 4"]
+        XCTAssertTrue(c4.waitForExistence(timeout: 10))
+        c4.tap()
+        XCTAssertTrue(app.buttons["voicing.check"].isEnabled)
+        app.buttons["voicing.check"].tap()
+        XCTAssertTrue(app.buttons["voicing.replay"].isEnabled)
+        XCTAssertTrue(app.staticTexts["voicing.feedback"].label.contains("Not quite"))
+        app.buttons["voicing.replay"].tap()
+
+        app.buttons["voicing.next"].tap()
+        XCTAssertTrue(app.staticTexts["voicing.target"].label.contains("First inversion"))
+        XCTAssertFalse(app.buttons["voicing.replay"].isEnabled)
+        XCTAssertTrue(app.staticTexts["voicing.progress"].label.contains("Round 2"))
+    }
+
 }

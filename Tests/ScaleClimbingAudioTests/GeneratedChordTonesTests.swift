@@ -63,3 +63,20 @@ import Testing
     #expect(GeneratedChordTones.melodicSamples(for: [c, c, c]).isEmpty)
     #expect(GeneratedChordTones.melodicSamples(for: [c,c], sampleRate: 0).isEmpty)
 }
+
+@Test func voicedAudioFrequenciesPreserveOctavesNotJustPitchClasses() {
+    let c4 = Pitch(.c, octave: 4)
+    let e4 = Pitch(.e, octave: 4)
+    let g4 = Pitch(.g, octave: 4)
+    let c5 = Pitch(.c, octave: 5)
+    let reference = GeneratedChordTones.voicedSamples(
+        for: [c4, e4, g4], sampleRate: 8_000, duration: 0.3
+    )
+    let shifted = GeneratedChordTones.voicedSamples(
+        for: [c5, e4, g4], sampleRate: 8_000, duration: 0.3
+    )
+    #expect(reference.count == 2_400)
+    #expect(reference != shifted)
+    #expect(reference.allSatisfy { $0.isFinite && abs($0) <= 0.25 })
+    #expect(GeneratedChordTones.voicedSamples(for: []).isEmpty)
+}

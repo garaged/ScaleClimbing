@@ -15,6 +15,8 @@ struct ScaleClimbingApp: App {
                 chordPlayer.play(pitch)
             }, onPlayInterval: { pitches in
                 chordPlayer.playInterval(pitches)
+            }, onPlayVoicing: { pitches in
+                chordPlayer.playVoicing(pitches)
             })
         }
     }
