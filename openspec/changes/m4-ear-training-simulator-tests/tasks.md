@@ -4,6 +4,8 @@
 - [x] Wire SwiftUI route and generated playback
 - [x] Add XCUITest target and automated simulator test
 - [ ] CI passing on exact PR head
+- [x] Add auditory Check chord, last-attempt replay, retry and tests
+- [x] Expand milestone roadmap for inversions, octave voicings, harmonics and core musicianship
 - [x] Fix Chord Forge button overflow on iPhone 17
 - [x] Add exact-octave audio feedback for Note Hunter and synthesis tests
 - [x] Add simulator navigation regression for existing M2/M3 exercises

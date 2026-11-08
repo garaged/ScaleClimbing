@@ -19,3 +19,10 @@ Adaptive scheduling, recording/microphone, MIDI, cloud sync, monetization, accou
 - Chord Forge action controls SHALL be arranged in a screen-width-adaptive two-column grid, so no button must be discovered through horizontal scrolling on iPhone 17.
 - Note Hunter SHALL play the exact octave of each tapped piano key with generated offline audio while still evaluating its pitch class.
 - UI simulator assertions SHALL cover visibility and hit-target accessibility of the Chord Forge action buttons.
+
+## M4 auditory comparison extension
+- **Check chord** SHALL evaluate and play the submitted selection regardless of correctness, without replacing the existing target reference audio.
+- A **Replay attempt** action SHALL sound the last submitted note set until cleared or advanced; editing the selection SHALL preserve the previous attempt for comparison.
+- Incorrect attempts SHALL leave the round open for immediate correction and reevaluation. Empty selections SHALL not count as an attempt or play silence.
+- Subsequent inversion/voicing/octave exercises SHALL preserve absolute pitches, rather than relying only on pitch-class sets.
+- The extended progression is documented in `docs/product/milestones.md`.

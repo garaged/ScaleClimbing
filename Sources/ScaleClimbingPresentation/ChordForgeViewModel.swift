@@ -7,6 +7,7 @@ public final class ChordForgeViewModel: ObservableObject {
     @Published public private(set) var prompt: ExercisePrompt
     @Published public private(set) var selectedPitchClasses: Set<PitchClass>
     @Published public private(set) var lastEvaluation: AnswerEvaluation?
+    @Published public private(set) var lastSubmittedPitchClasses: [PitchClass]?
     @Published public private(set) var correctCount: Int
     @Published public private(set) var attemptCount: Int
 
@@ -48,6 +49,7 @@ public final class ChordForgeViewModel: ObservableObject {
     public var instructions: String { prompt.instructions }
     public var targetPitchClasses: [PitchClass] { currentChord.pitchClasses }
     public var selectedPitchClassList: [PitchClass] { selectedPitchClasses.sorted() }
+    public var canCheckSelection: Bool { !selectedPitchClasses.isEmpty }
 
     public var roundProgressText: String {
         "Round \(chordIndex + 1) of \(chordSequence.count)"
@@ -100,7 +102,10 @@ public final class ChordForgeViewModel: ObservableObject {
     }
 
     public func submitSelection() {
-        let evaluation = ExerciseEvaluator.evaluate(.pitchClasses(selectedPitchClassList), for: prompt)
+        guard canCheckSelection else { return }
+        let submitted = selectedPitchClassList
+        lastSubmittedPitchClasses = submitted
+        let evaluation = ExerciseEvaluator.evaluate(.pitchClasses(submitted), for: prompt)
         lastEvaluation = evaluation
         attemptCount += 1
         if evaluation.isCorrect {
@@ -111,6 +116,7 @@ public final class ChordForgeViewModel: ObservableObject {
     public func clearSelection() {
         selectedPitchClasses = []
         lastEvaluation = nil
+        lastSubmittedPitchClasses = nil
     }
 
     public func advanceToNextChord() {
@@ -118,5 +124,6 @@ public final class ChordForgeViewModel: ObservableObject {
         prompt = ExerciseFactory.chordForge(root: currentChord.root, chord: currentChord.definition)
         selectedPitchClasses = []
         lastEvaluation = nil
+        lastSubmittedPitchClasses = nil
     }
 }

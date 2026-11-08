@@ -13,3 +13,8 @@ Automated XCUITest checks navigation into Note Hunter and Chord Forge as regress
 ## M4 usability fixes
 - In **Chord Forge**, verify all four controls are visible at once in a two-column grid on iPhone 17 without horizontal scrolling or cut-off buttons.
 - In **Note Hunter**, tap C4 and then C5. Both should produce audible generated tones, with C5 an octave higher; note scoring remains unchanged from M3.
+
+## Chord comparison quick check
+1. In Chord Forge tap **Hear chord**, then choose a wrong set of notes (e.g., C, E, A) and **Check chord**. The selected notes should play automatically even when the answer is wrong, without advancing the round.
+2. Tap **Hear chord** to compare the reference and **Replay attempt** to hear the checked notes again; adjust A to G and retry **Check chord**. Confirm correct feedback and that the new attempted notes play.
+3. Tap **Clear** or **Next chord**; **Replay attempt** must reset. Checking an empty selection should be disabled.

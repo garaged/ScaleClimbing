@@ -91,8 +91,22 @@ public struct ChordForgeGameView: View {
 
             Button("Check chord") {
                 viewModel.submitSelection()
+                if let attempted = viewModel.lastSubmittedPitchClasses {
+                    onPlayChord(attempted)
+                }
             }
+            .disabled(!viewModel.canCheckSelection)
             .buttonStyle(.borderedProminent)
+            .accessibilityHint("Check and hear the selected notes. If incorrect, adjust the notes and try again.")
+
+            Button("Replay attempt") {
+                if let attempted = viewModel.lastSubmittedPitchClasses {
+                    onPlayChord(attempted)
+                }
+            }
+            .disabled(viewModel.lastSubmittedPitchClasses == nil)
+            .buttonStyle(.bordered)
+            .accessibilityHint("Hear the last checked selection again to compare with Hear chord.")
 
             Button("Clear") {
                 viewModel.clearSelection()
