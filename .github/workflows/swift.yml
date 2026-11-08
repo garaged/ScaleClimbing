@@ -28,3 +28,14 @@ jobs:
         run: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
       - name: Build checked-in app and scheme
         run: make ios-build
+
+  ios-ui-tests:
+    name: iPhone Simulator UI acceptance
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select full Xcode
+        run: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+      - name: Run simulator UI acceptance
+        run: make ios-ui-test
