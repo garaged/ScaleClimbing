@@ -120,7 +120,7 @@
     outputPaths = ();
     runOnlyForDeploymentPostprocessing = 0;
     shellPath = /bin/sh;
-    shellScript = "set -eu\n/usr/bin/xcrun swift \"${PROJECT_DIR}/../../scripts/generate-app-icon.swift\" \"${PROJECT_DIR}/Assets.xcassets/AppIcon.appiconset/AppIcon.png\"\n";
+    shellScript = "set -eu\n/usr/bin/env -u SDKROOT -u SDK_NAME -u PLATFORM_NAME /usr/bin/xcrun --sdk macosx swift -sdk \"$(/usr/bin/xcrun --sdk macosx --show-sdk-path)\" \"${PROJECT_DIR}/../../scripts/generate-app-icon.swift\" \"${PROJECT_DIR}/Assets.xcassets/AppIcon.appiconset/AppIcon.png\"\n";
   };
 /* End PBXShellScriptBuildPhase section */
 
