@@ -25,4 +25,6 @@ For deterministic behavior:
 
 ## Pull request rule
 
+Use one branch and one draft PR per coherent milestone by default. Keep the PR draft while the milestone is partial, use bounded commits inside that PR, and make it ready only after automated validation and required manual acceptance are complete. Split a milestone only for a clear risk, dependency, security concern, or review-size reason.
+
 A PR is not ready until it maps implementation to intent, tests, docs/specs, and security/privacy impact.
