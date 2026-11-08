@@ -12,17 +12,24 @@
 - Responsive Chord Forge controls, exact-octave Note Hunter key sounds, minimal app icon.
 - Simulator UI regression coverage and short manual audio/accessibility acceptance.
 
-## M5 — Pitch and interval ear training (active)
+## M5 — Pitch and interval ear training (completed)
 - Interval Trail: blind sequential two-note ear training with ordered absolute pitch and three skills: up/down/same, semitone distance, and pitch equality across octaves.
 - Deterministic offline audio notes, silence gap, scored answers and explanation only after answer; Swift/domain/audio/XCUITest coverage.
 - Manual audio and accessibility acceptance before merge.
+
+## M6 — Chord inversions and voiced-pitch construction (active)
+- New **Voicing Lab** constructs root, first and second inversions using exact notes and octaves.
+- Offline **Hear voicing**, **Check voicing**, and **Replay attempt** facilitate listening comparison and correction.
+- Beginner catalog (12 rounds) and All keys (72 rounds): twelve chromatic roots × major/minor × three inversions.
+- Chord identity, inversion bass and strict close-position scoring remain separate so octave displacements and doubled notes are explained rather than silently accepted.
+- CI, iPhone UI regression and brief in-app listening acceptance gate.
 
 ## Planned learning milestones
 
 | Stage | Skills and variants | Learning outcome |
 |---|---|---|
 | M5 — Pitch and interval ear training | Active: Interval Trail implements semitones, direction, octave equivalence vs exact pitch | Distinguish interval distance, direction, pitch class and actual octave |
-| M6 — Chord foundations and inversions | Major/minor in every key, root position, first and second inversions, voicing and doubling | Hear and construct the same chord with different bass notes and octave placement |
+| M6 — Chord foundations and inversions | Active: canonical triads, all 12 keys, major/minor, root/first/second inversion, octave-sensitive voicing and doubled-tone classification | Hear and construct the same chord with different bass notes and octave placement |
 | M7 — Chord vocabulary | Diminished and augmented triads, sus2/sus4, power chords, dominant/major/minor/diminished sevenths | Recognize chord quality and harmonic function beyond basic triads |
 | M8 — Scales, modes and keys | Major, natural/harmonic/melodic minor; pentatonic and blues; diatonic modes; key signatures and circle of fifths | Build, recognize and hear fundamental scales and modes |
 | M9 — Harmony and progressions | Diatonic triads and sevenths, Roman numerals, cadences, tonic/dominant, inversions in context, transposition | Recognize relationships and harmonic movement instead of isolated chords |
