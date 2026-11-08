@@ -24,6 +24,20 @@ public enum GeneratedChordTones {
         samples(frequencies: [frequency(for: pitch)], sampleRate: sampleRate, duration: duration)
     }
 
+    /// Ordered melodic notes: each note decays before a deliberate silent interval.
+    public static func melodicSamples(
+        for pitches: [Pitch],
+        sampleRate: Double = 44_100,
+        noteDuration: Double = 0.45,
+        gapDuration: Double = 0.16
+    ) -> [Float] {
+        guard pitches.count == 2, sampleRate > 0, noteDuration > 0, gapDuration >= 0 else { return [] }
+        let first = samples(for: pitches[0], sampleRate: sampleRate, duration: noteDuration)
+        let gapCount = Int((sampleRate * gapDuration).rounded(.down))
+        let second = samples(for: pitches[1], sampleRate: sampleRate, duration: noteDuration)
+        return first + Array(repeating: Float.zero, count: gapCount) + second
+    }
+
     public static func frequency(for pitch: Pitch) -> Double {
         440.0 * pow(2.0, (Double(pitch.midiNumber) - 69.0) / 12.0)
     }
@@ -64,6 +78,10 @@ public final class GeneratedChordPlayer {
 
     public func play(_ pitch: Pitch) {
         playSamples(GeneratedChordTones.samples(for: pitch, sampleRate: sampleRate))
+    }
+
+    public func playInterval(_ pitches: [Pitch]) {
+        playSamples(GeneratedChordTones.melodicSamples(for: pitches, sampleRate: sampleRate))
     }
 
     private func playSamples(_ samples: [Float]) {

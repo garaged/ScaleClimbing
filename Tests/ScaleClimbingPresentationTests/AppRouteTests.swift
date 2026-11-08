@@ -28,3 +28,9 @@ import Testing
     #expect(AppRoute.earTraining.title == "Ear Training")
     #expect(AppRoute.earTraining.regionTitle == "Triad Cliffs")
 }
+
+@Test func intervalTrailRouteHasDistinctListeningRegion() {
+    #expect(AppRoute.intervalTrail.title == "Interval Trail")
+    #expect(AppRoute.intervalTrail.regionTitle == "Interval Ridge")
+    #expect(AppRoute.allCases.contains(.intervalTrail))
+}

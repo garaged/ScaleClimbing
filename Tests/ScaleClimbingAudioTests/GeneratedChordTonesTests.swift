@@ -37,3 +37,29 @@ import Testing
     #expect(samples.allSatisfy { $0.isFinite && abs($0) <= 0.25 })
     #expect(samples.contains { abs($0) > 0.05 })
 }
+
+@Test func melodicAudioPreservesNoteOrderGapAndLength() {
+    let sampleRate = 8_000.0
+    let first = Pitch(.c, octave: 4)
+    let second = Pitch(.c, octave: 5)
+    let noteCount = 800
+    let gapCount = 160
+    let samples = GeneratedChordTones.melodicSamples(
+        for: [first, second], sampleRate: sampleRate, noteDuration: 0.1, gapDuration: 0.02
+    )
+    #expect(samples.count == 2 * noteCount + gapCount)
+    #expect(samples[noteCount..<(noteCount + gapCount)].allSatisfy { $0 == 0 })
+    let firstExpected = GeneratedChordTones.samples(for: first, sampleRate: sampleRate, duration: 0.1)
+    let secondExpected = GeneratedChordTones.samples(for: second, sampleRate: sampleRate, duration: 0.1)
+    #expect(Array(samples[0..<noteCount]) == firstExpected)
+    #expect(Array(samples[(noteCount + gapCount)...]) == secondExpected)
+    #expect(samples.allSatisfy { $0.isFinite && abs($0) <= 0.25 })
+}
+
+@Test func melodicAudioRejectsIncompleteOrInvalidSequences() {
+    let c = Pitch(.c, octave: 4)
+    #expect(GeneratedChordTones.melodicSamples(for: []).isEmpty)
+    #expect(GeneratedChordTones.melodicSamples(for: [c]).isEmpty)
+    #expect(GeneratedChordTones.melodicSamples(for: [c, c, c]).isEmpty)
+    #expect(GeneratedChordTones.melodicSamples(for: [c,c], sampleRate: 0).isEmpty)
+}
