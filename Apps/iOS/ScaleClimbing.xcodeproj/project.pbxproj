@@ -1,0 +1,178 @@
+// !$*UTF8*$!
+{
+ archiveVersion = 1;
+ classes = {};
+ objectVersion = 56;
+ objects = {
+
+/* Begin PBXBuildFile section */
+  A00000000000000000000001 /* ScaleClimbingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000002 /* ScaleClimbingApp.swift */; };
+  A00000000000000000000003 /* ScaleClimbingPresentation in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000004 /* ScaleClimbingPresentation */; };
+  A00000000000000000000015 /* ScaleClimbingAudio in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000016 /* ScaleClimbingAudio */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+  A00000000000000000000002 /* ScaleClimbingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaleClimbingApp.swift; sourceTree = "<group>"; };
+  A00000000000000000000005 /* ScaleClimbing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScaleClimbing.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+  A00000000000000000000006 /* Frameworks */ = {
+    isa = PBXFrameworksBuildPhase;
+    buildActionMask = 2147483647;
+    files = ( A00000000000000000000003 /* ScaleClimbingPresentation in Frameworks */, A00000000000000000000015 /* ScaleClimbingAudio in Frameworks */, );
+    runOnlyForDeploymentPostprocessing = 0;
+  };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+  A00000000000000000000007 = {
+    isa = PBXGroup;
+    children = ( A00000000000000000000008 /* ScaleClimbing */, A00000000000000000000009 /* Products */, );
+    sourceTree = "<group>";
+  };
+  A00000000000000000000008 /* ScaleClimbing */ = {
+    isa = PBXGroup;
+    children = ( A00000000000000000000002 /* ScaleClimbingApp.swift */, );
+    name = ScaleClimbing;
+    sourceTree = "<group>";
+  };
+  A00000000000000000000009 /* Products */ = {
+    isa = PBXGroup;
+    children = ( A00000000000000000000005 /* ScaleClimbing.app */, );
+    name = Products;
+    sourceTree = "<group>";
+  };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+  A0000000000000000000000A /* ScaleClimbing */ = {
+    isa = PBXNativeTarget;
+    buildConfigurationList = A0000000000000000000000B /* Build configuration list for PBXNativeTarget "ScaleClimbing" */;
+    buildPhases = ( A0000000000000000000000C /* Sources */, A00000000000000000000006 /* Frameworks */, A0000000000000000000000D /* Resources */, );
+    buildRules = ();
+    dependencies = ();
+    name = ScaleClimbing;
+    packageProductDependencies = ( A00000000000000000000004 /* ScaleClimbingPresentation */, A00000000000000000000016 /* ScaleClimbingAudio */, );
+    productName = ScaleClimbing;
+    productReference = A00000000000000000000005 /* ScaleClimbing.app */;
+    productType = "com.apple.product-type.application";
+  };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+  A0000000000000000000000E /* Project object */ = {
+    isa = PBXProject;
+    attributes = {
+      BuildIndependentTargetsInParallel = 1;
+      LastUpgradeCheck = 1600;
+      TargetAttributes = { A0000000000000000000000A = { CreatedOnToolsVersion = 16.0; }; };
+    };
+    buildConfigurationList = A0000000000000000000000F /* Build configuration list for PBXProject "ScaleClimbing" */;
+    compatibilityVersion = "Xcode 14.0";
+    developmentRegion = en;
+    hasScannedForEncodings = 0;
+    knownRegions = ( en, Base, );
+    mainGroup = A00000000000000000000007;
+    packageReferences = ( A00000000000000000000010 /* Local ScaleClimbing package */, );
+    productRefGroup = A00000000000000000000009;
+    projectDirPath = "";
+    projectRoot = "";
+    targets = ( A0000000000000000000000A /* ScaleClimbing */, );
+  };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+  A0000000000000000000000D /* Resources */ = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+  A0000000000000000000000C /* Sources */ = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = ( A00000000000000000000001 /* ScaleClimbingApp.swift in Sources */, ); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+  A00000000000000000000011 /* Debug */ = { isa = XCBuildConfiguration; buildSettings = {
+    ONLY_ACTIVE_ARCH = YES;
+    SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+    ALWAYS_SEARCH_USER_PATHS = NO;
+    CLANG_ENABLE_MODULES = YES;
+    CODE_SIGN_STYLE = Automatic;
+    DEVELOPMENT_TEAM = T3CCJTUTJ5;
+    IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+    SDKROOT = iphoneos;
+    SWIFT_VERSION = 6.0;
+  }; name = Debug; };
+  A00000000000000000000012 /* Release */ = { isa = XCBuildConfiguration; buildSettings = {
+    ALWAYS_SEARCH_USER_PATHS = NO;
+    CLANG_ENABLE_MODULES = YES;
+    CODE_SIGN_STYLE = Automatic;
+    DEVELOPMENT_TEAM = T3CCJTUTJ5;
+    IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+    SDKROOT = iphoneos;
+    SWIFT_VERSION = 6.0;
+  }; name = Release; };
+  A00000000000000000000013 /* Debug */ = { isa = XCBuildConfiguration; buildSettings = {
+    ONLY_ACTIVE_ARCH = YES;
+    SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+    CODE_SIGN_STYLE = Automatic;
+    DEVELOPMENT_TEAM = T3CCJTUTJ5;
+    ENABLE_PREVIEWS = YES;
+    GENERATE_INFOPLIST_FILE = YES;
+    INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+    INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+    INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+    INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+    INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+    IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+    LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+    MARKETING_VERSION = 0.3.0;
+    CURRENT_PROJECT_VERSION = 1;
+    PRODUCT_BUNDLE_IDENTIFIER = org.garaged.ScaleClimbing;
+    PRODUCT_NAME = "$(TARGET_NAME)";
+    SDKROOT = iphoneos;
+    SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+    SUPPORTS_MACCATALYST = NO;
+    SWIFT_EMIT_LOC_STRINGS = YES;
+    SWIFT_VERSION = 6.0;
+    TARGETED_DEVICE_FAMILY = "1,2";
+  }; name = Debug; };
+  A00000000000000000000014 /* Release */ = { isa = XCBuildConfiguration; buildSettings = {
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+    CODE_SIGN_STYLE = Automatic;
+    DEVELOPMENT_TEAM = T3CCJTUTJ5;
+    GENERATE_INFOPLIST_FILE = YES;
+    INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+    INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+    INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+    IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+    LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+    MARKETING_VERSION = 0.3.0;
+    CURRENT_PROJECT_VERSION = 1;
+    PRODUCT_BUNDLE_IDENTIFIER = org.garaged.ScaleClimbing;
+    PRODUCT_NAME = "$(TARGET_NAME)";
+    SDKROOT = iphoneos;
+    SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+    SUPPORTS_MACCATALYST = NO;
+    SWIFT_EMIT_LOC_STRINGS = YES;
+    SWIFT_VERSION = 6.0;
+    TARGETED_DEVICE_FAMILY = "1,2";
+  }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+  A0000000000000000000000B /* Target configurations */ = { isa = XCConfigurationList; buildConfigurations = ( A00000000000000000000013 /* Debug */, A00000000000000000000014 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+  A0000000000000000000000F /* Project configurations */ = { isa = XCConfigurationList; buildConfigurations = ( A00000000000000000000011 /* Debug */, A00000000000000000000012 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+  A00000000000000000000010 /* Local ScaleClimbing package */ = { isa = XCLocalSwiftPackageReference; relativePath = ../..; };
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+  A00000000000000000000004 /* ScaleClimbingPresentation */ = { isa = XCSwiftPackageProductDependency; package = A00000000000000000000010 /* Local ScaleClimbing package */; productName = ScaleClimbingPresentation; };
+  A00000000000000000000016 /* ScaleClimbingAudio */ = { isa = XCSwiftPackageProductDependency; package = A00000000000000000000010 /* Local ScaleClimbing package */; productName = ScaleClimbingAudio; };
+/* End XCSwiftPackageProductDependency section */
+ };
+ rootObject = A0000000000000000000000E /* Project object */;
+}

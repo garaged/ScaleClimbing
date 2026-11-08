@@ -1,10 +1,16 @@
+import MusicTheoryCore
 import SwiftUI
 
 public struct ChordForgeGameView: View {
     @StateObject private var viewModel: ChordForgeViewModel
+    private let onPlayChord: ([PitchClass]) -> Void
 
-    public init(viewModel: @autoclosure @escaping () -> ChordForgeViewModel = ChordForgeViewModel()) {
+    public init(
+        viewModel: @autoclosure @escaping () -> ChordForgeViewModel = ChordForgeViewModel(),
+        onPlayChord: @escaping ([PitchClass]) -> Void = { _ in }
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel())
+        self.onPlayChord = onPlayChord
     }
 
     public var body: some View {
@@ -76,7 +82,14 @@ public struct ChordForgeGameView: View {
     }
 
     private var controls: some View {
-        HStack(spacing: 12) {
+        ScrollView(.horizontal) {
+            HStack(spacing: 12) {
+            Button("Hear chord") {
+                onPlayChord(viewModel.targetPitchClasses)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityHint("Play the target chord using generated tones")
+
             Button("Check chord") {
                 viewModel.submitSelection()
             }
@@ -91,8 +104,9 @@ public struct ChordForgeGameView: View {
                 viewModel.advanceToNextChord()
             }
             .buttonStyle(.bordered)
+            }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
 }
 

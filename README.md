@@ -1,26 +1,28 @@
 # ScaleClimbing
 
-ScaleClimbing is an iOS-first music-learning game for building fluency with notes, intervals, chords, and scales through visual practice and ear-training challenges.
+ScaleClimbing is an offline-first iOS music learning game for notes and triads.
 
-The product goal is to make music theory feel like skill-based play: short rounds, immediate audio/visual feedback, adaptive progression, and variety across visual recognition, listening, construction, and memory.
+## Open and run the iOS app
 
-## Current milestone
+1. Install full Xcode (not just Command Line Tools).
+2. Open `Apps/iOS/ScaleClimbing.xcodeproj`.
+3. Choose the shared **ScaleClimbing** scheme and an iPhone simulator.
+4. Press **Cmd-R**.
 
-**M0 — robust MVP foundation**
+The app includes **Note Hunter** and **Chord Forge**. Chord Forge can play the current target triad using locally generated tones; it does not require microphone permission, a network connection, or third-party audio assets.
 
-This baseline establishes:
+### CLI build and test
 
-- Product direction and MVP scope
-- OpenSpec intent and behavioral requirements
-- SDD/TDD/IDD engineering workflow
-- Swift package foundation
-- Pure music-theory domain model
-- Exercise generation and answer validation
-- Swift Testing coverage for notes, intervals, scales, chords, and exercises
-- Makefile local validation commands
-- CI workflow mirroring local validation
-- Security and privacy baseline checks
-- Manual acceptance checklist
+```bash
+make check
+make ios-build
+```
+
+CI runs both gates. To review the short combined M2/M3 manual check, use `make manual-m3`. Full M2 scenarios remain in `docs/engineering/manual-testing-m2.md`.
+
+**Pull request workflow:** One draft PR per milestone. M3 is stacked on unmerged M2; after combined manual acceptance, merge M2 and then M3. Never merge an unaccepted milestone solely to make downstream work easier.
+
+---
 
 ## MVP direction
 
