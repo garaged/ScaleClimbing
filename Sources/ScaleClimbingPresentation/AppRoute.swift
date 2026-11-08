@@ -2,6 +2,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
     case noteHunter
     case chordForge
     case earTraining
+    case intervalTrail
 
     public var id: String { rawValue }
 
@@ -13,6 +14,8 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return "Chord Forge"
         case .earTraining:
             return "Ear Training"
+        case .intervalTrail:
+            return "Interval Trail"
         }
     }
 
@@ -24,6 +27,8 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return "Build major and minor triads on the keyboard."
         case .earTraining:
             return "Hear a chord and identify major or minor."
+        case .intervalTrail:
+            return "Hear note direction, distance and octave differences."
         }
     }
 
@@ -35,6 +40,8 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return "Triad Cliffs"
         case .earTraining:
             return "Triad Cliffs"
+        case .intervalTrail:
+            return "Interval Ridge"
         }
     }
 }
