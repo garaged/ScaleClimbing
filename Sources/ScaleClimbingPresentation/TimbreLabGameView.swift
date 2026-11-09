@@ -170,7 +170,7 @@ public struct TimbreLabGameView: View {
                 columns: Array(repeating: GridItem(.flexible()), count: 3),
                 spacing: 10
             ) {
-                ForEach(viewModel.harmonicSeries.partials) { partial in
+                ForEach(viewModel.harmonicSeries.partials, id: \.harmonicNumber) { partial in
                     let selected = viewModel.selectedHarmonics.contains(
                         partial.harmonicNumber
                     )
