@@ -170,17 +170,16 @@ public struct TimbreLabGameView: View {
                 columns: Array(repeating: GridItem(.flexible()), count: 3),
                 spacing: 10
             ) {
-                ForEach(viewModel.harmonicSeries.partials, id: \.harmonicNumber) { partial in
+                ForEach(1...viewModel.harmonicSeries.partialCount, id: \.self) {
+                    harmonicNumber in
                     let selected = viewModel.selectedHarmonics.contains(
-                        partial.harmonicNumber
+                        harmonicNumber
                     )
-                    Button("Partial \(partial.harmonicNumber)") {
-                        viewModel.toggleHarmonic(partial.harmonicNumber)
+                    Button("Partial \(harmonicNumber)") {
+                        viewModel.toggleHarmonic(harmonicNumber)
                     }
                     .buttonStyle(selected ? .borderedProminent : .bordered)
-                    .accessibilityIdentifier(
-                        "timbre.partial.\(partial.harmonicNumber)"
-                    )
+                    .accessibilityIdentifier("timbre.partial.\(harmonicNumber)")
                 }
             }
 
