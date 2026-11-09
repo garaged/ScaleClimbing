@@ -114,6 +114,72 @@ public enum GeneratedChordTones {
         }
     }
 
+    /// Additive synthesis keeps the fundamental stable while profile amplitudes
+    /// change the spectral balance. Output is peak-normalized for fair A/B listening.
+    public static func timbreSamples(
+        for profile: TimbreProfile,
+        fundamentalFrequency: Double = 220,
+        sampleRate: Double = 44_100,
+        duration: Double = 1.2
+    ) -> [Float] {
+        additiveSamples(
+            fundamentalFrequency: fundamentalFrequency,
+            components: profile.components,
+            sampleRate: sampleRate,
+            duration: duration
+        )
+    }
+
+    public static func tuningSamples(
+        for comparison: TuningComparison,
+        sampleRate: Double = 44_100,
+        duration: Double = 1.2
+    ) -> [Float] {
+        additiveSamples(
+            frequencies: [comparison.rootFrequency, comparison.upperFrequency],
+            amplitudes: [1, 1],
+            sampleRate: sampleRate,
+            duration: duration
+        )
+    }
+
+    public static func beatingSamples(
+        for example: BeatingExample = BeatingExample(),
+        sampleRate: Double = 44_100,
+        duration: Double = 1.6
+    ) -> [Float] {
+        additiveSamples(
+            frequencies: [example.baseFrequency, example.detunedFrequency],
+            amplitudes: [1, 1],
+            sampleRate: sampleRate,
+            duration: duration
+        )
+    }
+
+    public static func timbrePlaybackSamples(
+        for playback: TimbrePlayback,
+        sampleRate: Double = 44_100
+    ) -> [Float] {
+        switch playback {
+        case .profile(let profile):
+            return timbreSamples(for: profile, sampleRate: sampleRate)
+        case .octave:
+            return additiveSamples(
+                frequencies: [220, 440],
+                amplitudes: [1, 1],
+                sampleRate: sampleRate,
+                duration: 1.2
+            )
+        case .tuning(let reference):
+            return tuningSamples(
+                for: TuningComparison(reference: reference),
+                sampleRate: sampleRate
+            )
+        case .beating:
+            return beatingSamples(sampleRate: sampleRate)
+        }
+    }
+
     public static func frequency(for pitch: Pitch) -> Double {
         440.0 * pow(2.0, (Double(pitch.midiNumber) - 69.0) / 12.0)
     }
@@ -140,6 +206,59 @@ public enum GeneratedChordTones {
                 + 0.22 * sin(2.0 * Double.pi * overtoneFrequency * time)
             return Float(wave * attack * decay * gain)
         }
+    }
+
+    private static func additiveSamples(
+        fundamentalFrequency: Double,
+        components: [HarmonicComponent],
+        sampleRate: Double,
+        duration: Double
+    ) -> [Float] {
+        guard fundamentalFrequency > 0 else { return [] }
+        return additiveSamples(
+            frequencies: components.map {
+                fundamentalFrequency * Double($0.harmonicNumber)
+            },
+            amplitudes: components.map(\.relativeAmplitude),
+            sampleRate: sampleRate,
+            duration: duration
+        )
+    }
+
+    private static func additiveSamples(
+        frequencies: [Double],
+        amplitudes: [Double],
+        sampleRate: Double,
+        duration: Double
+    ) -> [Float] {
+        guard
+            sampleRate > 0,
+            duration > 0,
+            !frequencies.isEmpty,
+            frequencies.count == amplitudes.count,
+            frequencies.allSatisfy({ $0 > 0 }),
+            amplitudes.allSatisfy({ $0 > 0 })
+        else {
+            return []
+        }
+
+        let frameCount = Int((sampleRate * duration).rounded(.down))
+        guard frameCount > 0 else { return [] }
+
+        let raw: [Float] = (0..<frameCount).map { frame in
+            let time = Double(frame) / sampleRate
+            let attack = min(1.0, time / 0.020)
+            let release = min(1.0, (duration - time) / 0.080)
+            let envelope = max(0.0, min(attack, release))
+            let wave = zip(frequencies, amplitudes).reduce(0.0) { total, pair in
+                total + pair.1 * sin(2.0 * Double.pi * pair.0 * time)
+            }
+            return Float(wave * envelope)
+        }
+
+        let peak = raw.reduce(0.0) { max($0, abs(Double($1))) }
+        guard peak > 0 else { return raw }
+        return raw.map { Float(Double($0) * 0.25 / peak) }
     }
 
     private static func samples(
@@ -205,6 +324,15 @@ public final class GeneratedChordPlayer {
 
     public func playRhythm(_ pattern: RhythmPattern) {
         playSamples(GeneratedChordTones.rhythmSamples(for: pattern, sampleRate: sampleRate))
+    }
+
+    public func playTimbre(_ playback: TimbrePlayback) {
+        playSamples(
+            GeneratedChordTones.timbrePlaybackSamples(
+                for: playback,
+                sampleRate: sampleRate
+            )
+        )
     }
 
     private func playSamples(_ samples: [Float]) {
