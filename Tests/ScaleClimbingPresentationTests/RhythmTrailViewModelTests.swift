@@ -3,33 +3,52 @@ import MusicTheoryCore
 import Testing
 
 @MainActor
-@Test func explorerShowsGroupingAndMeter() {
-    let vm = RhythmTrailViewModel()
-    #expect(vm.promptText == "4/4 meter")
-    #expect(vm.pulseText == "● ○ ● ○ ● ○ ● ○")
+@Test func explorerShowsGroupingMeterAndComfortableTempo() {
+    let viewModel = RhythmTrailViewModel()
+
+    #expect(viewModel.promptText == "4/4 meter")
+    #expect(viewModel.pulseText == "● ○ ● ○ ● ○ ● ○")
+    #expect(viewModel.tempo == .comfortable)
+    #expect(viewModel.pattern.tempo.beatsPerMinute == 108)
 }
 
 @MainActor
 @Test func listenerIsBlindAndOnlyScoresFirstAnswer() {
-    let vm = RhythmTrailViewModel()
-    vm.selectMode(.listen)
-    #expect(vm.promptText == "Which meter is this?")
-    vm.chooseMeter(.threeFour)
-    #expect(vm.lastWasCorrect == false)
-    #expect(vm.attemptCount == 1)
-    vm.chooseMeter(.fourFour)
-    #expect(vm.attemptCount == 1)
+    let viewModel = RhythmTrailViewModel()
+    viewModel.selectMode(.listen)
+
+    #expect(viewModel.promptText == "Which meter is this?")
+    viewModel.chooseMeter(.threeFour)
+    #expect(viewModel.lastWasCorrect == false)
+    #expect(viewModel.attemptCount == 1)
+    viewModel.chooseMeter(.fourFour)
+    #expect(viewModel.attemptCount == 1)
 }
 
 @MainActor
 @Test func tapModeRetriesPulseCompletion() {
-    let vm = RhythmTrailViewModel()
-    vm.selectMode(.tap)
-    vm.tapPulse(); vm.tapPulse(); vm.tapPulse()
-    vm.checkTapPattern()
-    #expect(vm.lastWasCorrect == false)
-    vm.tapPulse()
-    vm.checkTapPattern()
-    #expect(vm.lastWasCorrect == true)
-    #expect(vm.scoreText == "1/2 correct")
+    let viewModel = RhythmTrailViewModel()
+    viewModel.selectMode(.tap)
+    viewModel.tapPulse()
+    viewModel.tapPulse()
+    viewModel.tapPulse()
+    viewModel.checkTapPattern()
+
+    #expect(viewModel.lastWasCorrect == false)
+    viewModel.tapPulse()
+    viewModel.checkTapPattern()
+
+    #expect(viewModel.lastWasCorrect == true)
+    #expect(viewModel.scoreText == "1/2 correct")
+}
+
+@MainActor
+@Test func tempoSelectionChangesPlaybackPatternWithoutResettingProgress() {
+    let viewModel = RhythmTrailViewModel()
+    viewModel.selectMode(.listen)
+    viewModel.selectTempo(.easy)
+
+    #expect(viewModel.tempo == .easy)
+    #expect(viewModel.pattern.tempo == .easy)
+    #expect(viewModel.attemptCount == 0)
 }

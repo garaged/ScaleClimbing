@@ -93,16 +93,15 @@ public enum GeneratedChordTones {
     public static func rhythmSamples(
         for pattern: RhythmPattern,
         sampleRate: Double = 44_100,
-        clickDuration: Double = 0.10,
-        gapDuration: Double = 0.13
+        clickDuration: Double = 0.10
     ) -> [Float] {
-        guard sampleRate > 0, clickDuration > 0, gapDuration >= 0 else {
+        guard sampleRate > 0, clickDuration > 0 else {
             return []
         }
 
         let gap = Array(
             repeating: Float.zero,
-            count: Int((sampleRate * gapDuration).rounded(.down))
+            count: Int((sampleRate * pattern.interClickGap(after: clickDuration)).rounded(.down))
         )
 
         return pattern.clicks.enumerated().flatMap { index, click in

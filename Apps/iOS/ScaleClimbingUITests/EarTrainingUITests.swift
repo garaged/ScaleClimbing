@@ -314,6 +314,11 @@ final class EarTrainingUITests: XCTestCase {
         let app = XCUIApplication(); app.launch(); openRhythmTrail(in: app)
         XCTAssertTrue(app.staticTexts["rhythm.prompt"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["rhythm.prompt"].label.contains("4/4"))
+        let tempoControl = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == %@", "rhythm.tempo"))
+            .firstMatch
+        XCTAssertTrue(tempoControl.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["rhythm.tempo.detail"].label.contains("108 BPM"))
         app.segmentedControls["rhythm.mode"].buttons["Listen"].tap()
         XCTAssertTrue(app.staticTexts["rhythm.prompt"].label.contains("Which meter"))
         app.buttons["rhythm.answer.4-4"].tap()

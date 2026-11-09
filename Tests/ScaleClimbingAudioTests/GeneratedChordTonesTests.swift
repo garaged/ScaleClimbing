@@ -82,15 +82,14 @@ import Testing
 
 @Test func generatedRhythmClicksAreAudibleAndKeepEverySubdivision() {
     let sampleRate = 8_000.0
-    let pattern = RhythmPattern(meter: .fourFour)
+    let pattern = RhythmPattern(meter: .fourFour, tempo: .comfortable)
     let clickFrames = 800
-    let gapFrames = 1_040
+    let gapFrames = Int((sampleRate * pattern.interClickGap(after: 0.1)).rounded(.down))
 
     let samples = GeneratedChordTones.rhythmSamples(
         for: pattern,
         sampleRate: sampleRate,
-        clickDuration: 0.1,
-        gapDuration: 0.13
+        clickDuration: 0.1
     )
 
     #expect(samples.count == pattern.clicks.count * clickFrames + (pattern.clicks.count - 1) * gapFrames)
@@ -101,4 +100,19 @@ import Testing
         let start = index * (clickFrames + gapFrames)
         #expect(samples[start..<(start + clickFrames)].contains { abs($0) > 0.25 })
     }
+}
+
+
+@Test func slowerRhythmTempoProducesACompleteLongerClickTrack() {
+    let slow = GeneratedChordTones.rhythmSamples(
+        for: RhythmPattern(meter: .fourFour, tempo: .easy),
+        sampleRate: 8_000
+    )
+    let fast = GeneratedChordTones.rhythmSamples(
+        for: RhythmPattern(meter: .fourFour, tempo: .lively),
+        sampleRate: 8_000
+    )
+
+    #expect(!slow.isEmpty)
+    #expect(slow.count > fast.count)
 }

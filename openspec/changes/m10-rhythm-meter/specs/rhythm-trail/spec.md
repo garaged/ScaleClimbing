@@ -6,6 +6,8 @@ The domain SHALL define note/rest durations, beat subdivisions and 2/4, 3/4, 4/4
 - Each meter SHALL expose beat count, subdivision grouping, accented pulse positions and a stable identifier.
 - Simple meters SHALL group subdivisions in twos; 6/8 SHALL group six eighth notes as 3+3.
 - Generated click patterns SHALL be deterministic and retain accent information.
+- Rhythm Trail SHALL offer accessible named BPM tempo choices of 80, 100, 108 and 120 BPM, defaulting to 108 BPM.
+- The selected BPM SHALL determine the spacing of every subdivision; simple meters divide each beat in two and 6/8 divides each dotted-quarter pulse in three.
 
 ## Rhythm Trail practice
 - **Explore** SHALL disclose the selected meter's grouping and pulse pattern.
@@ -15,6 +17,6 @@ The domain SHALL define note/rest durations, beat subdivisions and 2/4, 3/4, 4/4
 - The UI SHALL expose stable accessibility identifiers and remain usable on an iPhone simulator.
 
 ## Validation
-- Tests SHALL cover meter grouping, accents, deterministic click generation and presentation score/retry state.
+- Tests SHALL cover meter grouping, accents, BPM-derived deterministic click spacing and presentation score/retry state.
 - iPhone UI coverage SHALL prove route entry, blind listening and tap retry.
 - Manual acceptance SHALL check audible accents, visual pulse and VoiceOver.

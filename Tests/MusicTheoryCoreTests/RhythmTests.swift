@@ -14,3 +14,21 @@ import Testing
     #expect(pattern.clicks.count == 6)
     #expect(pattern.clicks.filter(\.isAccent).map(\.subdivisionIndex) == [0, 3])
 }
+
+@Test func comfortableTempoIsTheDefaultAndUsesMeterAwareSubdivisionSpacing() {
+    let simple = RhythmPattern(meter: .fourFour)
+    let compound = RhythmPattern(meter: .sixEight)
+
+    #expect(simple.tempo == .comfortable)
+    #expect(simple.tempo.beatsPerMinute == 108)
+    #expect(abs(simple.secondsPerSubdivision - (60.0 / 216.0)) < 0.000_001)
+    #expect(abs(compound.secondsPerSubdivision - (60.0 / 324.0)) < 0.000_001)
+}
+
+@Test func slowerTempoCreatesLongerSubdivisionSpacing() {
+    let easy = RhythmPattern(meter: .fourFour, tempo: .easy)
+    let lively = RhythmPattern(meter: .fourFour, tempo: .lively)
+
+    #expect(easy.secondsPerSubdivision > lively.secondsPerSubdivision)
+    #expect(easy.interClickGap(after: 0.1) > lively.interClickGap(after: 0.1))
+}
