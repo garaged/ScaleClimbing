@@ -103,6 +103,10 @@ public struct TimbreLabGameView: View {
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("timbre.tuning")
 
+            Text("An octave doubles frequency while keeping the same note name.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
             Button("Hear octave displacement") {
                 onPlayTimbre(.octave)
             }
@@ -127,6 +131,10 @@ public struct TimbreLabGameView: View {
             }
             .buttonStyle(.bordered)
             .accessibilityIdentifier("timbre.beating")
+
+            Text("Beating is the audible rise and fall from two nearby frequencies.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
     }
 

@@ -50,6 +50,18 @@ Harmony Path introduces major-key diatonic triads and seventh chords, Roman nume
 
 For the concise manual check, run `make manual-m9`.
 
+## M10 — Rhythm Trail
+
+Rhythm Trail teaches simple and compound meter through Explore, blind Listen and Tap. It provides generated accented pulses for 2/4, 3/4, 4/4 and 6/8, with four named BPM choices and an approachable 108 BPM default.
+
+For the concise iPhone acceptance script run `make manual-m10`.
+
+## M11 — Timbre Lab
+
+Timbre Lab teaches how a fixed A3 fundamental can sound Pure, Warm or Bright as harmonic partial balance changes. Explore compares the harmonic series, octave displacement, equal-tempered and just fifths, and an intentionally audible beating example. Listen is blind until answered; Build lets learners hear, compare and correct a partial recipe.
+
+For the concise iPhone acceptance script run `make manual-m11`.
+
 ## Engineering principles
 
 ScaleClimbing uses:

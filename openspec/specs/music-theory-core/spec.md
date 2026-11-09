@@ -41,3 +41,20 @@ The core SHALL normalize equivalent answer representations where order or text c
 - **GIVEN** an exercise expects C, E, and G
 - **WHEN** the player submits G, C, and E
 - **THEN** the answer is accepted
+
+
+### Requirement: spectra and tuning stay deterministic
+
+The core SHALL represent harmonic partials, synthetic timbre profiles, octave frequency relationships and named tuning references without audio or UI dependencies.
+
+#### Scenario: a harmonic is an integer multiple
+
+- **GIVEN** a 220 Hz fundamental and a fourth partial
+- **WHEN** the partial frequency is derived
+- **THEN** the result is 880 Hz
+
+#### Scenario: fifth references differ predictably
+
+- **GIVEN** a shared root frequency
+- **WHEN** equal-tempered and just fifths are derived
+- **THEN** each remains above the root and their frequencies are different
