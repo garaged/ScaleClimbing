@@ -138,9 +138,7 @@ final class EarTrainingUITests: XCTestCase {
     func testChordAtlasListeningAnswersAndFamilySwitch() {
         let app = XCUIApplication()
         app.launch()
-        let atlasRoute = app.descendants(matching: .any)["home.route.chordAtlas"].firstMatch
-        XCTAssertTrue(atlasRoute.waitForExistence(timeout: 10))
-        atlasRoute.tap()
+        openChordAtlas(in: app)
         let prompt = app.staticTexts["atlas.prompt"]
         XCTAssertTrue(prompt.waitForExistence(timeout: 10))
         XCTAssertTrue(prompt.label.contains("Which quality"))
@@ -163,9 +161,7 @@ final class EarTrainingUITests: XCTestCase {
     func testChordAtlasConstructionCanReplayWrongAttempt() {
         let app = XCUIApplication()
         app.launch()
-        let atlasRoute = app.descendants(matching: .any)["home.route.chordAtlas"].firstMatch
-        XCTAssertTrue(atlasRoute.waitForExistence(timeout: 10))
-        atlasRoute.tap()
+        openChordAtlas(in: app)
         app.segmentedControls["atlas.mode"].buttons["Build"].tap()
         XCTAssertTrue(app.staticTexts["atlas.prompt"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["atlas.prompt"].label.contains("Build C Major Triad"))
@@ -180,6 +176,32 @@ final class EarTrainingUITests: XCTestCase {
         app.buttons["atlas.replay"].tap()
         app.buttons["atlas.clear"].tap()
         XCTAssertFalse(app.buttons["atlas.replay"].isEnabled)
+    }
+
+    /// SwiftUI List only materializes visible rows. Chord Atlas is the sixth route,
+    /// typically below the fold on iPhone 17; scroll before relying on its identity.
+    /// Match the combined accessible row label instead of its underlying UIKit type.
+    @MainActor
+    private func openChordAtlas(in app: XCUIApplication) {
+        let route = app.descendants(matching: .any)
+            .matching(NSPredicate(
+                format: "identifier == %@ OR label BEGINSWITH %@",
+                "home.route.chordAtlas", "Chord Atlas, "
+            ))
+            .firstMatch
+
+        for _ in 0..<6 {
+            if route.exists && route.isHittable {
+                route.tap()
+                XCTAssertTrue(
+                    app.staticTexts["atlas.prompt"].waitForExistence(timeout: 10),
+                    "Chord Atlas navigation did not open"
+                )
+                return
+            }
+            app.swipeUp()
+        }
+        XCTFail("Could not find a hittable Chord Atlas row after scrolling the home list")
     }
 
 }
