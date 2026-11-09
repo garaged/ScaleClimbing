@@ -1,6 +1,6 @@
 # ScaleClimbing
 
-ScaleClimbing is an offline-first iOS music learning game for notes and triads.
+ScaleClimbing is an offline-first iOS music learning game for notes, intervals, chords and scales.
 
 ## Open and run the iOS app
 
@@ -9,7 +9,7 @@ ScaleClimbing is an offline-first iOS music learning game for notes and triads.
 3. Choose the shared **ScaleClimbing** scheme and an iPhone simulator.
 4. Press **Cmd-R**.
 
-The app includes **Note Hunter**, **Chord Forge**, **Ear Training**, and **Interval Trail**, and **Voicing Lab**. Chord Forge can play the current target triad using locally generated tones; it does not require microphone permission, a network connection, or third-party audio assets.
+The app needs no account, network, microphone permission or third-party audio assets. It synthesizes its musical examples locally.
 
 ### CLI build and test
 
@@ -18,39 +18,31 @@ make check
 make ios-build
 ```
 
-CI runs both gates. To review the short combined M2/M3 manual check, use `make manual-m3`. Full M2 scenarios remain in `docs/engineering/manual-testing-m2.md`.
-
-**Pull request workflow:** One draft PR per milestone; merge only after green CI and short manual acceptance.
-
----
+CI runs both gates. Pull requests stay draft until all automated checks and the milestone's short manual acceptance pass.
 
 ## M5 — Interval Trail
 
-Interval Trail is a blind, two-note listening exercise. It trains melodic direction (up/down/same), the semitone distance from unison to octave, and the distinction between exact pitch and the same note name in another octave. Replay never changes scoring; feedback identifies both notes only after answering. The app synthesizes all sounds offline.
+Interval Trail is a blind, two-note listening exercise. It trains melodic direction (up/down/same), semitone distance from unison to octave, and the distinction between exact pitch and the same note name in another octave. Replay never changes scoring; feedback identifies both notes only after answering.
 
 For a short simulator checklist, run `make manual-m5`.
 
 ## M6 — Voicing Lab
 
-Voicing Lab extends chord construction with exact MIDI pitches and the lowest bass tone: C major root position C4–E4–G4, first inversion E4–G4–C5, second inversion G4–C5–E5. **Beginner** covers four major/minor roots and three inversions (12 rounds); **All keys** covers 12 roots × two triad qualities × three inversions (72 rounds). Use the keyboard to select exact pitches, **Hear voicing** to play the target, **Check voicing** to play the attempted notes and receive feedback, and **Replay attempt** to compare. Incorrect voicings can be revised and checked again. The strict canonical exercise rejects octave displacement and extra doubled notes; these can still be classified as the same chord identity with a different voicing.
+Voicing Lab extends chord construction with exact MIDI pitches and the lowest bass tone. **Beginner** covers four major/minor roots and three inversions (12 rounds); **All keys** covers 12 roots × two triad qualities × three inversions (72 rounds). Incorrect voicings can be revised and checked again.
 
 Use `make manual-m6` for the short simulator acceptance checklist.
 
 ## M7 — Chord Atlas
 
-Chord Atlas adds two training families: **Triads & Suspensions** and **Seventh Chords**, with **Listen** and **Build** modes. The app-generated audio stays offline. Listening conceals the correct chord quality until an answer; construction plays the submitted notes when checked, preserves the last attempt for replay and permits corrections. The reference uses root-position voicing, while pitch-class construction remains octave-independent; use Voicing Lab for exact inversion challenges.
+Chord Atlas has **Triads & Suspensions** and **Seventh Chords** families, each with **Listen** and **Build** modes. Listening conceals the correct chord quality until an answer; construction plays the submitted notes when checked, preserves the last attempt for replay and permits corrections. Construction is pitch-class based; use Voicing Lab for exact inversion challenges.
 
 For the short acceptance script run `make manual-m7`.
 
-## MVP direction
+## M8 — Scale Explorer
 
-The first playable slice should focus on **major/minor triads** because it exercises the core systems without requiring risky microphone transcription:
+Scale Explorer has **Explore**, **Listen** and **Build** flows for major, natural/harmonic/melodic minor, pentatonic, blues and the seven diatonic modes. It highlights pitch classes visually while playback retains order and octave. **Melodic Minor** rises with raised sixth/seventh and descends as natural minor. Major/natural-minor views disclose conventional key signatures and circle-of-fifths position. Construction compares pitch-class sets; the sounding reference and replay remain melodic sequences.
 
-1. Build a major or minor triad visually.
-2. Hear major versus minor using app-generated audio.
-3. Find a wrong note in a chord.
-4. Answer with an on-screen piano.
-5. Track mastery separately for visual and auditory skills.
+For the concise iPhone audio/accessibility acceptance, run `make manual-m8`.
 
 ## Engineering principles
 
@@ -122,21 +114,10 @@ Before implementing behavior changes:
 
 ## Security and privacy posture
 
-The MVP is offline-first and local-first.
+The MVP is offline-first and local-first. It intentionally excludes accounts, analytics SDKs, advertising SDKs, cloud sync, StoreKit/payment implementation, microphone capture, networked learning services and licensed song content.
 
-M0 intentionally excludes:
-
-- Accounts
-- Analytics SDKs
-- Advertising SDKs
-- Cloud sync
-- StoreKit/payment implementation
-- Microphone capture
-- Networked learning services
-- Licensed song content
-
-Generated listening exercises come before MIDI, and MIDI comes before microphone recognition. Microphone pitch/chord recognition requires a future spec, permission flow, privacy review, and manual validation plan.
+Generated listening exercises come before MIDI, and MIDI comes before microphone recognition. Microphone pitch/chord recognition requires a future spec, permission flow, privacy review and manual validation plan.
 
 ## Platform strategy
 
-Start iOS-first with a portable Swift core. Keep musical theory, exercise generation, learning progression, audio playback, and UI separate so macOS can follow naturally and Windows/Linux can be evaluated later.
+Start iOS-first with a portable Swift core. Keep musical theory, exercise generation, learning progression, audio playback and UI separate so macOS can follow naturally and Windows/Linux can be evaluated later.

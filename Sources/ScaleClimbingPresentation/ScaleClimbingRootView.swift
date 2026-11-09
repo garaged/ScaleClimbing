@@ -7,19 +7,22 @@ public struct ScaleClimbingRootView: View {
     private let onPlayPitch: (Pitch) -> Void
     private let onPlayInterval: ([Pitch]) -> Void
     private let onPlayVoicing: ([Pitch]) -> Void
+    private let onPlayScale: ([Pitch]) -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
         onPlayChord: @escaping ([PitchClass]) -> Void = { _ in },
         onPlayPitch: @escaping (Pitch) -> Void = { _ in },
         onPlayInterval: @escaping ([Pitch]) -> Void = { _ in },
-        onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in }
+        onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in },
+        onPlayScale: @escaping ([Pitch]) -> Void = { _ in }
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
         self.onPlayChord = onPlayChord
         self.onPlayPitch = onPlayPitch
         self.onPlayInterval = onPlayInterval
         self.onPlayVoicing = onPlayVoicing
+        self.onPlayScale = onPlayScale
     }
 
     public var body: some View {
@@ -53,18 +56,13 @@ public struct ScaleClimbingRootView: View {
     @ViewBuilder
     private func destination(for route: AppRoute) -> some View {
         switch route {
-        case .noteHunter:
-            NoteHunterGameView(onPlayPitch: onPlayPitch)
-        case .chordForge:
-            ChordForgeGameView(onPlayChord: onPlayChord)
-        case .earTraining:
-            EarTrainingGameView(onPlayChord: onPlayChord)
-        case .intervalTrail:
-            IntervalTrailGameView(onPlayInterval: onPlayInterval)
-        case .voicingLab:
-            VoicingLabGameView(onPlayVoicing: onPlayVoicing)
-        case .chordAtlas:
-            ChordAtlasGameView(onPlayVoicing: onPlayVoicing)
+        case .noteHunter: NoteHunterGameView(onPlayPitch: onPlayPitch)
+        case .chordForge: ChordForgeGameView(onPlayChord: onPlayChord)
+        case .earTraining: EarTrainingGameView(onPlayChord: onPlayChord)
+        case .intervalTrail: IntervalTrailGameView(onPlayInterval: onPlayInterval)
+        case .voicingLab: VoicingLabGameView(onPlayVoicing: onPlayVoicing)
+        case .chordAtlas: ChordAtlasGameView(onPlayVoicing: onPlayVoicing)
+        case .scaleExplorer: ScaleExplorerGameView(onPlayScale: onPlayScale)
         }
     }
 }
@@ -74,14 +72,9 @@ private struct RouteRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(route.title)
-                .font(.headline)
-            Text(route.regionTitle)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-            Text(route.subtitle)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            Text(route.title).font(.headline)
+            Text(route.regionTitle).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            Text(route.subtitle).font(.subheadline).foregroundStyle(.secondary)
         }
         .padding(.vertical, 6)
         .accessibilityElement(children: .combine)

@@ -38,21 +38,20 @@ import Testing
     #expect(samples.contains { abs($0) > 0.05 })
 }
 
-@Test func melodicAudioPreservesNoteOrderGapAndLength() {
+@Test func melodicAudioPreservesArbitraryNoteOrderGapsAndLength() {
     let sampleRate = 8_000.0
-    let first = Pitch(.c, octave: 4)
-    let second = Pitch(.c, octave: 5)
+    let pitches = [Pitch(.c, octave: 4), Pitch(.e, octave: 4), Pitch(.g, octave: 4), Pitch(.c, octave: 5)]
     let noteCount = 800
     let gapCount = 160
     let samples = GeneratedChordTones.melodicSamples(
-        for: [first, second], sampleRate: sampleRate, noteDuration: 0.1, gapDuration: 0.02
+        for: pitches, sampleRate: sampleRate, noteDuration: 0.1, gapDuration: 0.02
     )
-    #expect(samples.count == 2 * noteCount + gapCount)
-    #expect(samples[noteCount..<(noteCount + gapCount)].allSatisfy { $0 == 0 })
-    let firstExpected = GeneratedChordTones.samples(for: first, sampleRate: sampleRate, duration: 0.1)
-    let secondExpected = GeneratedChordTones.samples(for: second, sampleRate: sampleRate, duration: 0.1)
-    #expect(Array(samples[0..<noteCount]) == firstExpected)
-    #expect(Array(samples[(noteCount + gapCount)...]) == secondExpected)
+    #expect(samples.count == pitches.count * noteCount + (pitches.count - 1) * gapCount)
+    for index in 0..<(pitches.count - 1) {
+        let gapStart = noteCount + index * (noteCount + gapCount)
+        #expect(samples[gapStart..<(gapStart + gapCount)].allSatisfy { $0 == 0 })
+    }
+    #expect(Array(samples[0..<noteCount]) == GeneratedChordTones.samples(for: pitches[0], sampleRate: sampleRate, duration: 0.1))
     #expect(samples.allSatisfy { $0.isFinite && abs($0) <= 0.25 })
 }
 
@@ -60,8 +59,7 @@ import Testing
     let c = Pitch(.c, octave: 4)
     #expect(GeneratedChordTones.melodicSamples(for: []).isEmpty)
     #expect(GeneratedChordTones.melodicSamples(for: [c]).isEmpty)
-    #expect(GeneratedChordTones.melodicSamples(for: [c, c, c]).isEmpty)
-    #expect(GeneratedChordTones.melodicSamples(for: [c,c], sampleRate: 0).isEmpty)
+    #expect(GeneratedChordTones.melodicSamples(for: [c, c], sampleRate: 0).isEmpty)
 }
 
 @Test func voicedAudioFrequenciesPreserveOctavesNotJustPitchClasses() {

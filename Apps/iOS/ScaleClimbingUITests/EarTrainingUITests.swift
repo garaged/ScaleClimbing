@@ -204,4 +204,64 @@ final class EarTrainingUITests: XCTestCase {
         XCTFail("Could not find a hittable Chord Atlas row after scrolling the home list")
     }
 
+
+    @MainActor
+    func testScaleExplorerExploreListenAndBuildRetry() {
+        let app = XCUIApplication()
+        app.launch()
+        openScaleExplorer(in: app)
+
+        let prompt = app.staticTexts["scale.prompt"]
+        XCTAssertTrue(prompt.waitForExistence(timeout: 10))
+        XCTAssertTrue(prompt.label.contains("C Major scale"))
+        XCTAssertTrue(app.staticTexts["scale.intervals"].label.contains("0, 2, 4, 5, 7, 9, 11"))
+        XCTAssertTrue(app.staticTexts["scale.key-context"].label.contains("C major"))
+        app.buttons["scale.hear"].tap()
+
+        app.segmentedControls["scale.mode"].buttons["Listen"].tap()
+        XCTAssertTrue(prompt.label.contains("Which C scale"))
+        XCTAssertFalse(prompt.label.contains("Major"))
+        app.buttons["scale.hear"].tap()
+        app.buttons["scale.answer.major"].tap()
+        XCTAssertTrue(app.staticTexts["scale.feedback"].label.contains("Correct"))
+        XCTAssertTrue(app.staticTexts["scale.progress"].label.contains("1/1"))
+        XCTAssertFalse(app.buttons["scale.answer.major"].isEnabled)
+
+        app.segmentedControls["scale.mode"].buttons["Build"].tap()
+        XCTAssertFalse(app.buttons["scale.check"].isEnabled)
+        let c = app.buttons["C in octave 4"]
+        XCTAssertTrue(c.waitForExistence(timeout: 10))
+        c.tap()
+        XCTAssertTrue(app.buttons["scale.check"].isEnabled)
+        app.buttons["scale.check"].tap()
+        XCTAssertTrue(app.staticTexts["scale.feedback"].label.contains("Not yet"))
+        XCTAssertTrue(app.buttons["scale.replay"].isEnabled)
+        app.buttons["scale.replay"].tap()
+        app.buttons["scale.clear"].tap()
+        XCTAssertFalse(app.buttons["scale.replay"].isEnabled)
+    }
+
+    @MainActor
+    private func openScaleExplorer(in app: XCUIApplication) {
+        let route = app.descendants(matching: .any)
+            .matching(NSPredicate(
+                format: "identifier == %@ OR label BEGINSWITH %@",
+                "home.route.scaleExplorer", "Scale Explorer, "
+            ))
+            .firstMatch
+
+        for _ in 0..<7 {
+            if route.exists && route.isHittable {
+                route.tap()
+                XCTAssertTrue(
+                    app.staticTexts["scale.prompt"].waitForExistence(timeout: 10),
+                    "Scale Explorer navigation did not open"
+                )
+                return
+            }
+            app.swipeUp()
+        }
+        XCTFail("Could not find a hittable Scale Explorer row after scrolling the home list")
+    }
+
 }

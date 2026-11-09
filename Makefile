@@ -1,8 +1,8 @@
 SHELL := /bin/bash
 
-.PHONY: help check ci test smoke specs docs architecture security clean manual-m0 manual-m1 manual-m2 manual-m3 manual-m4 manual-m5 manual-m6 manual-m7 ios-build ios-ui-test
+.PHONY: help check ci test smoke specs docs architecture security clean manual-m0 manual-m1 manual-m2 manual-m3 manual-m4 manual-m5 manual-m6 manual-m7 manual-m8 ios-build ios-ui-test
 help:
-	@echo "ScaleClimbing: make check | make ios-build | make ios-ui-test | make manual-m7"
+	@echo "ScaleClimbing: make check | make ios-build | make ios-ui-test | make manual-m8"
 
 check: specs docs architecture security test smoke
 ci: check
@@ -21,7 +21,6 @@ security:
 
 ios-build:
 	xcodebuild -project Apps/iOS/ScaleClimbing.xcodeproj -scheme ScaleClimbing -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
-
 ios-ui-test:
 	bash scripts/run-ios-ui-tests.sh
 
@@ -33,6 +32,8 @@ manual-m6:
 	@cat docs/engineering/manual-testing-m6.md
 manual-m7:
 	@cat docs/engineering/manual-testing-m7.md
+manual-m8:
+	@cat docs/engineering/manual-testing-m8.md
 
 manual-m0:
 	@cat docs/engineering/manual-testing.md

@@ -36,18 +36,19 @@ public enum GeneratedChordTones {
         samples(frequencies: [frequency(for: pitch)], sampleRate: sampleRate, duration: duration)
     }
 
-    /// Ordered melodic notes: each note decays before a deliberate silent interval.
+    /// Ordered melodic notes: every note decays before a deliberate silent interval.
     public static func melodicSamples(
         for pitches: [Pitch],
         sampleRate: Double = 44_100,
         noteDuration: Double = 0.45,
         gapDuration: Double = 0.16
     ) -> [Float] {
-        guard pitches.count == 2, sampleRate > 0, noteDuration > 0, gapDuration >= 0 else { return [] }
-        let first = samples(for: pitches[0], sampleRate: sampleRate, duration: noteDuration)
-        let gapCount = Int((sampleRate * gapDuration).rounded(.down))
-        let second = samples(for: pitches[1], sampleRate: sampleRate, duration: noteDuration)
-        return first + Array(repeating: Float.zero, count: gapCount) + second
+        guard pitches.count >= 2, sampleRate > 0, noteDuration > 0, gapDuration >= 0 else { return [] }
+        let gap = Array(repeating: Float.zero, count: Int((sampleRate * gapDuration).rounded(.down)))
+        return pitches.enumerated().flatMap { index, pitch in
+            samples(for: pitch, sampleRate: sampleRate, duration: noteDuration)
+                + (index == pitches.indices.last ? [] : gap)
+        }
     }
 
     public static func frequency(for pitch: Pitch) -> Double {
@@ -90,6 +91,10 @@ public final class GeneratedChordPlayer {
 
     public func playInterval(_ pitches: [Pitch]) {
         playSamples(GeneratedChordTones.melodicSamples(for: pitches, sampleRate: sampleRate))
+    }
+
+    public func playScale(_ pitches: [Pitch]) {
+        playSamples(GeneratedChordTones.melodicSamples(for: pitches, sampleRate: sampleRate, noteDuration: 0.28, gapDuration: 0.10))
     }
 
     public func playVoicing(_ pitches: [Pitch]) {
@@ -142,8 +147,7 @@ private final class AudioPlaybackWorker: @unchecked Sendable {
         guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1),
               let buffer = AVAudioPCMBuffer(
                   pcmFormat: format, frameCapacity: AVAudioFrameCount(samples.count)
-              ),
-              let channel = buffer.floatChannelData?[0] else {
+              ), let channel = buffer.floatChannelData?[0] else {
             return "Unable to create an audio buffer."
         }
         buffer.frameLength = AVAudioFrameCount(samples.count)
@@ -151,7 +155,6 @@ private final class AudioPlaybackWorker: @unchecked Sendable {
 
         do {
             #if os(iOS)
-            // Blocking AVAudioSession operations must not run on the main actor.
             try AVAudioSession.sharedInstance().setCategory(
                 .playback, mode: .default, options: [.mixWithOthers]
             )
