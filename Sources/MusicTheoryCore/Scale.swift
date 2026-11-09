@@ -114,7 +114,7 @@ public struct Scale: Codable, Hashable, Sendable {
         case .ascending:
             return intervals.map { tonic.transposed(by: $0) } + [tonic.transposed(by: 12)]
         case .descending:
-            return [tonic.transposed(by: 12)] + intervals.dropFirst().reversed().map { tonic.transposed(by: $0) }
+            return [tonic.transposed(by: 12)] + intervals.reversed().map { tonic.transposed(by: $0) }
         }
     }
 
