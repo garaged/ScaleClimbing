@@ -264,4 +264,48 @@ final class EarTrainingUITests: XCTestCase {
         XCTFail("Could not find a hittable Scale Explorer row after scrolling the home list")
     }
 
+
+    @MainActor
+    func testHarmonyPathExploreListenAndBuildRetry() {
+        let app = XCUIApplication()
+        app.launch()
+        openHarmonyPath(in: app)
+        let prompt = app.staticTexts["harmony.prompt"]
+        XCTAssertTrue(prompt.waitForExistence(timeout: 10))
+        XCTAssertTrue(prompt.label.contains("C major harmony"))
+        XCTAssertTrue(app.staticTexts["harmony.diatonic"].label.contains("I: C Major Triad"))
+        XCTAssertTrue(app.staticTexts["harmony.target"].label.contains("V–I"))
+        app.buttons["harmony.hear"].tap()
+        app.segmentedControls["harmony.mode"].buttons["Listen"].tap()
+        XCTAssertTrue(prompt.label.contains("Which cadence"))
+        app.buttons["harmony.answer.authentic"].tap()
+        XCTAssertTrue(app.staticTexts["harmony.feedback"].label.contains("Correct"))
+        XCTAssertTrue(app.staticTexts["harmony.score"].label.contains("1/1"))
+        app.segmentedControls["harmony.mode"].buttons["Build"].tap()
+        app.buttons["harmony.roman.I"].tap()
+        app.buttons["harmony.roman.V"].tap()
+        app.buttons["harmony.check"].tap()
+        XCTAssertTrue(app.staticTexts["harmony.feedback"].label.contains("Not yet"))
+        XCTAssertTrue(app.buttons["harmony.replay"].isEnabled)
+        app.buttons["harmony.clear"].tap()
+        app.buttons["harmony.roman.V"].tap()
+        app.buttons["harmony.roman.I"].tap()
+        app.buttons["harmony.check"].tap()
+        XCTAssertTrue(app.staticTexts["harmony.feedback"].label.contains("Correct"))
+    }
+
+    @MainActor
+    private func openHarmonyPath(in app: XCUIApplication) {
+        let route = app.descendants(matching: .any).matching(NSPredicate(format: "identifier == %@ OR label BEGINSWITH %@", "home.route.harmonyPath", "Harmony Path, ")).firstMatch
+        for _ in 0..<8 {
+            if route.exists && route.isHittable {
+                route.tap()
+                XCTAssertTrue(app.staticTexts["harmony.prompt"].waitForExistence(timeout: 10))
+                return
+            }
+            app.swipeUp()
+        }
+        XCTFail("Could not find a hittable Harmony Path row after scrolling the home list")
+    }
+
 }
