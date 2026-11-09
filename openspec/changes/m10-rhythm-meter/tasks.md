@@ -6,4 +6,4 @@
 - [x] Add manual acceptance and Makefile target
 - [x] Add named BPM selection with an accessible 108 BPM default and meter-aware click spacing
 - [x] Pass hosted gates
-- [ ] Receive manual acceptance before merge
+- [x] Receive manual acceptance before merge
