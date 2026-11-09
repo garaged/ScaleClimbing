@@ -308,4 +308,34 @@ final class EarTrainingUITests: XCTestCase {
         XCTFail("Could not find a hittable Harmony Path row after scrolling the home list")
     }
 
+
+    @MainActor
+    func testRhythmTrailExploreListenAndTapRetry() {
+        let app = XCUIApplication(); app.launch(); openRhythmTrail(in: app)
+        XCTAssertTrue(app.staticTexts["rhythm.prompt"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["rhythm.prompt"].label.contains("4/4"))
+        let tempoControl = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == %@", "rhythm.tempo"))
+            .firstMatch
+        XCTAssertTrue(tempoControl.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["rhythm.tempo.detail"].label.contains("108 BPM"))
+        app.segmentedControls["rhythm.mode"].buttons["Listen"].tap()
+        XCTAssertTrue(app.staticTexts["rhythm.prompt"].label.contains("Which meter"))
+        app.buttons["rhythm.answer.4-4"].tap()
+        XCTAssertTrue(app.staticTexts["rhythm.feedback"].label.contains("Correct"))
+        app.segmentedControls["rhythm.mode"].buttons["Tap"].tap()
+        app.buttons["rhythm.tap"].tap(); app.buttons["rhythm.tap"].tap(); app.buttons["rhythm.tap"].tap()
+        app.buttons["rhythm.check"].tap()
+        XCTAssertTrue(app.staticTexts["rhythm.feedback"].label.contains("Not yet"))
+        app.buttons["rhythm.tap"].tap(); app.buttons["rhythm.check"].tap()
+        XCTAssertTrue(app.staticTexts["rhythm.feedback"].label.contains("Correct"))
+    }
+
+    @MainActor
+    private func openRhythmTrail(in app: XCUIApplication) {
+        let route = app.descendants(matching: .any).matching(NSPredicate(format: "identifier == %@ OR label BEGINSWITH %@", "home.route.rhythmTrail", "Rhythm Trail, ")).firstMatch
+        for _ in 0..<9 { if route.exists && route.isHittable { route.tap(); XCTAssertTrue(app.staticTexts["rhythm.prompt"].waitForExistence(timeout: 10)); return }; app.swipeUp() }
+        XCTFail("Could not find Rhythm Trail")
+    }
+
 }

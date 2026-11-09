@@ -1,6 +1,16 @@
 public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sendable {
-    case noteHunter, chordForge, earTraining, intervalTrail, voicingLab, chordAtlas, scaleExplorer, harmonyPath
+    case noteHunter
+    case chordForge
+    case earTraining
+    case intervalTrail
+    case voicingLab
+    case chordAtlas
+    case scaleExplorer
+    case harmonyPath
+    case rhythmTrail
+
     public var id: String { rawValue }
+
     public var title: String {
         switch self {
         case .noteHunter: return "Note Hunter"
@@ -11,8 +21,10 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .chordAtlas: return "Chord Atlas"
         case .scaleExplorer: return "Scale Explorer"
         case .harmonyPath: return "Harmony Path"
+        case .rhythmTrail: return "Rhythm Trail"
         }
     }
+
     public var subtitle: String {
         switch self {
         case .noteHunter: return "Find matching notes across octaves."
@@ -23,15 +35,24 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .chordAtlas: return "Hear and construct expanded chord qualities."
         case .scaleExplorer: return "Explore, hear and build scales, modes and keys."
         case .harmonyPath: return "Hear and build diatonic cadences in context."
+        case .rhythmTrail: return "Hear pulse, identify meter and tap the beat."
         }
     }
+
     public var regionTitle: String {
         switch self {
-        case .noteHunter: return "Note Harbor"
-        case .chordForge, .earTraining, .voicingLab: return "Triad Cliffs"
-        case .intervalTrail: return "Interval Ridge"
-        case .chordAtlas, .harmonyPath: return "Harmony Heights"
-        case .scaleExplorer: return "Scale Summit"
+        case .noteHunter:
+            return "Note Harbor"
+        case .chordForge, .earTraining, .voicingLab:
+            return "Triad Cliffs"
+        case .intervalTrail:
+            return "Interval Ridge"
+        case .chordAtlas, .harmonyPath:
+            return "Harmony Heights"
+        case .scaleExplorer:
+            return "Scale Summit"
+        case .rhythmTrail:
+            return "Rhythm Ridge"
         }
     }
 }

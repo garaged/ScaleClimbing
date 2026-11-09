@@ -16,9 +16,6 @@ public struct VoicingLabGameView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Voicing Lab")
-                    .font(.largeTitle.bold())
-                    .accessibilityAddTraits(.isHeader)
 
                 Picker("Practice range", selection: Binding(
                     get: { viewModel.mode },

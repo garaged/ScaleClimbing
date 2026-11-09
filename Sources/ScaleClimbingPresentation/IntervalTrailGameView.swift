@@ -16,9 +16,6 @@ public struct IntervalTrailGameView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Interval Trail")
-                    .font(.largeTitle.bold())
-                    .accessibilityAddTraits(.isHeader)
                 Text(viewModel.roundText + " · " + viewModel.modeText)
                     .font(.headline)
                     .accessibilityIdentifier("interval.round")
