@@ -8,12 +8,12 @@ public struct ScaleClimbingRootView: View {
     private let onPlayInterval: ([Pitch]) -> Void
     private let onPlayVoicing: ([Pitch]) -> Void
     private let onPlayScale: ([Pitch]) -> Void
-    private let onPlayProgression: ([[Pitch]]) -> Void
+    private let onPlayProgression: ([[Pitch]]) -> Void\n    private let onPlayRhythm: (RhythmPattern) -> Void
 
-    public init(viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(), onPlayChord: @escaping ([PitchClass]) -> Void = { _ in }, onPlayPitch: @escaping (Pitch) -> Void = { _ in }, onPlayInterval: @escaping ([Pitch]) -> Void = { _ in }, onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in }, onPlayScale: @escaping ([Pitch]) -> Void = { _ in }, onPlayProgression: @escaping ([[Pitch]]) -> Void = { _ in }) {
+    public init(viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(), onPlayChord: @escaping ([PitchClass]) -> Void = { _ in }, onPlayPitch: @escaping (Pitch) -> Void = { _ in }, onPlayInterval: @escaping ([Pitch]) -> Void = { _ in }, onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in }, onPlayScale: @escaping ([Pitch]) -> Void = { _ in }, onPlayProgression: @escaping ([[Pitch]]) -> Void = { _ in }, onPlayRhythm: @escaping (RhythmPattern) -> Void = { _ in }) {
         _viewModel = StateObject(wrappedValue: viewModel())
         self.onPlayChord = onPlayChord; self.onPlayPitch = onPlayPitch; self.onPlayInterval = onPlayInterval
-        self.onPlayVoicing = onPlayVoicing; self.onPlayScale = onPlayScale; self.onPlayProgression = onPlayProgression
+        self.onPlayVoicing = onPlayVoicing; self.onPlayScale = onPlayScale; self.onPlayProgression = onPlayProgression; self.onPlayRhythm = onPlayRhythm
     }
 
     public var body: some View {
@@ -45,7 +45,7 @@ public struct ScaleClimbingRootView: View {
         case .voicingLab: VoicingLabGameView(onPlayVoicing: onPlayVoicing)
         case .chordAtlas: ChordAtlasGameView(onPlayVoicing: onPlayVoicing)
         case .scaleExplorer: ScaleExplorerGameView(onPlayScale: onPlayScale)
-        case .harmonyPath: HarmonyPathGameView(onPlayProgression: onPlayProgression)
+        case .harmonyPath: HarmonyPathGameView(onPlayProgression: onPlayProgression)\n        case .rhythmTrail: RhythmTrailGameView(onPlayRhythm: onPlayRhythm)
         }
     }
 }

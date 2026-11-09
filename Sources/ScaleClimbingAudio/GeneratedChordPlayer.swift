@@ -42,8 +42,20 @@ public enum GeneratedChordTones {
         }
     }
 
+    public static func rhythmSamples(for pattern: RhythmPattern, sampleRate: Double = 44_100, clickDuration: Double = 0.05, gapDuration: Double = 0.10) -> [Float] {
+        guard sampleRate > 0, clickDuration > 0, gapDuration >= 0 else { return [] }
+        let gap = Array(repeating: Float.zero, count: Int((sampleRate * gapDuration).rounded(.down)))
+        return pattern.clicks.enumerated().flatMap { index, click in
+            clickSamples(accent: click.isAccent, sampleRate: sampleRate, duration: clickDuration) + (index == pattern.clicks.indices.last ? [] : gap)
+        }
+    }
+
     public static func frequency(for pitch: Pitch) -> Double {
         440.0 * pow(2.0, (Double(pitch.midiNumber) - 69.0) / 12.0)
+    }
+
+    private static func clickSamples(accent: Bool, sampleRate: Double, duration: Double) -> [Float] {
+        samples(frequencies: [accent ? 1_320 : 880], sampleRate: sampleRate, duration: duration)
     }
 
     private static func samples(frequencies tones: [Double], sampleRate: Double, duration: Double) -> [Float] {
@@ -73,7 +85,7 @@ public final class GeneratedChordPlayer {
     public func playInterval(_ pitches: [Pitch]) { playSamples(GeneratedChordTones.melodicSamples(for: pitches, sampleRate: sampleRate)) }
     public func playScale(_ pitches: [Pitch]) { playSamples(GeneratedChordTones.melodicSamples(for: pitches, sampleRate: sampleRate, noteDuration: 0.28, gapDuration: 0.10)) }
     public func playVoicing(_ pitches: [Pitch]) { playSamples(GeneratedChordTones.voicedSamples(for: pitches, sampleRate: sampleRate)) }
-    public func playProgression(_ chords: [[Pitch]]) { playSamples(GeneratedChordTones.progressionSamples(for: chords, sampleRate: sampleRate)) }
+    public func playProgression(_ chords: [[Pitch]]) { playSamples(GeneratedChordTones.progressionSamples(for: chords, sampleRate: sampleRate)) }\n    public func playRhythm(_ pattern: RhythmPattern) { playSamples(GeneratedChordTones.rhythmSamples(for: pattern, sampleRate: sampleRate)) }
 
     private func playSamples(_ samples: [Float]) {
         guard !samples.isEmpty else { return }
