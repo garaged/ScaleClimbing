@@ -30,12 +30,18 @@
 - MusicTheoryCore chord catalog is shared; Chord Atlas construction remains pitch-class-based, while Voicing Lab owns inversion and octave-sensitive scoring.
 - Domain, presentation, simulator regression and short audible acceptance gates.
 
-## M8 — Scales, modes and keys (active)
+## M8 — Scales, modes and keys (completed)
 - **Scale Explorer** teaches fourteen scale definitions through Explore, Listen and Build flows.
 - Major, all three minor forms, pentatonic/blues and seven diatonic modes share a pure scale model.
 - Ordered, octave-aware offline playback ascends and descends; melodic minor uses natural-minor descent.
 - Major/natural-minor key signatures and circle-of-fifths position provide context without changing pitch-class calculation.
 - Draft PR requires Swift/domain/audio/presentation/iPhone regression gates plus short manual audio/accessibility acceptance.
+
+## M9 — Harmony and progressions (active)
+- **Harmony Path** derives major-key diatonic triads and sevenths across every chromatic tonic.
+- Roman numerals and tonic/predominant/dominant labels distinguish harmonic relationship from absolute chord identity.
+- Authentic V–I, plagal IV–I and half I–V cadences support Explore, blind Listen and ordered Roman-numeral construction.
+- Ordered offline chord playback, tests, simulator regression and short listening/VoiceOver acceptance gate.
 
 ## Planned learning milestones
 
@@ -44,8 +50,8 @@
 | M5 — Pitch and interval ear training | Active: Interval Trail implements semitones, direction, octave equivalence vs exact pitch | Distinguish interval distance, direction, pitch class and actual octave |
 | M6 — Chord foundations and inversions | Active: canonical triads, all 12 keys, major/minor, root/first/second inversion, octave-sensitive voicing and doubled-tone classification | Hear and construct the same chord with different bass notes and octave placement |
 | M7 — Chord vocabulary | Completed: twelve qualities including diminished/augmented, sus2/sus4, power, dominant/major/minor/half-diminished/fully diminished sevenths | Recognize chord quality; harmonic function requires progression context in M9 |
-| M8 — Scales, modes and keys | Active: major, natural/harmonic/melodic minor; pentatonic and blues; diatonic modes; key signatures and circle of fifths | Build, recognize and hear fundamental scales and modes |
-| M9 — Harmony and progressions | Diatonic triads and sevenths, Roman numerals, cadences, tonic/dominant, inversions in context, transposition | Recognize relationships and harmonic movement instead of isolated chords |
+| M8 — Scales, modes and keys | Completed: major, natural/harmonic/melodic minor; pentatonic and blues; diatonic modes; key signatures and circle of fifths | Build, recognize and hear fundamental scales and modes |
+| M9 — Harmony and progressions | Active: major-key diatonic triads/sevenths, Roman numerals, tonic/predominant/dominant functions and authentic/plagal/half cadences | Recognize relationships and harmonic movement instead of isolated chords |
 | M10 — Rhythm and meter | Pulse, note/rest values, subdivisions, time signatures, syncopation, simple/compound meters | Learn timing through tapping and listening |
 | M11 — Timbre, overtones and tuning | Harmonic series/partials, overtones versus harmonics, consonance/beating, tuning and temperaments, octave displacement, instrument timbre | Separate fundamental pitch, spectral content and timbre; hear octave and tuning differences |
 | M12 — Reading and musicianship | Staff, clefs, accidentals/enharmonics, chord symbols, sight reading, solfege and melodic dictation | Connect notation, sound, theory and playing |

@@ -44,6 +44,12 @@ Scale Explorer has **Explore**, **Listen** and **Build** flows for major, natura
 
 For the concise iPhone audio/accessibility acceptance, run `make manual-m8`.
 
+## M9 — Harmony Path
+
+Harmony Path introduces major-key diatonic triads and seventh chords, Roman numerals, tonic/predominant/dominant context, and authentic, plagal and half cadences. **Explore** explains the key; **Listen** identifies a cadence without disclosure; **Build** assembles its Roman numerals with retry. Progression audio is generated offline using root-position close voicings; exact inversions remain in Voicing Lab.
+
+For the concise manual check, run `make manual-m9`.
+
 ## Engineering principles
 
 ScaleClimbing uses:
