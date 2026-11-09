@@ -6,5 +6,5 @@
 - [x] Implement Timbre Lab Explore, Listen and Build flows with accessible feedback
 - [x] Add domain, audio, presentation and focused iPhone UI tests
 - [x] Add retained specifications, manual acceptance and Makefile target
-- [ ] Pass hosted validation, simulator build and simulator UI acceptance
+- [x] Pass hosted validation, simulator build and simulator UI acceptance
 - [ ] Receive manual acceptance before marking the PR ready
