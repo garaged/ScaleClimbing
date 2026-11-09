@@ -71,18 +71,14 @@ public enum GeneratedChordTones {
 }
 
 /// Platform adapter: synthesized audio output only. Playback does not request recording access.
+/// All audio session and engine mutations are serialized off the UI/main thread.
 @MainActor
 public final class GeneratedChordPlayer {
-    private let engine = AVAudioEngine()
-    private let player = AVAudioPlayerNode()
+    private let worker = AudioPlaybackWorker()
     private let sampleRate: Double = 44_100
     public private(set) var lastPlaybackError: String?
 
-    public init() {
-        engine.attach(player)
-        let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1)!
-        engine.connect(player, to: engine.mainMixerNode, format: format)
-    }
+    public init() {}
 
     public func play(_ pitchClasses: [PitchClass]) {
         playSamples(GeneratedChordTones.samples(for: pitchClasses, sampleRate: sampleRate))
@@ -102,27 +98,72 @@ public final class GeneratedChordPlayer {
 
     private func playSamples(_ samples: [Float]) {
         guard !samples.isEmpty else { return }
-        let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1)!
-        guard let buffer = AVAudioPCMBuffer(
-            pcmFormat: format, frameCapacity: AVAudioFrameCount(samples.count)
-        ), let channel = buffer.floatChannelData?[0] else {
-            lastPlaybackError = "Unable to create an audio buffer."
-            return
+        worker.enqueue(samples: samples) { [weak self] error in
+            Task { @MainActor [weak self] in
+                self?.lastPlaybackError = error
+            }
+        }
+    }
+}
+
+/// The private engine and player are touched exclusively on the serial queue.
+/// @unchecked Sendable is safe here because every access to mutable audio state
+/// occurs on that queue; main actor only enqueues immutable sample buffers.
+private final class AudioPlaybackWorker: @unchecked Sendable {
+    private let queue = DispatchQueue(label: "org.garaged.ScaleClimbing.audio", qos: .userInitiated)
+    private let sampleRate: Double = 44_100
+    private var engine: AVAudioEngine?
+    private var player: AVAudioPlayerNode?
+
+    func enqueue(samples: [Float], report: @escaping @Sendable (String?) -> Void) {
+        queue.async { [self] in
+            report(playOnQueue(samples))
+        }
+    }
+
+    private func playOnQueue(_ samples: [Float]) -> String? {
+        let engine: AVAudioEngine
+        let player: AVAudioPlayerNode
+        if let existingEngine = self.engine, let existingPlayer = self.player {
+            engine = existingEngine
+            player = existingPlayer
+        } else {
+            engine = AVAudioEngine()
+            player = AVAudioPlayerNode()
+            engine.attach(player)
+            guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1) else {
+                return "Unable to create an audio format."
+            }
+            engine.connect(player, to: engine.mainMixerNode, format: format)
+            self.engine = engine
+            self.player = player
+        }
+
+        guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1),
+              let buffer = AVAudioPCMBuffer(
+                  pcmFormat: format, frameCapacity: AVAudioFrameCount(samples.count)
+              ),
+              let channel = buffer.floatChannelData?[0] else {
+            return "Unable to create an audio buffer."
         }
         buffer.frameLength = AVAudioFrameCount(samples.count)
         for index in samples.indices { channel[index] = samples[index] }
+
         do {
             #if os(iOS)
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            // Blocking AVAudioSession operations must not run on the main actor.
+            try AVAudioSession.sharedInstance().setCategory(
+                .playback, mode: .default, options: [.mixWithOthers]
+            )
             try AVAudioSession.sharedInstance().setActive(true)
             #endif
             if !engine.isRunning { try engine.start() }
             player.stop()
             player.scheduleBuffer(buffer)
             player.play()
-            lastPlaybackError = nil
+            return nil
         } catch {
-            lastPlaybackError = String(describing: error)
+            return String(describing: error)
         }
     }
 }

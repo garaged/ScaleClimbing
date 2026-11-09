@@ -34,3 +34,9 @@ import Testing
     #expect(AppRoute.intervalTrail.regionTitle == "Interval Ridge")
     #expect(AppRoute.allCases.contains(.intervalTrail))
 }
+
+@Test func chordAtlasRouteLivesInHarmonyHeights() {
+    #expect(AppRoute.chordAtlas.title == "Chord Atlas")
+    #expect(AppRoute.chordAtlas.regionTitle == "Harmony Heights")
+    #expect(AppRoute.allCases.contains(.chordAtlas))
+}

@@ -39,6 +39,7 @@ public struct ScaleClimbingRootView: View {
                         NavigationLink(value: route) {
                             RouteRow(route: route)
                         }
+                        .accessibilityIdentifier("home.route.\(route.rawValue)")
                     }
                 }
             }
@@ -62,6 +63,8 @@ public struct ScaleClimbingRootView: View {
             IntervalTrailGameView(onPlayInterval: onPlayInterval)
         case .voicingLab:
             VoicingLabGameView(onPlayVoicing: onPlayVoicing)
+        case .chordAtlas:
+            ChordAtlasGameView(onPlayVoicing: onPlayVoicing)
         }
     }
 }

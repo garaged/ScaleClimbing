@@ -4,6 +4,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
     case earTraining
     case intervalTrail
     case voicingLab
+    case chordAtlas
 
     public var id: String { rawValue }
 
@@ -19,6 +20,8 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return "Interval Trail"
         case .voicingLab:
             return "Voicing Lab"
+        case .chordAtlas:
+            return "Chord Atlas"
         }
     }
 
@@ -34,6 +37,8 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return "Hear note direction, distance and octave differences."
         case .voicingLab:
             return "Build major and minor triad inversions with exact octaves."
+        case .chordAtlas:
+            return "Hear and construct expanded chord qualities."
         }
     }
 
@@ -49,6 +54,8 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return "Interval Ridge"
         case .voicingLab:
             return "Triad Cliffs"
+        case .chordAtlas:
+            return "Harmony Heights"
         }
     }
 }
