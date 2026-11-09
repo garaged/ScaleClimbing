@@ -8,12 +8,27 @@ public struct ScaleClimbingRootView: View {
     private let onPlayInterval: ([Pitch]) -> Void
     private let onPlayVoicing: ([Pitch]) -> Void
     private let onPlayScale: ([Pitch]) -> Void
-    private let onPlayProgression: ([[Pitch]]) -> Void\n    private let onPlayRhythm: (RhythmPattern) -> Void
+    private let onPlayProgression: ([[Pitch]]) -> Void
+    private let onPlayRhythm: (RhythmPattern) -> Void
 
-    public init(viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(), onPlayChord: @escaping ([PitchClass]) -> Void = { _ in }, onPlayPitch: @escaping (Pitch) -> Void = { _ in }, onPlayInterval: @escaping ([Pitch]) -> Void = { _ in }, onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in }, onPlayScale: @escaping ([Pitch]) -> Void = { _ in }, onPlayProgression: @escaping ([[Pitch]]) -> Void = { _ in }, onPlayRhythm: @escaping (RhythmPattern) -> Void = { _ in }) {
+    public init(
+        viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
+        onPlayChord: @escaping ([PitchClass]) -> Void = { _ in },
+        onPlayPitch: @escaping (Pitch) -> Void = { _ in },
+        onPlayInterval: @escaping ([Pitch]) -> Void = { _ in },
+        onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in },
+        onPlayScale: @escaping ([Pitch]) -> Void = { _ in },
+        onPlayProgression: @escaping ([[Pitch]]) -> Void = { _ in },
+        onPlayRhythm: @escaping (RhythmPattern) -> Void = { _ in }
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel())
-        self.onPlayChord = onPlayChord; self.onPlayPitch = onPlayPitch; self.onPlayInterval = onPlayInterval
-        self.onPlayVoicing = onPlayVoicing; self.onPlayScale = onPlayScale; self.onPlayProgression = onPlayProgression; self.onPlayRhythm = onPlayRhythm
+        self.onPlayChord = onPlayChord
+        self.onPlayPitch = onPlayPitch
+        self.onPlayInterval = onPlayInterval
+        self.onPlayVoicing = onPlayVoicing
+        self.onPlayScale = onPlayScale
+        self.onPlayProgression = onPlayProgression
+        self.onPlayRhythm = onPlayRhythm
     }
 
     public var body: some View {
@@ -21,44 +36,72 @@ public struct ScaleClimbingRootView: View {
             List {
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(viewModel.subtitle).font(.headline).foregroundStyle(.secondary)
-                    }.padding(.vertical, 8)
+                        Text(viewModel.subtitle)
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 8)
                 }
+
                 Section("Practice") {
                     ForEach(viewModel.availableRoutes) { route in
-                        NavigationLink(value: route) { RouteRow(route: route) }
-                            .accessibilityIdentifier("home.route.\(route.rawValue)")
+                        NavigationLink(value: route) {
+                            RouteRow(route: route)
+                        }
+                        .accessibilityIdentifier("home.route.\(route.rawValue)")
                     }
                 }
             }
             .navigationTitle(viewModel.title)
-            .navigationDestination(for: AppRoute.self) { destination(for: $0) }
+            .navigationDestination(for: AppRoute.self) { route in
+                destination(for: route)
+            }
         }
     }
 
-    @ViewBuilder private func destination(for route: AppRoute) -> some View {
+    @ViewBuilder
+    private func destination(for route: AppRoute) -> some View {
         switch route {
-        case .noteHunter: NoteHunterGameView(onPlayPitch: onPlayPitch)
-        case .chordForge: ChordForgeGameView(onPlayChord: onPlayChord)
-        case .earTraining: EarTrainingGameView(onPlayChord: onPlayChord)
-        case .intervalTrail: IntervalTrailGameView(onPlayInterval: onPlayInterval)
-        case .voicingLab: VoicingLabGameView(onPlayVoicing: onPlayVoicing)
-        case .chordAtlas: ChordAtlasGameView(onPlayVoicing: onPlayVoicing)
-        case .scaleExplorer: ScaleExplorerGameView(onPlayScale: onPlayScale)
-        case .harmonyPath: HarmonyPathGameView(onPlayProgression: onPlayProgression)\n        case .rhythmTrail: RhythmTrailGameView(onPlayRhythm: onPlayRhythm)
+        case .noteHunter:
+            NoteHunterGameView(onPlayPitch: onPlayPitch)
+        case .chordForge:
+            ChordForgeGameView(onPlayChord: onPlayChord)
+        case .earTraining:
+            EarTrainingGameView(onPlayChord: onPlayChord)
+        case .intervalTrail:
+            IntervalTrailGameView(onPlayInterval: onPlayInterval)
+        case .voicingLab:
+            VoicingLabGameView(onPlayVoicing: onPlayVoicing)
+        case .chordAtlas:
+            ChordAtlasGameView(onPlayVoicing: onPlayVoicing)
+        case .scaleExplorer:
+            ScaleExplorerGameView(onPlayScale: onPlayScale)
+        case .harmonyPath:
+            HarmonyPathGameView(onPlayProgression: onPlayProgression)
+        case .rhythmTrail:
+            RhythmTrailGameView(onPlayRhythm: onPlayRhythm)
         }
     }
 }
 
 private struct RouteRow: View {
     let route: AppRoute
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(route.title).font(.headline)
-            Text(route.regionTitle).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-            Text(route.subtitle).font(.subheadline).foregroundStyle(.secondary)
+            Text(route.title)
+                .font(.headline)
+            Text(route.regionTitle)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(route.subtitle)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
-        .padding(.vertical, 6).accessibilityElement(children: .combine)
-        .accessibilityLabel("\(route.title), \(route.regionTitle), \(route.subtitle)")
+        .padding(.vertical, 6)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            "\(route.title), \(route.regionTitle), \(route.subtitle)"
+        )
     }
 }
