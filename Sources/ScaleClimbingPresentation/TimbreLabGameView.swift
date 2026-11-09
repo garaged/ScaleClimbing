@@ -158,10 +158,12 @@ public struct TimbreLabGameView: View {
 
     private func partialButton(_ harmonicNumber: Int) -> some View {
         let selected = viewModel.selectedHarmonics.contains(harmonicNumber)
-        return Button("Partial \(harmonicNumber)") {
+        return Button(
+            selected ? "✓ Partial \(harmonicNumber)" : "Partial \(harmonicNumber)"
+        ) {
             viewModel.toggleHarmonic(harmonicNumber)
         }
-        .buttonStyle(selected ? .borderedProminent : .bordered)
+        .buttonStyle(.bordered)
         .frame(maxWidth: .infinity)
         .accessibilityIdentifier("timbre.partial.\(harmonicNumber)")
     }
