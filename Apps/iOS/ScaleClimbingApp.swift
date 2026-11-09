@@ -6,20 +6,16 @@ import SwiftUI
 @MainActor
 struct ScaleClimbingApp: App {
     private let chordPlayer = GeneratedChordPlayer()
-
     var body: some Scene {
         WindowGroup {
-            ScaleClimbingRootView(onPlayChord: { notes in
-                chordPlayer.play(notes)
-            }, onPlayPitch: { pitch in
-                chordPlayer.play(pitch)
-            }, onPlayInterval: { pitches in
-                chordPlayer.playInterval(pitches)
-            }, onPlayVoicing: { pitches in
-                chordPlayer.playVoicing(pitches)
-            }, onPlayScale: { pitches in
-                chordPlayer.playScale(pitches)
-            })
+            ScaleClimbingRootView(
+                onPlayChord: { chordPlayer.play($0) },
+                onPlayPitch: { chordPlayer.play($0) },
+                onPlayInterval: { chordPlayer.playInterval($0) },
+                onPlayVoicing: { chordPlayer.playVoicing($0) },
+                onPlayScale: { chordPlayer.playScale($0) },
+                onPlayProgression: { chordPlayer.playProgression($0) }
+            )
         }
     }
 }
