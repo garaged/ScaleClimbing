@@ -138,7 +138,9 @@ final class EarTrainingUITests: XCTestCase {
     func testChordAtlasListeningAnswersAndFamilySwitch() {
         let app = XCUIApplication()
         app.launch()
-        app.staticTexts["Chord Atlas"].firstMatch.tap()
+        let atlasRoute = app.descendants(matching: .any)["home.route.chordAtlas"].firstMatch
+        XCTAssertTrue(atlasRoute.waitForExistence(timeout: 10))
+        atlasRoute.tap()
         let prompt = app.staticTexts["atlas.prompt"]
         XCTAssertTrue(prompt.waitForExistence(timeout: 10))
         XCTAssertTrue(prompt.label.contains("Which quality"))
@@ -161,7 +163,9 @@ final class EarTrainingUITests: XCTestCase {
     func testChordAtlasConstructionCanReplayWrongAttempt() {
         let app = XCUIApplication()
         app.launch()
-        app.staticTexts["Chord Atlas"].firstMatch.tap()
+        let atlasRoute = app.descendants(matching: .any)["home.route.chordAtlas"].firstMatch
+        XCTAssertTrue(atlasRoute.waitForExistence(timeout: 10))
+        atlasRoute.tap()
         app.segmentedControls["atlas.mode"].buttons["Build"].tap()
         XCTAssertTrue(app.staticTexts["atlas.prompt"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["atlas.prompt"].label.contains("Build C Major Triad"))

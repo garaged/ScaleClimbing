@@ -39,6 +39,7 @@ public struct ScaleClimbingRootView: View {
                         NavigationLink(value: route) {
                             RouteRow(route: route)
                         }
+                        .accessibilityIdentifier("home.route.\(route.rawValue)")
                     }
                 }
             }
