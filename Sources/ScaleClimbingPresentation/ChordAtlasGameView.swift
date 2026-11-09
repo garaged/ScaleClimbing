@@ -16,10 +16,6 @@ public struct ChordAtlasGameView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Chord Atlas")
-                    .font(.largeTitle.bold())
-                    .accessibilityAddTraits(.isHeader)
-
                 Picker("Chord family", selection: Binding(
                     get: { viewModel.family },
                     set: { viewModel.selectFamily($0) }

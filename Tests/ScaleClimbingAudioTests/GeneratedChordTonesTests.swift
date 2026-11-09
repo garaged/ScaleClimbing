@@ -78,3 +78,27 @@ import Testing
     #expect(reference.allSatisfy { $0.isFinite && abs($0) <= 0.25 })
     #expect(GeneratedChordTones.voicedSamples(for: []).isEmpty)
 }
+
+
+@Test func generatedRhythmClicksAreAudibleAndKeepEverySubdivision() {
+    let sampleRate = 8_000.0
+    let pattern = RhythmPattern(meter: .fourFour)
+    let clickFrames = 800
+    let gapFrames = 1_040
+
+    let samples = GeneratedChordTones.rhythmSamples(
+        for: pattern,
+        sampleRate: sampleRate,
+        clickDuration: 0.1,
+        gapDuration: 0.13
+    )
+
+    #expect(samples.count == pattern.clicks.count * clickFrames + (pattern.clicks.count - 1) * gapFrames)
+    #expect(samples.allSatisfy { $0.isFinite && abs($0) <= 1.0 })
+    #expect(samples.contains { abs($0) > 0.25 })
+
+    for index in pattern.clicks.indices {
+        let start = index * (clickFrames + gapFrames)
+        #expect(samples[start..<(start + clickFrames)].contains { abs($0) > 0.25 })
+    }
+}

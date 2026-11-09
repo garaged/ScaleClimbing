@@ -16,10 +16,6 @@ public struct ScaleExplorerGameView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Scale Explorer")
-                    .font(.largeTitle.bold())
-                    .accessibilityAddTraits(.isHeader)
-
                 Picker("Scale family", selection: Binding(
                     get: { viewModel.family },
                     set: { viewModel.selectFamily($0) }

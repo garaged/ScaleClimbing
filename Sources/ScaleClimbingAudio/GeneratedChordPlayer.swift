@@ -93,8 +93,8 @@ public enum GeneratedChordTones {
     public static func rhythmSamples(
         for pattern: RhythmPattern,
         sampleRate: Double = 44_100,
-        clickDuration: Double = 0.05,
-        gapDuration: Double = 0.10
+        clickDuration: Double = 0.10,
+        gapDuration: Double = 0.13
     ) -> [Float] {
         guard sampleRate > 0, clickDuration > 0, gapDuration >= 0 else {
             return []
@@ -119,16 +119,28 @@ public enum GeneratedChordTones {
         440.0 * pow(2.0, (Double(pitch.midiNumber) - 69.0) / 12.0)
     }
 
+    /// A short, bright percussive tone. This envelope is intentionally separate
+    /// from sustained-note synthesis so rhythm clicks remain audible on an iPhone.
     private static func clickSamples(
         accent: Bool,
         sampleRate: Double,
         duration: Double
     ) -> [Float] {
-        samples(
-            frequencies: [accent ? 1_320 : 880],
-            sampleRate: sampleRate,
-            duration: duration
-        )
+        let frameCount = Int((sampleRate * duration).rounded(.down))
+        guard frameCount > 0 else { return [] }
+
+        let primaryFrequency = accent ? 1_760.0 : 1_120.0
+        let overtoneFrequency = accent ? 2_640.0 : 1_680.0
+        let gain = accent ? 0.68 : 0.52
+
+        return (0..<frameCount).map { frame in
+            let time = Double(frame) / sampleRate
+            let attack = min(1.0, time / 0.002)
+            let decay = exp(-time * 30.0)
+            let wave = sin(2.0 * Double.pi * primaryFrequency * time)
+                + 0.22 * sin(2.0 * Double.pi * overtoneFrequency * time)
+            return Float(wave * attack * decay * gain)
+        }
     }
 
     private static func samples(

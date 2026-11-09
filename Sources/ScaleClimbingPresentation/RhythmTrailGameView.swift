@@ -10,7 +10,6 @@ public struct RhythmTrailGameView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Rhythm Trail").font(.largeTitle.bold()).accessibilityAddTraits(.isHeader)
                 Picker("Meter", selection: Binding(get: { viewModel.meter }, set: { viewModel.selectMeter($0) })) {
                     ForEach(RhythmMeter.allCases) { Text($0.title).tag($0) }
                 }.pickerStyle(.menu).accessibilityIdentifier("rhythm.meter")
