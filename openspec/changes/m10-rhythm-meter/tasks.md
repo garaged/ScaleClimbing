@@ -5,5 +5,5 @@
 - [x] Add domain, audio, presentation and iPhone UI tests
 - [x] Add manual acceptance and Makefile target
 - [x] Add named BPM selection with an accessible 108 BPM default and meter-aware click spacing
-- [ ] Pass hosted gates
+- [x] Pass hosted gates
 - [ ] Receive manual acceptance before merge
