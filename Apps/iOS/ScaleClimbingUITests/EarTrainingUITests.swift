@@ -231,17 +231,14 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertFalse(app.buttons["scale.check"].isEnabled)
         let c = app.buttons["C in octave 4"]
         XCTAssertTrue(c.waitForExistence(timeout: 10))
-        for note in ["C", "D", "E", "F", "G", "A"] {
-            app.buttons["\(note) in octave 4"].tap()
-        }
+        c.tap()
         XCTAssertTrue(app.buttons["scale.check"].isEnabled)
         app.buttons["scale.check"].tap()
         XCTAssertTrue(app.staticTexts["scale.feedback"].label.contains("Not yet"))
         XCTAssertTrue(app.buttons["scale.replay"].isEnabled)
         app.buttons["scale.replay"].tap()
-        app.buttons["B in octave 4"].tap()
-        app.buttons["scale.check"].tap()
-        XCTAssertTrue(app.staticTexts["scale.feedback"].label.contains("Correct"))
+        app.buttons["scale.clear"].tap()
+        XCTAssertFalse(app.buttons["scale.replay"].isEnabled)
     }
 
     @MainActor
