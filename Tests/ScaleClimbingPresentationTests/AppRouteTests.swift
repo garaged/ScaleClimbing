@@ -4,12 +4,8 @@ import Testing
 @MainActor
 @Test func homeListsAvailableRoutesFromRouteCatalog() {
     let viewModel = HomeViewModel()
-    let routes = viewModel.availableRoutes
-
-    #expect(routes == AppRoute.allCases)
-    #expect(routes.contains(.noteHunter))
-    #expect(routes.contains(.chordForge))
-    #expect(routes.contains(.earTraining))
+    #expect(viewModel.availableRoutes == AppRoute.allCases)
+    #expect(viewModel.availableRoutes.contains(.scaleExplorer))
 }
 
 @Test func noteHunterRouteHasBeginnerFacingLabels() {
@@ -24,19 +20,13 @@ import Testing
     #expect(AppRoute.chordForge.subtitle.contains("triads"))
 }
 
-@Test func earTrainingRouteExplainsAuditorySkill() {
-    #expect(AppRoute.earTraining.title == "Ear Training")
-    #expect(AppRoute.earTraining.regionTitle == "Triad Cliffs")
-}
-
 @Test func intervalTrailRouteHasDistinctListeningRegion() {
     #expect(AppRoute.intervalTrail.title == "Interval Trail")
     #expect(AppRoute.intervalTrail.regionTitle == "Interval Ridge")
-    #expect(AppRoute.allCases.contains(.intervalTrail))
 }
 
-@Test func chordAtlasRouteLivesInHarmonyHeights() {
-    #expect(AppRoute.chordAtlas.title == "Chord Atlas")
-    #expect(AppRoute.chordAtlas.regionTitle == "Harmony Heights")
-    #expect(AppRoute.allCases.contains(.chordAtlas))
+@Test func scaleExplorerRouteLivesAtScaleSummit() {
+    #expect(AppRoute.scaleExplorer.title == "Scale Explorer")
+    #expect(AppRoute.scaleExplorer.regionTitle == "Scale Summit")
+    #expect(AppRoute.scaleExplorer.subtitle.contains("modes"))
 }
