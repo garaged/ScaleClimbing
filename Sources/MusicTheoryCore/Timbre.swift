@@ -178,6 +178,7 @@ public struct BeatingExample: Codable, Hashable, Sendable {
 
 public enum TimbrePlayback: Codable, Hashable, Sendable {
     case profile(TimbreProfile)
+    case components([HarmonicComponent])
     case octave
     case tuning(TuningReference)
     case beating

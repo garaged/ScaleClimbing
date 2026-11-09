@@ -16,7 +16,8 @@ struct ScaleClimbingApp: App {
                 onPlayVoicing: { chordPlayer.playVoicing($0) },
                 onPlayScale: { chordPlayer.playScale($0) },
                 onPlayProgression: { chordPlayer.playProgression($0) },
-                onPlayRhythm: { chordPlayer.playRhythm($0) }
+                onPlayRhythm: { chordPlayer.playRhythm($0) },
+                onPlayTimbre: { chordPlayer.playTimbre($0) }
             )
         }
     }

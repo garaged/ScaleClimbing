@@ -14,4 +14,6 @@ import Testing
     #expect(AppRoute.scaleExplorer.regionTitle == "Scale Summit")
     #expect(AppRoute.harmonyPath.title == "Harmony Path")
     #expect(AppRoute.harmonyPath.regionTitle == "Harmony Heights")
+    #expect(AppRoute.timbreLab.title == "Timbre Lab")
+    #expect(AppRoute.timbreLab.regionTitle == "Timbre Terrace")
 }

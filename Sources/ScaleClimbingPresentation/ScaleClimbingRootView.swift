@@ -10,6 +10,7 @@ public struct ScaleClimbingRootView: View {
     private let onPlayScale: ([Pitch]) -> Void
     private let onPlayProgression: ([[Pitch]]) -> Void
     private let onPlayRhythm: (RhythmPattern) -> Void
+    private let onPlayTimbre: (TimbrePlayback) -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
@@ -19,7 +20,8 @@ public struct ScaleClimbingRootView: View {
         onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in },
         onPlayScale: @escaping ([Pitch]) -> Void = { _ in },
         onPlayProgression: @escaping ([[Pitch]]) -> Void = { _ in },
-        onPlayRhythm: @escaping (RhythmPattern) -> Void = { _ in }
+        onPlayRhythm: @escaping (RhythmPattern) -> Void = { _ in },
+        onPlayTimbre: @escaping (TimbrePlayback) -> Void = { _ in }
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
         self.onPlayChord = onPlayChord
@@ -29,6 +31,7 @@ public struct ScaleClimbingRootView: View {
         self.onPlayScale = onPlayScale
         self.onPlayProgression = onPlayProgression
         self.onPlayRhythm = onPlayRhythm
+        self.onPlayTimbre = onPlayTimbre
     }
 
     public var body: some View {
@@ -80,6 +83,8 @@ public struct ScaleClimbingRootView: View {
             HarmonyPathGameView(onPlayProgression: onPlayProgression)
         case .rhythmTrail:
             RhythmTrailGameView(onPlayRhythm: onPlayRhythm)
+        case .timbreLab:
+            TimbreLabGameView(onPlayTimbre: onPlayTimbre)
         }
     }
 }

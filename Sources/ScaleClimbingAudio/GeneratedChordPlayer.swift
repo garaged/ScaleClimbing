@@ -163,6 +163,13 @@ public enum GeneratedChordTones {
         switch playback {
         case .profile(let profile):
             return timbreSamples(for: profile, sampleRate: sampleRate)
+        case .components(let components):
+            return additiveSamples(
+                fundamentalFrequency: 220,
+                components: components,
+                sampleRate: sampleRate,
+                duration: 1.2
+            )
         case .octave:
             return additiveSamples(
                 frequencies: [220, 440],
