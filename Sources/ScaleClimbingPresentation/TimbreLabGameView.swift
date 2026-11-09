@@ -156,6 +156,16 @@ public struct TimbreLabGameView: View {
         }
     }
 
+    private func partialButton(_ harmonicNumber: Int) -> some View {
+        let selected = viewModel.selectedHarmonics.contains(harmonicNumber)
+        return Button("Partial \(harmonicNumber)") {
+            viewModel.toggleHarmonic(harmonicNumber)
+        }
+        .buttonStyle(selected ? .borderedProminent : .bordered)
+        .frame(maxWidth: .infinity)
+        .accessibilityIdentifier("timbre.partial.\(harmonicNumber)")
+    }
+
     @ViewBuilder
     private var buildContent: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -166,21 +176,15 @@ public struct TimbreLabGameView: View {
             )
             .accessibilityIdentifier("timbre.selected")
 
-            LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible()), count: 3),
-                spacing: 10
-            ) {
-                ForEach(1...viewModel.harmonicSeries.partialCount, id: \.self) {
-                    harmonicNumber in
-                    let selected = viewModel.selectedHarmonics.contains(
-                        harmonicNumber
-                    )
-                    Button("Partial \(harmonicNumber)") {
-                        viewModel.toggleHarmonic(harmonicNumber)
-                    }
-                    .buttonStyle(selected ? .borderedProminent : .bordered)
-                    .accessibilityIdentifier("timbre.partial.\(harmonicNumber)")
-                }
+            HStack {
+                partialButton(1)
+                partialButton(2)
+                partialButton(3)
+            }
+            HStack {
+                partialButton(4)
+                partialButton(5)
+                partialButton(6)
             }
 
             Button("Hear attempt") {
