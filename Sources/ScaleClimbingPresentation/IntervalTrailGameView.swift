@@ -19,10 +19,10 @@ public struct IntervalTrailGameView: View {
                 Text(viewModel.roundText + " · " + viewModel.modeText)
                     .font(.headline)
                     .accessibilityIdentifier("interval.round")
-                Text(viewModel.scoreText)
+                Text(AppCopy.learnerText(viewModel.scoreText))
                     .font(.subheadline.monospacedDigit())
                     .accessibilityIdentifier("interval.score")
-                Text(viewModel.promptText)
+                Text(AppCopy.learnerText(viewModel.promptText))
                     .font(.title3.weight(.semibold))
                     .accessibilityIdentifier("interval.prompt")
                 Button {
@@ -48,7 +48,7 @@ public struct IntervalTrailGameView: View {
                     }
                 }
 
-                Text(viewModel.feedbackText)
+                Text(AppCopy.learnerText(viewModel.feedbackText))
                     .accessibilityIdentifier("interval.feedback")
                     .practiceFeedbackCard()
                 Button("Next interval") { viewModel.nextRound() }

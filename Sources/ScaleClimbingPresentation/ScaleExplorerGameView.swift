@@ -63,7 +63,7 @@ public struct ScaleExplorerGameView: View {
                 Text(viewModel.roundText + " · " + viewModel.scoreText)
                     .font(.subheadline.monospacedDigit())
                     .accessibilityIdentifier("scale.progress")
-                Text(viewModel.promptText)
+                Text(AppCopy.learnerText(viewModel.promptText))
                     .font(.title3.weight(.semibold))
                     .accessibilityIdentifier("scale.prompt")
 
@@ -78,11 +78,11 @@ public struct ScaleExplorerGameView: View {
                 .accessibilityHint("Play the scale ascending and descending without changing the answer")
 
                 if viewModel.mode == .explore {
-                    Text(viewModel.intervalText)
+                    Text(AppCopy.learnerText(viewModel.intervalText))
                         .accessibilityIdentifier("scale.intervals")
-                    Text(viewModel.noteText)
+                    Text(AppCopy.learnerText(viewModel.noteText))
                         .accessibilityIdentifier("scale.notes")
-                    Text(viewModel.keyContextText)
+                    Text(AppCopy.learnerText(viewModel.keyContextText))
                         .foregroundStyle(.secondary)
                         .accessibilityIdentifier("scale.key-context")
                     PianoKeyboardView(
@@ -107,7 +107,7 @@ public struct ScaleExplorerGameView: View {
                         highlightedPitchClasses: viewModel.selectedPitchClasses,
                         onKeyTap: { key in viewModel.toggle(key.pitchClass) }
                     )
-                    Text(viewModel.selectionText)
+                    Text(AppCopy.learnerText(viewModel.selectionText))
                         .font(.callout.monospaced())
                         .accessibilityIdentifier("scale.selection")
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
@@ -136,7 +136,7 @@ public struct ScaleExplorerGameView: View {
                     .controlSize(.large)
                 }
 
-                Text(viewModel.feedbackText)
+                Text(AppCopy.learnerText(viewModel.feedbackText))
                     .practiceFeedbackCard()
                     .accessibilityIdentifier("scale.feedback")
 

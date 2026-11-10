@@ -47,11 +47,11 @@ public struct NotationTrailGameView: View {
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("notation.mode")
 
-                Text(viewModel.scoreText)
+                Text(AppCopy.learnerText(viewModel.scoreText))
                     .font(.subheadline.monospacedDigit())
                     .accessibilityIdentifier("notation.score")
 
-                Text(viewModel.promptText)
+                Text(AppCopy.learnerText(viewModel.promptText))
                     .font(.title3.weight(.semibold))
                     .accessibilityIdentifier("notation.prompt")
 
@@ -77,7 +77,7 @@ public struct NotationTrailGameView: View {
                     dictateContent
                 }
 
-                Text(viewModel.feedbackText)
+                Text(AppCopy.learnerText(viewModel.feedbackText))
                     .practiceFeedbackCard()
                     .accessibilityIdentifier("notation.feedback")
 
@@ -147,7 +147,7 @@ public struct NotationTrailGameView: View {
             .buttonStyle(.borderedProminent)
             .accessibilityIdentifier("notation.hear-melody")
 
-            Text(viewModel.selectedText)
+            Text(AppCopy.learnerText(viewModel.selectedText))
                 .accessibilityIdentifier("notation.selected")
 
             LazyVGrid(

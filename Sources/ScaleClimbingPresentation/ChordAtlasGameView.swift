@@ -41,7 +41,7 @@ public struct ChordAtlasGameView: View {
                 Text(viewModel.roundText + " · " + viewModel.scoreText)
                     .font(.subheadline.monospacedDigit())
                     .accessibilityIdentifier("atlas.progress")
-                Text(viewModel.promptText)
+                Text(AppCopy.learnerText(viewModel.promptText))
                     .font(.title3.weight(.semibold))
                     .accessibilityIdentifier("atlas.prompt")
 
@@ -71,7 +71,7 @@ public struct ChordAtlasGameView: View {
                         highlightedPitchClasses: viewModel.selectedPitchClasses,
                         onKeyTap: { key in viewModel.toggle(key.pitchClass) }
                     )
-                    Text(viewModel.selectionText)
+                    Text(AppCopy.learnerText(viewModel.selectionText))
                         .font(.callout.monospaced())
                         .accessibilityIdentifier("atlas.selection")
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
@@ -98,7 +98,7 @@ public struct ChordAtlasGameView: View {
                     .controlSize(.large)
                 }
 
-                Text(viewModel.feedbackText)
+                Text(AppCopy.learnerText(viewModel.feedbackText))
                     .practiceFeedbackCard()
                     .accessibilityIdentifier("atlas.feedback")
 

@@ -29,11 +29,11 @@ public struct NoteHunterGameView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(viewModel.title)
+            Text(AppCopy.learnerText(viewModel.title))
                 .font(.largeTitle.bold())
-            Text(viewModel.instructions)
+            Text(AppCopy.learnerText(viewModel.instructions))
                 .font(.headline)
-            Text(viewModel.scoreText)
+            Text(AppCopy.learnerText(viewModel.scoreText))
                 .font(.subheadline.monospacedDigit())
                 .foregroundStyle(.secondary)
         }
@@ -52,11 +52,11 @@ public struct NoteHunterGameView: View {
     }
 
     private var feedback: some View {
-        Text(viewModel.feedbackText)
+        Text(AppCopy.learnerText(viewModel.feedbackText))
             .font(.body)
             .practiceFeedbackCard()
             .padding(.horizontal)
-            .accessibilityLabel(viewModel.feedbackText)
+            .accessibilityLabel(AppCopy.learnerText(viewModel.feedbackText))
     }
 
     private var controls: some View {

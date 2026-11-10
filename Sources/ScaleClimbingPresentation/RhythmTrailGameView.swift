@@ -63,15 +63,15 @@ public struct RhythmTrailGameView: View {
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("rhythm.mode")
 
-                Text(viewModel.scoreText)
+                Text(AppCopy.learnerText(viewModel.scoreText))
                     .font(.subheadline.monospacedDigit())
                     .accessibilityIdentifier("rhythm.score")
 
-                Text(viewModel.promptText)
+                Text(AppCopy.learnerText(viewModel.promptText))
                     .font(.title3.weight(.semibold))
                     .accessibilityIdentifier("rhythm.prompt")
 
-                Text(viewModel.pulseText)
+                Text(AppCopy.learnerText(viewModel.pulseText))
                     .font(.largeTitle)
                     .accessibilityLabel("Pulse pattern \(viewModel.pulseText)")
                     .accessibilityIdentifier("rhythm.pulse")
@@ -133,7 +133,7 @@ public struct RhythmTrailGameView: View {
                     .controlSize(.large)
                 }
 
-                Text(viewModel.feedbackText)
+                Text(AppCopy.learnerText(viewModel.feedbackText))
                     .practiceFeedbackCard()
                     .accessibilityIdentifier("rhythm.feedback")
 
