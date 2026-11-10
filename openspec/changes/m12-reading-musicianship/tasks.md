@@ -6,5 +6,5 @@
 - [x] Wire generated offline note and phrase playback without adding permissions
 - [x] Add domain, presentation, audio-route and focused iPhone UI tests
 - [x] Add retained specifications, manual acceptance and Makefile target
-- [ ] Pass hosted validation, simulator build and simulator UI acceptance
+- [x] Pass hosted validation, simulator build and simulator UI acceptance
 - [ ] Receive manual acceptance before marking the PR ready
