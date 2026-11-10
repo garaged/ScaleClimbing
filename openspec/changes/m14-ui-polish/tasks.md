@@ -6,5 +6,5 @@
 - [x] Apply the common visual shell to all existing practice screens without behavior drift
 - [x] Add presentation and focused iPhone UI tests for the redesign
 - [x] Document the design system, manual acceptance and Makefile target
-- [ ] Pass hosted validation, simulator build and simulator UI acceptance
+- [x] Pass hosted validation, simulator build and simulator UI acceptance
 - [ ] Receive manual acceptance before marking the PR ready
