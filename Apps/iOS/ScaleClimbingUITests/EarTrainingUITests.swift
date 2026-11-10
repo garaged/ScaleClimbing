@@ -9,7 +9,7 @@ final class EarTrainingUITests: XCTestCase {
     func testBlindPromptAnswerAndNextRound() {
         let app = XCUIApplication()
         app.launch()
-        app.staticTexts["Ear Training"].firstMatch.tap()
+        openRoute(in: app, identifier: "home.route.earTraining")
 
         let prompt = app.staticTexts["ear.prompt"]
         XCTAssertTrue(prompt.waitForExistence(timeout: 10))
@@ -40,14 +40,14 @@ final class EarTrainingUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        app.staticTexts["Note Hunter"].firstMatch.tap()
+        openRoute(in: app, identifier: "home.route.noteHunter")
         XCTAssertTrue(app.buttons["Next note"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "octave 4")).firstMatch.exists)
 
         // Restart to navigate from a fresh home screen rather than relying on OS back-button labels.
         app.terminate()
         app.launch()
-        app.staticTexts["Chord Forge"].firstMatch.tap()
+        openRoute(in: app, identifier: "home.route.chordForge")
         XCTAssertTrue(app.buttons["Hear chord"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["Check chord"].exists)
         XCTAssertTrue(app.buttons["Replay attempt"].exists)
@@ -63,7 +63,7 @@ final class EarTrainingUITests: XCTestCase {
     func testChordForgeAuditoryAttemptCanBeReplayedAndRetried() {
         let app = XCUIApplication()
         app.launch()
-        app.staticTexts["Chord Forge"].firstMatch.tap()
+        openRoute(in: app, identifier: "home.route.chordForge")
         let keyboardKeys = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "in octave 4"))
         XCTAssertTrue(keyboardKeys.firstMatch.waitForExistence(timeout: 10))
         let c = app.buttons["C in octave 4"]
@@ -81,7 +81,7 @@ final class EarTrainingUITests: XCTestCase {
     func testIntervalTrailBlindPlaybackAndProgression() {
         let app = XCUIApplication()
         app.launch()
-        app.staticTexts["Interval Trail"].firstMatch.tap()
+        openRoute(in: app, identifier: "home.route.intervalTrail")
 
         let prompt = app.staticTexts["interval.prompt"]
         XCTAssertTrue(prompt.waitForExistence(timeout: 10))
@@ -111,7 +111,7 @@ final class EarTrainingUITests: XCTestCase {
     func testVoicingLabExactPitchesAndRetryNavigation() {
         let app = XCUIApplication()
         app.launch()
-        app.staticTexts["Voicing Lab"].firstMatch.tap()
+        openRoute(in: app, identifier: "home.route.voicingLab")
         let target = app.staticTexts["voicing.target"]
         XCTAssertTrue(target.waitForExistence(timeout: 10))
         XCTAssertTrue(target.label.contains("Root position"))
@@ -511,6 +511,23 @@ final class EarTrainingUITests: XCTestCase {
                 .exists
         )
         XCTAssertTrue(app.staticTexts["Start with the basics"].exists)
+    }
+
+
+    @MainActor
+    private func openRoute(in app: XCUIApplication, identifier: String) {
+        let route = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == %@", identifier))
+            .firstMatch
+
+        for _ in 0..<14 {
+            if route.exists && route.isHittable {
+                route.tap()
+                return
+            }
+            app.swipeUp()
+        }
+        XCTFail("Could not find a hittable route for \(identifier)")
     }
 
 }
