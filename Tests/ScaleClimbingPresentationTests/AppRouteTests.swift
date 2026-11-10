@@ -16,4 +16,6 @@ import Testing
     #expect(AppRoute.harmonyPath.regionTitle == "Harmony Heights")
     #expect(AppRoute.timbreLab.title == "Timbre Lab")
     #expect(AppRoute.timbreLab.regionTitle == "Timbre Terrace")
+    #expect(AppRoute.notationTrail.title == "Notation Trail")
+    #expect(AppRoute.notationTrail.regionTitle == "Notation Nook")
 }

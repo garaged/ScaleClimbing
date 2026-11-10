@@ -58,3 +58,14 @@ The core SHALL represent harmonic partials, synthetic timbre profiles, octave fr
 - **GIVEN** a shared root frequency
 - **WHEN** equal-tempered and just fifths are derived
 - **THEN** each remains above the root and their frequencies are different
+
+
+### Requirement: written notation has deterministic staff geometry
+
+The core SHALL model clefs, written spellings and octaves independently from pitch classes and derive staff steps, ledger lines and sounding pitches deterministically.
+
+#### Scenario: enharmonic spellings remain visually distinct
+
+- **GIVEN** C sharp and D flat in one octave
+- **WHEN** their sounding pitch and treble staff steps are derived
+- **THEN** the pitch classes match and the staff steps differ
