@@ -504,7 +504,12 @@ final class EarTrainingUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(app.staticTexts["Learn music by doing"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons["home.route.learningPath"].exists)
+        XCTAssertTrue(
+            app.descendants(matching: .any)
+                .matching(NSPredicate(format: "identifier == %@", "home.route.learningPath"))
+                .firstMatch
+                .exists
+        )
         XCTAssertTrue(app.staticTexts["Start with the basics"].exists)
     }
 
