@@ -53,9 +53,7 @@ public struct MasteryRecord: Codable, Hashable, Sendable {
         let intervals = [0, 1, 3, 7, 14, 30]
         return MasteryRecord(
             level: nextLevel,
-            nextReviewDate: date.addingTimeInterval(
-                Double(intervals[nextLevel]) * 86_400
-            )
+            nextReviewDate: date.addingTimeInterval(Double(intervals[nextLevel]) * 86_400)
         )
     }
 }
@@ -115,19 +113,39 @@ public enum DailyPracticePlan {
         let all = PracticeSkill.allCases.map {
             DailyPracticeItem(skill: $0, record: progress.record(for: $0))
         }
-        let due = all.filter { $0.record.nextReviewDate <= date }
-        let source = due.isEmpty ? all : due
-        return Array(source.sorted(by: isEarlier).prefix(max(0, limit)))
+        let dueReviews = all.filter {
+            progress.records[$0.skill] != nil && $0.record.nextReviewDate <= date
+        }
+        let newSkills = all.filter { progress.records[$0.skill] == nil }
+        let source = dueReviews + newSkills
+        let items = source.isEmpty ? all : source
+
+        return Array(
+            items.sorted {
+                isEarlier($0, than: $1, progress: progress)
+            }
+            .prefix(max(0, limit))
+        )
     }
 
-    private static func isEarlier(_ lhs: DailyPracticeItem, _ rhs: DailyPracticeItem) -> Bool {
+    private static func isEarlier(
+        _ lhs: DailyPracticeItem,
+        than rhs: DailyPracticeItem,
+        progress: LearningProgress
+    ) -> Bool {
+        let lhsIsNew = progress.records[lhs.skill] == nil
+        let rhsIsNew = progress.records[rhs.skill] == nil
+        if lhsIsNew != rhsIsNew {
+            return !lhsIsNew
+        }
         if lhs.record.nextReviewDate != rhs.record.nextReviewDate {
             return lhs.record.nextReviewDate < rhs.record.nextReviewDate
         }
         if lhs.record.level != rhs.record.level {
             return lhs.record.level < rhs.record.level
         }
-        return lhs.skill.rawValue < rhs.skill.rawValue
+        return PracticeSkill.allCases.firstIndex(of: lhs.skill)! <
+            PracticeSkill.allCases.firstIndex(of: rhs.skill)!
     }
 }
 
