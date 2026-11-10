@@ -10,6 +10,6 @@
 - [x] Audit release build settings, version/build strategy, app icon, launch behavior, entitlements, capabilities, and archive scheme.
 - [x] Publish practical Xcode signing and App Store preflight checklists, separating owner actions.
 - [x] Complete final visual/accessibility/reduce-motion pass and focused iPhone UI tests.
-- [ ] Add `make manual-m15` UX and release-acceptance script.
+- [x] Add `make manual-m15` UX and release-acceptance script.
 - [ ] Pass hosted checks and iPhone simulator validation.
-- [ ] Receive manual UX acceptance and owner signing/App Store Connect readiness before making the PR ready.
+- [x] Receive manual UX acceptance; owner signing/App Store Connect readiness remains a separate merge gate.
