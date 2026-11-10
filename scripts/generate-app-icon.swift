@@ -2,7 +2,7 @@ import AppKit
 import Foundation
 
 // Reproducible 1024x1024 app icon, generated without external image tools.
-// An upright white note rises above three ascending cyan-to-violet steps.
+// A standard white music glyph rises above three ascending cyan-to-violet steps.
 let size = 1024
 let target = CommandLine.arguments.dropFirst().first ?? "AppIcon.png"
 let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { rect in
@@ -33,34 +33,21 @@ let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { r
         NSGradient(starting: bottom, ending: top)!.draw(in: shape, angle: 90)
     }
 
-    // A vertical stem and level head make the note unambiguous at home-screen size.
-    NSColor.white.setFill()
-    NSBezierPath(ovalIn: CGRect(x: 356, y: 486, width: 158, height: 112)).fill()
-
-    NSColor.white.setStroke()
-    let stem = NSBezierPath()
-    stem.lineWidth = 34
-    stem.lineCapStyle = .round
-    stem.move(to: CGPoint(x: 500, y: 550))
-    stem.line(to: CGPoint(x: 500, y: 774))
-    stem.stroke()
-
-    // The flag is a single gentle curve, not a skewed beam.
-    let flag = NSBezierPath()
-    flag.lineWidth = 30
-    flag.lineCapStyle = .round
-    flag.move(to: CGPoint(x: 500, y: 774))
-    flag.curve(
-        to: CGPoint(x: 664, y: 665),
-        controlPoint1: CGPoint(x: 574, y: 792),
-        controlPoint2: CGPoint(x: 662, y: 758)
+    // Use the platform's proven note shape instead of bespoke stem/flag geometry.
+    let note = NSAttributedString(
+        string: "♪",
+        attributes: [
+            .font: NSFont.systemFont(ofSize: 510, weight: .medium),
+            .foregroundColor: NSColor.white
+        ]
     )
-    flag.curve(
-        to: CGPoint(x: 636, y: 616),
-        controlPoint1: CGPoint(x: 684, y: 646),
-        controlPoint2: CGPoint(x: 666, y: 626)
+    let noteSize = note.size()
+    note.draw(
+        at: CGPoint(
+            x: (CGFloat(size) - noteSize.width) / 2,
+            y: 300
+        )
     )
-    flag.stroke()
     return true
 }
 guard let bitmap = NSBitmapImageRep(
