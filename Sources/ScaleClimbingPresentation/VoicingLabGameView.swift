@@ -14,7 +14,7 @@ public struct VoicingLabGameView: View {
     }
 
     public var body: some View {
-        ScrollView {
+        PracticeScreen {
             VStack(alignment: .leading, spacing: 16) {
 
                 Picker("Practice range", selection: Binding(
@@ -51,9 +51,7 @@ public struct VoicingLabGameView: View {
                     .accessibilityIdentifier("voicing.selected")
                 Text(viewModel.feedbackText)
                     .font(.body)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .practiceFeedbackCard()
                     .accessibilityIdentifier("voicing.feedback")
 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {

@@ -11,7 +11,7 @@ public struct LearningPathGameView: View {
     }
 
     public var body: some View {
-        ScrollView {
+        PracticeScreen {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Today’s mixed practice")
                     .font(.title3.weight(.semibold))

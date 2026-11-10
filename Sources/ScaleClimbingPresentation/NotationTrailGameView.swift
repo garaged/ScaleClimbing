@@ -17,7 +17,7 @@ public struct NotationTrailGameView: View {
     }
 
     public var body: some View {
-        ScrollView {
+        PracticeScreen {
             VStack(alignment: .leading, spacing: 16) {
                 Picker(
                     "Clef",
@@ -78,9 +78,7 @@ public struct NotationTrailGameView: View {
                 }
 
                 Text(viewModel.feedbackText)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .practiceFeedbackCard()
                     .accessibilityIdentifier("notation.feedback")
 
                 if viewModel.mode != .dictate {

@@ -14,7 +14,7 @@ public struct HarmonyPathGameView: View {
     }
 
     public var body: some View {
-        ScrollView {
+        PracticeScreen {
             VStack(alignment: .leading, spacing: 16) {
                 Picker("Key", selection: Binding(get: { viewModel.tonic }, set: { viewModel.selectTonic($0) })) {
                     ForEach(PitchClass.allCases, id: \.self) { Text($0.sharpName).tag($0) }

@@ -14,7 +14,7 @@ public struct RhythmTrailGameView: View {
     }
 
     public var body: some View {
-        ScrollView {
+        PracticeScreen {
             VStack(alignment: .leading, spacing: 16) {
                 Picker(
                     "Meter",
@@ -134,9 +134,7 @@ public struct RhythmTrailGameView: View {
                 }
 
                 Text(viewModel.feedbackText)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .practiceFeedbackCard()
                     .accessibilityIdentifier("rhythm.feedback")
 
                 Button("Next meter") {
