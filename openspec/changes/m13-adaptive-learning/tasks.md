@@ -6,5 +6,5 @@
 - [x] Implement Learning Path queue, explicit review completion, route links and accessibility controls
 - [x] Add domain, persistence, presentation and focused iPhone UI tests
 - [x] Add retained specifications, manual acceptance and Makefile target
-- [ ] Pass hosted validation, simulator build and simulator UI acceptance
+- [x] Pass hosted validation, simulator build and simulator UI acceptance
 - [ ] Receive manual acceptance before marking the PR ready
