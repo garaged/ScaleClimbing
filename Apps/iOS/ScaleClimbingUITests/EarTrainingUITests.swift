@@ -542,7 +542,7 @@ final class EarTrainingUITests: XCTestCase {
         spanish.buttons["home.about"].tap()
         XCTAssertTrue(spanish.navigationBars["Acerca de y ayuda"].waitForExistence(timeout: 10))
         XCTAssertTrue(spanish.staticTexts["Privacidad"].exists)
-        XCTAssertTrue(spanish.links["Ve el proyecto de código abierto"].exists)
+        XCTAssertTrue(spanish.staticTexts["Ve el proyecto de código abierto"].exists)
     }
 
 }
