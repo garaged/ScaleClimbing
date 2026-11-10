@@ -32,3 +32,14 @@ A milestone that introduces generated spectral audio SHALL document a short chec
 - **GIVEN** M11 is ready for manual review
 - **WHEN** the reviewer runs `make manual-m11`
 - **THEN** they receive a concise iPhone simulator checklist
+
+
+### Requirement: notation learning has practical acceptance coverage
+
+A milestone that renders staff notation SHALL document a short check for readable display, generated playback, accessibility and absent permission prompts.
+
+#### Scenario: reviewer runs Notation Trail acceptance
+
+- **GIVEN** M12 is ready for manual review
+- **WHEN** the reviewer runs `make manual-m12`
+- **THEN** they receive a concise iPhone simulator checklist

@@ -81,6 +81,10 @@ public struct WrittenNote: Codable, Hashable, Sendable, Identifiable {
     }
 }
 
+extension NoteSpelling: Identifiable {
+    public var id: String { description }
+}
+
 extension NoteLetter {
     fileprivate var diatonicIndex: Int {
         switch self {

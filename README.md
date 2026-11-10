@@ -62,6 +62,12 @@ Timbre Lab teaches how a fixed A3 fundamental can sound Pure, Warm or Bright as 
 
 For the concise iPhone acceptance script run `make manual-m11`.
 
+## M12 — Notation Trail
+
+Notation Trail connects staff positions to sound through treble/bass clefs, accidentals and enharmonic context. **Explore** explains a written pitch and basic chord symbols; **Read** asks for the note name without disclosure; **Dictate** plays a short C-major phrase for ordered movable-Do construction and retry.
+
+For the concise iPhone acceptance script run `make manual-m12`.
+
 ## Engineering principles
 
 ScaleClimbing uses:

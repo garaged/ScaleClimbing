@@ -48,10 +48,15 @@
 - Named tempo choices from 80 through 120 BPM use 108 BPM as the comfortable default.
 - Offline click playback, deterministic tests, simulator coverage and manual accessibility/audio acceptance protect the flow.
 
-## M11 — Timbre, overtones and tuning (active)
+## M11 — Timbre, overtones and tuning (completed)
 - **Timbre Lab** introduces a controlled harmonic series, additive Pure/Warm/Bright spectra, octave displacement, an equal-tempered versus just fifth, and an audible beating example.
 - Explore reveals the controlled comparison; blind Listen identifies spectral balance; Build assembles and replays a partial recipe.
 - All sound remains synthesized locally; microphone capture, samples and tuning-table editing remain deferred.
+
+## M12 — Reading and musicianship (active)
+- **Notation Trail** connects written notation and generated sound with treble/bass staff position, accidentals, enharmonic context, beginner chord symbols and short movable-Do dictation.
+- The staff renderer handles a bounded beginner range including ledger lines; it is intentionally not a score editor.
+- Generated notes and phrases, deterministic tests, simulator coverage and a short audio/accessibility acceptance gate keep the loop offline-first.
 
 ## Planned learning milestones
 
@@ -63,8 +68,8 @@
 | M8 — Scales, modes and keys | Completed: major, natural/harmonic/melodic minor; pentatonic and blues; diatonic modes; key signatures and circle of fifths | Build, recognize and hear fundamental scales and modes |
 | M9 — Harmony and progressions | Completed: major-key diatonic triads/sevenths, Roman numerals, tonic/predominant/dominant functions and authentic/plagal/half cadences | Recognize relationships and harmonic movement instead of isolated chords |
 | M10 — Rhythm and meter | Pulse, note/rest values, subdivisions, time signatures, syncopation, simple/compound meters | Learn timing through tapping and listening |
-| M11 — Timbre, overtones and tuning | Active: harmonic series/partials, overtone language, additive timbre, octave displacement, beating, equal-tempered and just fifths | Separate fundamental pitch, spectral content and timbre; hear octave and tuning differences |
-| M12 — Reading and musicianship | Staff, clefs, accidentals/enharmonics, chord symbols, sight reading, solfege and melodic dictation | Connect notation, sound, theory and playing |
+| M11 — Timbre, overtones and tuning | Completed: harmonic series/partials, overtone language, additive timbre, octave displacement, beating, equal-tempered and just fifths | Separate fundamental pitch, spectral content and timbre; hear octave and tuning differences |
+| M12 — Reading and musicianship | Active: treble/bass staff reading, accidental/enharmonic context, beginner chord symbols, movable-Do melodic dictation | Connect notation, sound, theory and playing |
 | M13 — Adaptive learning | Per-skill mastery, spaced repetition, mixed daily practice, saved progress, accessibility settings | Consolidate knowledge with persistent and personalized practice |
 
 ## Design principles for all variants

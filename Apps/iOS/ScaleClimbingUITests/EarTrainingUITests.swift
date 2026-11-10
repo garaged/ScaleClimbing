@@ -398,4 +398,64 @@ final class EarTrainingUITests: XCTestCase {
         XCTFail("Could not find Timbre Lab")
     }
 
+    @MainActor
+    func testNotationTrailExploreReadAndDictateRetry() {
+        let app = XCUIApplication()
+        app.launch()
+        openNotationTrail(in: app)
+
+        let prompt = app.staticTexts["notation.prompt"]
+        XCTAssertTrue(prompt.waitForExistence(timeout: 10))
+        XCTAssertTrue(prompt.label.contains("Treble"))
+        XCTAssertTrue(prompt.label.contains("F#4"))
+        XCTAssertTrue(app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier == %@", "notation.staff")
+        ).firstMatch.exists)
+        XCTAssertTrue(app.buttons["notation.hear-note"].isHittable)
+        XCTAssertTrue(app.staticTexts["notation.chord.C7"].label.contains("dominant"))
+
+        app.segmentedControls["notation.mode"].buttons["Read"].tap()
+        XCTAssertTrue(prompt.label.contains("Name this"))
+        XCTAssertFalse(prompt.label.contains("F#4"))
+        app.buttons["notation.answer.F#"].tap()
+        XCTAssertTrue(app.staticTexts["notation.feedback"].label.contains("Correct"))
+        XCTAssertTrue(app.staticTexts["notation.score"].label.contains("1/1"))
+
+        app.segmentedControls["notation.mode"].buttons["Dictate"].tap()
+        XCTAssertTrue(app.buttons["notation.hear-melody"].isHittable)
+        app.buttons["notation.degree.do"].tap()
+        app.buttons["notation.degree.mi"].tap()
+        app.buttons["notation.check"].tap()
+        XCTAssertTrue(app.staticTexts["notation.feedback"].label.contains("Not yet"))
+        app.buttons["notation.clear"].tap()
+        app.buttons["notation.degree.do"].tap()
+        app.buttons["notation.degree.re"].tap()
+        app.buttons["notation.degree.mi"].tap()
+        app.buttons["notation.check"].tap()
+        XCTAssertTrue(app.staticTexts["notation.feedback"].label.contains("Correct"))
+    }
+
+    @MainActor
+    private func openNotationTrail(in app: XCUIApplication) {
+        let route = app.descendants(matching: .any).matching(
+            NSPredicate(
+                format: "identifier == %@ OR label BEGINSWITH %@",
+                "home.route.notationTrail",
+                "Notation Trail, "
+            )
+        ).firstMatch
+
+        for _ in 0..<12 {
+            if route.exists && route.isHittable {
+                route.tap()
+                XCTAssertTrue(
+                    app.staticTexts["notation.prompt"].waitForExistence(timeout: 10)
+                )
+                return
+            }
+            app.swipeUp()
+        }
+        XCTFail("Could not find Notation Trail")
+    }
+
 }

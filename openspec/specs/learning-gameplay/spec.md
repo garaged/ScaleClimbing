@@ -32,3 +32,14 @@ ScaleClimbing SHALL use generated comparisons that hold a stated reference const
 - **GIVEN** a Timbre Lab listening round
 - **WHEN** a profile is played
 - **THEN** the fundamental pitch stays fixed while partial balance changes
+
+
+### Requirement: melodic dictation preserves order
+
+ScaleClimbing SHALL treat a short melodic-dictation answer as an ordered sequence, rather than an unordered set of scale degrees.
+
+#### Scenario: reordered solfège fails
+
+- **GIVEN** a Do–Re–Mi prompt
+- **WHEN** a learner submits Do–Mi–Re
+- **THEN** the answer is rejected and feedback reveals the expected sequence
