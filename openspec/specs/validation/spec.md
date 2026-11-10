@@ -43,3 +43,14 @@ A milestone that renders staff notation SHALL document a short check for readabl
 - **GIVEN** M12 is ready for manual review
 - **WHEN** the reviewer runs `make manual-m12`
 - **THEN** they receive a concise iPhone simulator checklist
+
+
+### Requirement: adaptive learning has practical acceptance coverage
+
+A milestone that introduces persisted learning recommendations SHALL document a short check for explicit completion, local settings, route behavior and absent permission prompts.
+
+#### Scenario: reviewer runs Learning Path acceptance
+
+- **GIVEN** M13 is ready for manual review
+- **WHEN** the reviewer runs `make manual-m13`
+- **THEN** they receive a concise iPhone simulator checklist

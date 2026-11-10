@@ -53,10 +53,15 @@
 - Explore reveals the controlled comparison; blind Listen identifies spectral balance; Build assembles and replays a partial recipe.
 - All sound remains synthesized locally; microphone capture, samples and tuning-table editing remain deferred.
 
-## M12 — Reading and musicianship (active)
+## M12 — Reading and musicianship (completed)
 - **Notation Trail** connects written notation and generated sound with treble/bass staff position, accidentals, enharmonic context, beginner chord symbols and short movable-Do dictation.
 - The staff renderer handles a bounded beginner range including ledger lines; it is intentionally not a score editor.
 - Generated notes and phrases, deterministic tests, simulator coverage and a short audio/accessibility acceptance gate keep the loop offline-first.
+
+## M13 — Adaptive learning (active)
+- **Learning Path** mixes due reviews and new skills into a transparent daily queue with explicit review completion.
+- Per-skill mastery follows a deterministic local schedule; progress and accessible preferences stay on-device.
+- Domain, persistence, presentation and iPhone simulator checks protect the offline-first experience.
 
 ## Planned learning milestones
 

@@ -458,4 +458,43 @@ final class EarTrainingUITests: XCTestCase {
         XCTFail("Could not find Notation Trail")
     }
 
+
+    @MainActor
+    func testLearningPathShowsLocalPreferencesAndExplicitReview() {
+        let app = XCUIApplication()
+        app.launch()
+        openLearningPath(in: app)
+
+        XCTAssertTrue(app.staticTexts["path.title"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.switches["path.simple"].exists)
+        XCTAssertTrue(app.switches["path.large"].exists)
+
+        let review = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "path.review.")
+        ).firstMatch
+        XCTAssertTrue(review.waitForExistence(timeout: 10))
+        review.tap()
+        XCTAssertTrue(app.staticTexts["path.title"].exists)
+    }
+
+    @MainActor
+    private func openLearningPath(in app: XCUIApplication) {
+        let route = app.descendants(matching: .any).matching(
+            NSPredicate(
+                format: "identifier == %@ OR label BEGINSWITH %@",
+                "home.route.learningPath",
+                "Learning Path, "
+            )
+        ).firstMatch
+
+        for _ in 0..<14 {
+            if route.exists && route.isHittable {
+                route.tap()
+                return
+            }
+            app.swipeUp()
+        }
+        XCTFail("Could not find Learning Path")
+    }
+
 }
