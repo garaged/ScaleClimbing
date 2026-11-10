@@ -7,10 +7,10 @@ struct StaffNoteView: View {
 
     var body: some View {
         Canvas { context, size in
-            let horizontalInset = 26.0
+            let horizontalInset: CGFloat = 26
             let lineSpacing = size.height / 8.0
             let bottomLineY = size.height - (lineSpacing * 1.5)
-            let noteY = bottomLineY - (Double(note.staffStep(in: clef)) * lineSpacing / 2.0)
+            let noteY = bottomLineY - (CGFloat(note.staffStep(in: clef)) * lineSpacing / 2.0)
             let noteX = size.width * 0.58
 
             for line in 0..<5 {
@@ -22,7 +22,7 @@ struct StaffNoteView: View {
             }
 
             for step in note.ledgerLineSteps(in: clef) {
-                let y = bottomLineY - (Double(step) * lineSpacing / 2.0)
+                let y = bottomLineY - (CGFloat(step) * lineSpacing / 2.0)
                 var path = Path()
                 path.move(to: CGPoint(x: noteX - 20, y: y))
                 path.addLine(to: CGPoint(x: noteX + 20, y: y))
