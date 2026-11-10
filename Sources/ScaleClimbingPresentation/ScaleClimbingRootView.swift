@@ -40,6 +40,16 @@ public struct ScaleClimbingRootView: View {
                 .navigationDestination(for: AppRoute.self) { route in
                     destination(for: route)
                 }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
+                            AboutView()
+                        } label: {
+                            Label("About & Support", systemImage: "info.circle")
+                        }
+                        .accessibilityIdentifier("home.about")
+                    }
+                }
         }
     }
 
@@ -213,5 +223,62 @@ private struct RouteCard: View {
         case .notation: return ScaleClimbingPalette.emerald
         case nil: return ScaleClimbingPalette.violet
         }
+    }
+}
+
+
+private struct AboutView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        PracticeScreen {
+            VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Learn music, one short round at a time.")
+                        .font(.title2.bold())
+                    Text("ScaleClimbing is an offline-first music-learning app built with generated local audio. It does not require an account, a network connection, microphone access, or personal data.")
+                        .foregroundStyle(.secondary)
+                }
+
+                PracticeCard {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("Privacy", systemImage: "hand.raised.fill")
+                            .font(.headline)
+                        Text("Your practice and learning progress stay on this device. ScaleClimbing has no analytics, ads, accounts, cloud sync, or in-app purchases.")
+                        Link("Read the privacy policy on GitHub", destination: URL(string: "https://github.com/garaged/ScaleClimbing/blob/main/docs/product/privacy-policy.md")!)
+                    }
+                }
+
+                PracticeCard {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("Support & source", systemImage: "heart.text.square")
+                            .font(.headline)
+                        Link("Get help or report an issue", destination: URL(string: "https://github.com/garaged/ScaleClimbing/issues")!)
+                        Link("View the open-source project", destination: URL(string: "https://github.com/garaged/ScaleClimbing")!)
+                        Text("Support links open outside the app. They are voluntary external support, not purchases or in-app donations.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                        Link("Support the developer on GitHub Sponsors", destination: URL(string: "https://github.com/sponsors/garaged")!)
+                    }
+                }
+
+                PracticeCard {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Version")
+                            .font(.headline)
+                        Text(versionText)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .accessibilityElement(children: .contain)
+        }
+        .navigationTitle("About & Support")
+    }
+
+    private var versionText: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.3.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return String(format: AppCopy.text("Version %@ (%@)"), version, build)
     }
 }

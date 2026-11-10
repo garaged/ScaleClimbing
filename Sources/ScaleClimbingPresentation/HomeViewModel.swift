@@ -9,7 +9,7 @@ public final class HomeViewModel: ObservableObject {
     }
 
     public var title: String { "ScaleClimbing" }
-    public var subtitle: String { "Build music intuition one short round at a time." }
+    public var subtitle: String { AppCopy.text("Build music intuition one short round at a time.") }
     public var featuredRoute: AppRoute { .learningPath }
 
     public var practiceZones: [PracticeZone] {

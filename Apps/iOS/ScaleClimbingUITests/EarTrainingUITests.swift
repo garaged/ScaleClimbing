@@ -530,4 +530,19 @@ final class EarTrainingUITests: XCTestCase {
         XCTFail("Could not find a hittable route for \(identifier)")
     }
 
+
+    @MainActor
+    func testAboutAndSpanishHomeLanguage() {
+        let spanish = XCUIApplication()
+        spanish.launchArguments += ["-AppleLanguages", "(es-MX)", "-AppleLocale", "es_MX"]
+        spanish.launch()
+        XCTAssertTrue(spanish.staticTexts["Aprende música practicando"].waitForExistence(timeout: 10))
+        XCTAssertTrue(spanish.staticTexts["Empieza con lo básico"].exists)
+
+        spanish.buttons["home.about"].tap()
+        XCTAssertTrue(spanish.navigationBars["Acerca de y ayuda"].waitForExistence(timeout: 10))
+        XCTAssertTrue(spanish.staticTexts["Privacidad"].exists)
+        XCTAssertTrue(spanish.links["Ve el proyecto de código abierto"].exists)
+    }
+
 }
