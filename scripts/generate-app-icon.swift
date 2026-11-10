@@ -2,17 +2,21 @@ import AppKit
 import Foundation
 
 // Reproducible 1024x1024 app icon, generated without external image tools.
-// A white musical note rises above three ascending cyan-to-violet steps.
+// A standard white music glyph rises above three ascending cyan-to-violet steps.
 let size = 1024
 let target = CommandLine.arguments.dropFirst().first ?? "AppIcon.png"
 let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { rect in
     let background = NSGradient(colors: [
-        NSColor(calibratedRed: 0.08, green: 0.20, blue: 0.52, alpha: 1),
-        NSColor(calibratedRed: 0.22, green: 0.10, blue: 0.55, alpha: 1)
+        NSColor(calibratedRed: 0.06, green: 0.16, blue: 0.44, alpha: 1),
+        NSColor(calibratedRed: 0.24, green: 0.09, blue: 0.55, alpha: 1)
     ])!
     background.draw(in: rect, angle: 0)
 
-    // Rounded, overlapping steps progress upward in pitch.
+    // A quiet halo separates the mark without making it look like a button.
+    NSColor.white.withAlphaComponent(0.08).setFill()
+    NSBezierPath(ovalIn: CGRect(x: 236, y: 348, width: 560, height: 560)).fill()
+
+    // Rounded steps progress upward in pitch and learning.
     let steps: [(CGRect, NSColor, NSColor)] = [
         (CGRect(x: 145, y: 190, width: 250, height: 135),
          NSColor(calibratedRed: 0.17, green: 0.83, blue: 0.96, alpha: 1),
@@ -25,28 +29,25 @@ let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { r
          NSColor(calibratedRed: 0.37, green: 0.18, blue: 0.88, alpha: 1))
     ]
     for (frame, top, bottom) in steps {
-        let shape = NSBezierPath(roundedRect: frame, xRadius: 28, yRadius: 28)
+        let shape = NSBezierPath(roundedRect: frame, xRadius: 30, yRadius: 30)
         NSGradient(starting: bottom, ending: top)!.draw(in: shape, angle: 90)
     }
 
-    // Note head and diagonal stem/flag remain recognizable at home-screen sizes.
-    NSColor.white.setFill()
-    let head = NSBezierPath(ovalIn: CGRect(x: 382, y: 494, width: 144, height: 104))
-    var transform = AffineTransform(translationByX: -454, byY: -546)
-    transform.rotate(byDegrees: -20)
-    transform.translate(x: 454, y: 546)
-    head.transform(using: transform)
-    head.fill()
-
-    let stem = NSBezierPath()
-    stem.lineWidth = 33
-    stem.lineCapStyle = .round
-    stem.move(to: CGPoint(x: 510, y: 550))
-    stem.line(to: CGPoint(x: 510, y: 748))
-    stem.line(to: CGPoint(x: 682, y: 798))
-    stem.line(to: CGPoint(x: 682, y: 665))
-    NSColor.white.setStroke()
-    stem.stroke()
+    // Use the platform's proven note shape instead of bespoke stem/flag geometry.
+    let note = NSAttributedString(
+        string: "♪",
+        attributes: [
+            .font: NSFont.systemFont(ofSize: 510, weight: .medium),
+            .foregroundColor: NSColor.white
+        ]
+    )
+    let noteSize = note.size()
+    note.draw(
+        at: CGPoint(
+            x: (CGFloat(size) - noteSize.width) / 2,
+            y: 300
+        )
+    )
     return true
 }
 guard let bitmap = NSBitmapImageRep(

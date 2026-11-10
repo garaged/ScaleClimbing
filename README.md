@@ -68,6 +68,12 @@ Notation Trail connects staff positions to sound through treble/bass clefs, acci
 
 For the concise iPhone acceptance script run `make manual-m12`.
 
+## M13 — Learning Path
+
+Learning Path makes daily practice transparent and local. It mixes recorded reviews with new practice areas, explains why each card appears, and only advances a skill when the learner explicitly chooses **Mark reviewed**. The spaced-review schedule is visible and deterministic: one, three, seven, fourteen and thirty days as mastery advances. Simplified explanations and larger controls are stored only on the device.
+
+For the concise iPhone acceptance script run `make manual-m13`.
+
 ## Engineering principles
 
 ScaleClimbing uses:

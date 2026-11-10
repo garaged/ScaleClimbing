@@ -18,4 +18,5 @@ import Testing
     #expect(AppRoute.timbreLab.regionTitle == "Timbre Terrace")
     #expect(AppRoute.notationTrail.title == "Notation Trail")
     #expect(AppRoute.notationTrail.regionTitle == "Notation Nook")
+    #expect(AppRoute.learningPath.title == "Learning Path")
 }

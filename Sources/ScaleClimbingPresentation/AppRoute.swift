@@ -10,6 +10,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
     case rhythmTrail
     case timbreLab
     case notationTrail
+    case learningPath
 
     public var id: String { rawValue }
 
@@ -26,6 +27,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .rhythmTrail: return "Rhythm Trail"
         case .timbreLab: return "Timbre Lab"
         case .notationTrail: return "Notation Trail"
+        case .learningPath: return "Learning Path"
         }
     }
 
@@ -42,6 +44,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .rhythmTrail: return "Hear pulse, identify meter and tap the beat."
         case .timbreLab: return "Hear harmonics, timbre and controlled tuning differences."
         case .notationTrail: return "Read staff notes and dictate short movable-Do melodies."
+        case .learningPath: return "Plan local spaced reviews across your skills."
         }
     }
 
@@ -63,6 +66,8 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return "Timbre Terrace"
         case .notationTrail:
             return "Notation Nook"
+        case .learningPath:
+            return "Practice Plaza"
         }
     }
 }
