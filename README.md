@@ -157,3 +157,9 @@ Generated listening exercises come before MIDI, and MIDI comes before microphone
 ## Platform strategy
 
 Start iOS-first with a portable Swift core. Keep musical theory, exercise generation, learning progression, audio playback and UI separate so macOS can follow naturally and Windows/Linux can be evaluated later.
+
+
+## M15 — First App Store release preparation
+
+M15 adds an accessible **About & Support** screen, external source/support links, an es-MX resource catalog, and a privacy-minimal App Store release path. Support links intentionally open outside the app and are not purchases or in-app donations. Run `make manual-m15` for the iPhone UX/release review, then follow [the signing and release checklist](docs/engineering/signing-and-release.md) and [App Store preflight](docs/product/app-store-preflight.md).
+
