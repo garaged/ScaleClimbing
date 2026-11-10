@@ -85,6 +85,8 @@ public struct ScaleClimbingRootView: View {
             RhythmTrailGameView(onPlayRhythm: onPlayRhythm)
         case .timbreLab:
             TimbreLabGameView(onPlayTimbre: onPlayTimbre)
+        case .learningPath:
+            LearningPathGameView()
         case .notationTrail:
             NotationTrailGameView(
                 onPlayPitch: onPlayPitch,
