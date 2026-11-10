@@ -36,29 +36,10 @@ public struct ScaleClimbingRootView: View {
 
     public var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(viewModel.subtitle)
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 8)
+            HomeView(viewModel: viewModel)
+                .navigationDestination(for: AppRoute.self) { route in
+                    destination(for: route)
                 }
-
-                Section("Practice") {
-                    ForEach(viewModel.availableRoutes) { route in
-                        NavigationLink(value: route) {
-                            RouteRow(route: route)
-                        }
-                        .accessibilityIdentifier("home.route.\(route.rawValue)")
-                    }
-                }
-            }
-            .navigationTitle(viewModel.title)
-            .navigationDestination(for: AppRoute.self) { route in
-                destination(for: route)
-            }
         }
     }
 
@@ -96,24 +77,141 @@ public struct ScaleClimbingRootView: View {
     }
 }
 
-private struct RouteRow: View {
+private struct HomeView: View {
+    @ObservedObject var viewModel: HomeViewModel
+    @Environment(\.colorScheme) private var colorScheme
+
+    private let columns = [GridItem(.adaptive(minimum: 155), spacing: 12)]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Learn music by doing")
+                        .font(.largeTitle.bold())
+                    Text(viewModel.subtitle)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                }
+                .accessibilityElement(children: .combine)
+
+                NavigationLink(value: viewModel.featuredRoute) {
+                    FeaturedPracticeCard(route: viewModel.featuredRoute)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("home.route.\(viewModel.featuredRoute.rawValue)")
+
+                ForEach(viewModel.practiceZones) { zone in
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(zone.title)
+                            .font(.title3.bold())
+                        Text(zone.subtitle)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(viewModel.routes(in: zone)) { route in
+                                NavigationLink(value: route) {
+                                    RouteCard(route: route)
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityIdentifier("home.route.\(route.rawValue)")
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(20)
+        }
+        .scrollIndicators(.hidden)
+        .background(ScaleClimbingPalette.canvas(for: colorScheme).ignoresSafeArea())
+        .navigationTitle(viewModel.title)
+    }
+}
+
+private struct FeaturedPracticeCard: View {
     let route: AppRoute
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: route.symbolName)
+                .font(.title2.weight(.bold))
+                .frame(width: 48, height: 48)
+                .background(.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 14))
+            VStack(alignment: .leading, spacing: 4) {
+                Text("TODAY’S PRACTICE")
+                    .font(.caption.weight(.bold))
+                    .tracking(0.8)
+                Text(route.title)
+                    .font(.title3.bold())
+                Text(route.subtitle)
+                    .font(.subheadline)
+                    .opacity(0.88)
+            }
+            Spacer(minLength: 0)
+            Image(systemName: "arrow.right")
+                .font(.headline.weight(.bold))
+        }
+        .foregroundStyle(.white)
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [ScaleClimbingPalette.indigo, ScaleClimbingPalette.violet],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 24, style: .continuous)
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Today’s practice, \(route.title), \(route.subtitle)")
+    }
+}
+
+private struct RouteCard: View {
+    let route: AppRoute
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Image(systemName: route.symbolName)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(accent)
+                .frame(width: 38, height: 38)
+                .background(accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+
             Text(route.title)
                 .font(.headline)
-            Text(route.regionTitle)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.primary)
+                .lineLimit(2)
+
             Text(route.subtitle)
-                .font(.subheadline)
+                .font(.caption)
                 .foregroundStyle(.secondary)
+                .lineLimit(3)
         }
-        .padding(.vertical, 6)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(
-            "\(route.title), \(route.regionTitle), \(route.subtitle)"
+        .frame(maxWidth: .infinity, minHeight: 158, alignment: .leading)
+        .padding(14)
+        .background(
+            ScaleClimbingPalette.surface(for: colorScheme),
+            in: RoundedRectangle(cornerRadius: 20, style: .continuous)
         )
+        .overlay {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(.primary.opacity(0.08), lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(route.title), \(route.subtitle)")
+    }
+
+    private var accent: Color {
+        switch route.practiceZone {
+        case .foundations: return ScaleClimbingPalette.sky
+        case .listening: return ScaleClimbingPalette.violet
+        case .harmony: return ScaleClimbingPalette.indigo
+        case .timeAndTimbre: return ScaleClimbingPalette.amber
+        case .notation: return ScaleClimbingPalette.emerald
+        case nil: return ScaleClimbingPalette.violet
+        }
     }
 }

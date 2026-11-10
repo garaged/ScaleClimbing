@@ -1,3 +1,33 @@
+public enum PracticeZone: String, CaseIterable, Codable, Hashable, Identifiable, Sendable {
+    case foundations
+    case listening
+    case harmony
+    case timeAndTimbre
+    case notation
+
+    public var id: String { rawValue }
+
+    public var title: String {
+        switch self {
+        case .foundations: return "Start with the basics"
+        case .listening: return "Train your ear"
+        case .harmony: return "Explore harmony"
+        case .timeAndTimbre: return "Feel time and color"
+        case .notation: return "Read and write"
+        }
+    }
+
+    public var subtitle: String {
+        switch self {
+        case .foundations: return "Notes and chord building"
+        case .listening: return "Sound, direction and distance"
+        case .harmony: return "Chords, scales and cadences"
+        case .timeAndTimbre: return "Pulse, texture and tuning"
+        case .notation: return "Staff reading and dictation"
+        }
+    }
+}
+
 public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sendable {
     case noteHunter
     case chordForge
@@ -68,6 +98,40 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return "Notation Nook"
         case .learningPath:
             return "Practice Plaza"
+        }
+    }
+
+    public var practiceZone: PracticeZone? {
+        switch self {
+        case .noteHunter, .chordForge:
+            return .foundations
+        case .earTraining, .intervalTrail:
+            return .listening
+        case .voicingLab, .chordAtlas, .scaleExplorer, .harmonyPath:
+            return .harmony
+        case .rhythmTrail, .timbreLab:
+            return .timeAndTimbre
+        case .notationTrail:
+            return .notation
+        case .learningPath:
+            return nil
+        }
+    }
+
+    public var symbolName: String {
+        switch self {
+        case .noteHunter: return "music.note"
+        case .chordForge: return "pianokeys"
+        case .earTraining: return "ear"
+        case .intervalTrail: return "arrow.up.and.down"
+        case .voicingLab: return "rectangle.3.group"
+        case .chordAtlas: return "square.grid.3x3"
+        case .scaleExplorer: return "music.quarternote.3"
+        case .harmonyPath: return "point.3.connected.trianglepath.dotted"
+        case .rhythmTrail: return "metronome"
+        case .timbreLab: return "waveform"
+        case .notationTrail: return "music.note.list"
+        case .learningPath: return "sparkles"
         }
     }
 }
