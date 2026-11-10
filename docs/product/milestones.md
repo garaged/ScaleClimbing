@@ -58,10 +58,15 @@
 - The staff renderer handles a bounded beginner range including ledger lines; it is intentionally not a score editor.
 - Generated notes and phrases, deterministic tests, simulator coverage and a short audio/accessibility acceptance gate keep the loop offline-first.
 
-## M13 — Adaptive learning (active)
+## M13 — Adaptive learning (completed)
 - **Learning Path** mixes due reviews and new skills into a transparent daily queue with explicit review completion.
 - Per-skill mastery follows a deterministic local schedule; progress and accessible preferences stay on-device.
 - Domain, persistence, presentation and iPhone simulator checks protect the offline-first experience.
+
+## M14 — Visual design system and practice polish (active)
+- Semantic, accessible palette and appearance-aware canvas/surfaces.
+- Featured Learning Path, grouped practice-zone home, and shared screen/feedback presentation across all existing exercises.
+- Gameplay, audio, routes and identifiers remain stable while visual hierarchy, Dynamic Type and VoiceOver polish improve.
 
 ## Planned learning milestones
 

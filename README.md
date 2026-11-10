@@ -74,6 +74,12 @@ Learning Path makes daily practice transparent and local. It mixes recorded revi
 
 For the concise iPhone acceptance script run `make manual-m13`.
 
+## M14 — Visual Design System
+
+M14 gives ScaleClimbing one accessible visual language: semantic indigo/sky/violet/emerald/amber/rose accents, appearance-aware canvas and cards, a featured daily-practice home hierarchy, and a shared scrollable practice-screen shell. The learning rules, audio, route identities and controls remain intact.
+
+For the concise visual/audio/accessibility acceptance script run make manual-m14.
+
 ## Engineering principles
 
 ScaleClimbing uses:

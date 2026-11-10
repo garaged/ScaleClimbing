@@ -497,4 +497,15 @@ final class EarTrainingUITests: XCTestCase {
         XCTFail("Could not find Learning Path")
     }
 
+
+    @MainActor
+    func testHomeFeaturesLearningPathAndGroupedPractice() {
+        let app = XCUIApplication()
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Learn music by doing"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["home.route.learningPath"].exists)
+        XCTAssertTrue(app.staticTexts["Start with the basics"].exists)
+    }
+
 }
