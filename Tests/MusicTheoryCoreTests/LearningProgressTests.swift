@@ -33,3 +33,14 @@ import Testing
     #expect(progress.record(for: .notation).level == 0)
     #expect(reviewed.record(for: .notation).level == 1)
 }
+
+@Test func firstReviewsExplainTheSpecificSkill() {
+    #expect(
+        DailyPracticeItem(skill: .rhythm, record: MasteryRecord()).reason ==
+            "Start with pulse and meter."
+    )
+    #expect(
+        DailyPracticeItem(skill: .notation, record: MasteryRecord()).reason ==
+            "Start with staff positions and note names."
+    )
+}

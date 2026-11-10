@@ -25,6 +25,19 @@ public enum PracticeSkill: String, CaseIterable, Codable, Hashable, Sendable, Id
         }
     }
 
+    public var firstReviewReason: String {
+        switch self {
+        case .notes: return "Start with note names and keyboard mapping."
+        case .chords: return "Start with chord quality and chord shapes."
+        case .intervals: return "Start with melodic direction and distance."
+        case .scales: return "Start with scale patterns and sound."
+        case .harmony: return "Start with harmonic function and cadence."
+        case .rhythm: return "Start with pulse and meter."
+        case .timbre: return "Start with tone color and partials."
+        case .notation: return "Start with staff positions and note names."
+        }
+    }
+
     public var routeIdentifier: String {
         switch self {
         case .notes: return "noteHunter"
@@ -99,7 +112,7 @@ public struct DailyPracticeItem: Hashable, Sendable, Identifiable {
 
     public var reason: String {
         record.level == 0
-            ? "New skill: start a short first review."
+            ? skill.firstReviewReason
             : "Due review at mastery \(record.level)."
     }
 }
