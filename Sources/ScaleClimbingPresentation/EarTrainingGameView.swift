@@ -14,7 +14,7 @@ public struct EarTrainingGameView: View {
     }
 
     public var body: some View {
-        ScrollView {
+        PracticeScreen {
             VStack(alignment: .leading, spacing: 24) {
                 Text("Major or Minor?")
                     .font(.largeTitle.bold())

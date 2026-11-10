@@ -14,7 +14,8 @@ public struct ChordForgeGameView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        PracticeScreen {
+            VStack(alignment: .leading, spacing: 20) {
             header
             keyboard
             selectedSummary
@@ -23,7 +24,8 @@ public struct ChordForgeGameView: View {
             controls
             Spacer(minLength: 0)
         }
-        .padding(.vertical)
+            .padding(.vertical)
+        }
         .navigationTitle("Chord Forge")
     }
 
@@ -67,9 +69,7 @@ public struct ChordForgeGameView: View {
     private var feedback: some View {
         Text(viewModel.feedbackText)
             .font(.body)
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .practiceFeedbackCard()
             .padding(.horizontal)
             .accessibilityLabel(viewModel.feedbackText)
     }

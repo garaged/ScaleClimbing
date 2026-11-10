@@ -14,7 +14,7 @@ public struct ChordAtlasGameView: View {
     }
 
     public var body: some View {
-        ScrollView {
+        PracticeScreen {
             VStack(alignment: .leading, spacing: 16) {
                 Picker("Chord family", selection: Binding(
                     get: { viewModel.family },
@@ -99,9 +99,7 @@ public struct ChordAtlasGameView: View {
                 }
 
                 Text(viewModel.feedbackText)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .practiceFeedbackCard()
                     .accessibilityIdentifier("atlas.feedback")
 
                 Button("Next chord") { viewModel.nextRound() }

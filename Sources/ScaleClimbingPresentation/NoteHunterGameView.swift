@@ -14,14 +14,16 @@ public struct NoteHunterGameView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        PracticeScreen {
+            VStack(alignment: .leading, spacing: 20) {
             header
             keyboard
             feedback
             controls
             Spacer(minLength: 0)
         }
-        .padding(.vertical)
+            .padding(.vertical)
+        }
         .navigationTitle("Note Hunter")
     }
 
@@ -52,9 +54,7 @@ public struct NoteHunterGameView: View {
     private var feedback: some View {
         Text(viewModel.feedbackText)
             .font(.body)
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .practiceFeedbackCard()
             .padding(.horizontal)
             .accessibilityLabel(viewModel.feedbackText)
     }

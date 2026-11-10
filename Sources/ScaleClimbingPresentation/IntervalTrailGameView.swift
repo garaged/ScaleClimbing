@@ -14,7 +14,7 @@ public struct IntervalTrailGameView: View {
     }
 
     public var body: some View {
-        ScrollView {
+        PracticeScreen {
             VStack(alignment: .leading, spacing: 20) {
                 Text(viewModel.roundText + " · " + viewModel.modeText)
                     .font(.headline)
@@ -50,9 +50,7 @@ public struct IntervalTrailGameView: View {
 
                 Text(viewModel.feedbackText)
                     .accessibilityIdentifier("interval.feedback")
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .practiceFeedbackCard()
                 Button("Next interval") { viewModel.nextRound() }
                     .buttonStyle(.borderedProminent)
                     .disabled(!viewModel.isAnswered)
