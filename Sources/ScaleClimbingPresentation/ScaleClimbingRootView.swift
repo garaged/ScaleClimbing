@@ -41,7 +41,7 @@ public struct ScaleClimbingRootView: View {
                     destination(for: route)
                 }
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
+                    ToolbarItem(placement: .automatic) {
                         NavigationLink {
                             AboutView()
                         } label: {
