@@ -338,4 +338,64 @@ final class EarTrainingUITests: XCTestCase {
         XCTFail("Could not find Rhythm Trail")
     }
 
+    @MainActor
+    func testTimbreLabExploreListenAndBuildRetry() {
+        let app = XCUIApplication()
+        app.launch()
+        openTimbreLab(in: app)
+
+        let prompt = app.staticTexts["timbre.prompt"]
+        XCTAssertTrue(prompt.waitForExistence(timeout: 10))
+        XCTAssertTrue(prompt.label.contains("A3"))
+        XCTAssertTrue(prompt.label.contains("Bright"))
+        XCTAssertTrue(app.buttons["timbre.hear"].exists)
+        XCTAssertTrue(app.staticTexts["timbre.series"].label.contains("1: 220 Hz"))
+        XCTAssertTrue(app.buttons["timbre.octave"].isHittable)
+        XCTAssertTrue(app.buttons["timbre.equal-fifth"].isHittable)
+        XCTAssertTrue(app.buttons["timbre.just-fifth"].isHittable)
+        XCTAssertTrue(app.buttons["timbre.beating"].isHittable)
+
+        app.segmentedControls["timbre.mode"].buttons["Listen"].tap()
+        XCTAssertTrue(prompt.label.contains("Which spectrum"))
+        XCTAssertFalse(prompt.label.contains("Bright"))
+        app.buttons["timbre.answer.bright"].tap()
+        XCTAssertTrue(app.staticTexts["timbre.feedback"].label.contains("Correct"))
+        XCTAssertTrue(app.staticTexts["timbre.score"].label.contains("1/1"))
+
+        app.segmentedControls["timbre.mode"].buttons["Build"].tap()
+        XCTAssertTrue(app.staticTexts["timbre.selected"].label.contains("1"))
+        app.buttons["timbre.check"].tap()
+        XCTAssertTrue(app.staticTexts["timbre.feedback"].label.contains("Not yet"))
+        for harmonic in 2...6 {
+            app.buttons["timbre.partial.\(harmonic)"].tap()
+        }
+        XCTAssertTrue(app.buttons["timbre.hear-attempt"].isEnabled)
+        app.buttons["timbre.hear-attempt"].tap()
+        app.buttons["timbre.check"].tap()
+        XCTAssertTrue(app.staticTexts["timbre.feedback"].label.contains("Correct"))
+    }
+
+    @MainActor
+    private func openTimbreLab(in app: XCUIApplication) {
+        let route = app.descendants(matching: .any).matching(
+            NSPredicate(
+                format: "identifier == %@ OR label BEGINSWITH %@",
+                "home.route.timbreLab",
+                "Timbre Lab, "
+            )
+        ).firstMatch
+
+        for _ in 0..<11 {
+            if route.exists && route.isHittable {
+                route.tap()
+                XCTAssertTrue(
+                    app.staticTexts["timbre.prompt"].waitForExistence(timeout: 10)
+                )
+                return
+            }
+            app.swipeUp()
+        }
+        XCTFail("Could not find Timbre Lab")
+    }
+
 }

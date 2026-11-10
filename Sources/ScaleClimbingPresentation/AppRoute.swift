@@ -8,6 +8,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
     case scaleExplorer
     case harmonyPath
     case rhythmTrail
+    case timbreLab
 
     public var id: String { rawValue }
 
@@ -22,6 +23,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .scaleExplorer: return "Scale Explorer"
         case .harmonyPath: return "Harmony Path"
         case .rhythmTrail: return "Rhythm Trail"
+        case .timbreLab: return "Timbre Lab"
         }
     }
 
@@ -36,6 +38,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .scaleExplorer: return "Explore, hear and build scales, modes and keys."
         case .harmonyPath: return "Hear and build diatonic cadences in context."
         case .rhythmTrail: return "Hear pulse, identify meter and tap the beat."
+        case .timbreLab: return "Hear harmonics, timbre and controlled tuning differences."
         }
     }
 
@@ -53,6 +56,8 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return "Scale Summit"
         case .rhythmTrail:
             return "Rhythm Ridge"
+        case .timbreLab:
+            return "Timbre Terrace"
         }
     }
 }
