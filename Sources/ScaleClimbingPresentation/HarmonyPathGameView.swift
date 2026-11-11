@@ -34,8 +34,8 @@ public struct HarmonyPathGameView: View {
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("harmony.mode")
 
-                Text(viewModel.scoreText).font(.subheadline.monospacedDigit()).accessibilityIdentifier("harmony.score")
-                Text(viewModel.promptText).font(.title3.weight(.semibold)).accessibilityIdentifier("harmony.prompt")
+                Text(AppCopy.learnerText(viewModel.scoreText)).font(.subheadline.monospacedDigit()).accessibilityIdentifier("harmony.score")
+                Text(AppCopy.learnerText(viewModel.promptText)).font(.title3.weight(.semibold)).accessibilityIdentifier("harmony.prompt")
 
                 Button {
                     onPlayProgression(viewModel.progression.voicedChords)
@@ -46,11 +46,11 @@ public struct HarmonyPathGameView: View {
                 .accessibilityIdentifier("harmony.hear")
 
                 if viewModel.mode == .explore {
-                    Text(viewModel.diatonicText).accessibilityIdentifier("harmony.diatonic")
+                    Text(AppCopy.learnerText(viewModel.diatonicText)).accessibilityIdentifier("harmony.diatonic")
                     Text("Cadence: " + viewModel.targetRomanNumerals.joined(separator: "–"))
                         .font(.headline)
                         .accessibilityIdentifier("harmony.target")
-                    Text(viewModel.inversionContextText).foregroundStyle(.secondary).accessibilityIdentifier("harmony.inversions")
+                    Text(AppCopy.learnerText(viewModel.inversionContextText)).foregroundStyle(.secondary).accessibilityIdentifier("harmony.inversions")
                 } else if viewModel.mode == .listen {
                     LazyVGrid(columns: [GridItem(.flexible())], spacing: 10) {
                         ForEach(CadenceKind.allCases) { cadence in
@@ -91,7 +91,7 @@ public struct HarmonyPathGameView: View {
                     .controlSize(.large)
                 }
 
-                Text(viewModel.feedbackText)
+                Text(AppCopy.learnerText(viewModel.feedbackText))
                     .padding().frame(maxWidth: .infinity, alignment: .leading)
                     .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14))
                     .accessibilityIdentifier("harmony.feedback")

@@ -20,7 +20,7 @@ public struct EarTrainingGameView: View {
                     .font(.largeTitle.bold())
                     .accessibilityAddTraits(.isHeader)
 
-                Text(viewModel.roundText)
+                Text(AppCopy.learnerText(viewModel.roundText))
                     .font(.headline)
                     .accessibilityIdentifier("ear.round")
 
@@ -28,7 +28,7 @@ public struct EarTrainingGameView: View {
                     .font(.subheadline.monospacedDigit())
                     .accessibilityIdentifier("ear.score")
 
-                Text(viewModel.promptText)
+                Text(AppCopy.learnerText(viewModel.promptText))
                     .font(.title3.weight(.semibold))
                     .accessibilityIdentifier("ear.prompt")
 
@@ -53,7 +53,7 @@ public struct EarTrainingGameView: View {
                 .controlSize(.large)
                 .disabled(viewModel.isAnswered)
 
-                Text(viewModel.feedbackText)
+                Text(AppCopy.learnerText(viewModel.feedbackText))
                     .font(.body)
                     .accessibilityIdentifier("ear.feedback")
 

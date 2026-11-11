@@ -46,10 +46,10 @@ public struct VoicingLabGameView: View {
                     onKeyTap: { key in viewModel.toggle(key.pitch) }
                 )
 
-                Text(viewModel.selectedText)
+                Text(AppCopy.learnerText(viewModel.selectedText))
                     .font(.callout.monospaced())
                     .accessibilityIdentifier("voicing.selected")
-                Text(viewModel.feedbackText)
+                Text(AppCopy.learnerText(viewModel.feedbackText))
                     .font(.body)
                     .practiceFeedbackCard()
                     .accessibilityIdentifier("voicing.feedback")

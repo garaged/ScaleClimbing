@@ -44,11 +44,11 @@ public struct TimbreLabGameView: View {
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("timbre.mode")
 
-                Text(viewModel.scoreText)
+                Text(AppCopy.learnerText(viewModel.scoreText))
                     .font(.subheadline.monospacedDigit())
                     .accessibilityIdentifier("timbre.score")
 
-                Text(viewModel.promptText)
+                Text(AppCopy.learnerText(viewModel.promptText))
                     .font(.title3.weight(.semibold))
                     .accessibilityIdentifier("timbre.prompt")
 
@@ -69,7 +69,7 @@ public struct TimbreLabGameView: View {
                     buildContent
                 }
 
-                Text(viewModel.feedbackText)
+                Text(AppCopy.learnerText(viewModel.feedbackText))
                     .practiceFeedbackCard()
                     .accessibilityIdentifier("timbre.feedback")
 
@@ -89,14 +89,14 @@ public struct TimbreLabGameView: View {
     @ViewBuilder
     private var exploreContent: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(viewModel.partialText)
+            Text(AppCopy.learnerText(viewModel.partialText))
                 .accessibilityIdentifier("timbre.partials")
-            Text(viewModel.harmonicSeriesText)
+            Text(AppCopy.learnerText(viewModel.harmonicSeriesText))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("timbre.series")
 
-            Text(viewModel.tuningText)
+            Text(AppCopy.learnerText(viewModel.tuningText))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("timbre.tuning")

@@ -63,10 +63,15 @@
 - Per-skill mastery follows a deterministic local schedule; progress and accessible preferences stay on-device.
 - Domain, persistence, presentation and iPhone simulator checks protect the offline-first experience.
 
-## M14 — Visual design system and practice polish (active)
+## M14 — Visual design system and practice polish (completed)
 - Semantic, accessible palette and appearance-aware canvas/surfaces.
 - Featured Learning Path, grouped practice-zone home, and shared screen/feedback presentation across all existing exercises.
 - Gameplay, audio, routes and identifiers remain stable while visual hierarchy, Dynamic Type and VoiceOver polish improve.
+
+## M15 — App Store readiness, localization, and final product finish (active)
+- Accessible About & Support, repository sponsors metadata, and explicit external-link wording.
+- English plus Spanish (Mexico) learner-facing presentation localization, with theory notation preserved.
+- Signing, release, privacy, App Store metadata, UX, and manual acceptance preflight. Account-side actions remain owner-operated.
 
 ## Planned learning milestones
 

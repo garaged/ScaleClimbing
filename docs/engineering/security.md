@@ -29,3 +29,8 @@ The following require explicit spec, implementation tests, manual acceptance, an
 - Analytics.
 - Purchases.
 - Licensed music or uploaded user audio.
+
+
+## M15 release declaration
+
+The first App Store release collects no data, uses no tracking, has no account, sends no network request, and does not access the microphone, camera, contacts, photos, location, notifications, or Bluetooth. Its only external destinations are learner-initiated Support, Source, Privacy, and GitHub Sponsors links. The App Privacy details and App Review notes must state this accurately at submission time.
