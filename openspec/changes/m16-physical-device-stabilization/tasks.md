@@ -9,7 +9,7 @@
 - [x] Open one dedicated draft PR (#18); keep draft until automated and owner acceptance gates pass.
 
 ## Physical-device findings
-- [ ] Receive the first observation; record it in `issues.md` as M16-001 or explain why it is not a defect.
+- [x] Record first observations M16-001 (dark keyboard/note hints) and M16-002 (repeated playback), with evidence and unknown device context.
 - [ ] For each accepted finding: reproduce; classify and prioritize; add a failing objective test where possible; minimally fix; run focused + baseline gates; record manual evidence and release impact.
 - [ ] Re-run relevant audio, accessibility, rotation, localization, offline and persistence flows after fixes.
 
@@ -21,9 +21,9 @@
 
 ## M16-001 / M16-002 focused repair
 - [x] Triage reported dark-mode keyboard and repeated-play audio symptoms; record evidence and uncertainty in OpenSpec.
-- [ ] Add focused keyboard model/layout/label policy and audio latest-request tests before implementation.
-- [ ] Implement contrast-safe piano key appearance and layered natural/accidental geometry using documented M14 extension.
-- [ ] Add localized and persistent Standard / Novice learning-assistance selector; Standard hides labels in Note Hunter by default, Novice reveals them; no impact on VoiceOver, core theory or scoring.
-- [ ] Move audio synthesis off main actor, coalesce superseded queued audio, and avoid repeat session activation in a running engine.
+- [x] Add focused keyboard model/layout/label policy, fixed-key contrast and audio latest-request/simultaneous-chord tests before or with implementation.
+- [x] Implement contrast-safe piano key appearance and layered natural/accidental geometry using documented M14 extension.
+- [x] Add localized and persistent Standard / Novice learning-assistance selector; Standard hides labels in Note Hunter by default, Novice reveals them; no impact on VoiceOver, core theory or scoring.
+- [x] Move audio synthesis off main actor, coalesce superseded queued audio, and avoid repeat session activation in a running engine.
 - [ ] Validate all hosted package, iOS simulator, UI and Release gates; repair failures.
 - [ ] Owner manual dark/light iPhone/iPad keyboard and repeated playback / interruption acceptance.
