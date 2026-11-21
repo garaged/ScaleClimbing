@@ -46,3 +46,31 @@ M16 SHALL document how to respond to Guideline 2.1 without asserting account-sid
 - **GIVEN** build 0.3.0 is already submitted
 - **WHEN** an accepted M16 UI fix changes app behavior or appearance
 - **THEN** the team records that the submitted build is unchanged and asks the owner to choose the replacement upload/review evidence path before making App Store Connect changes
+
+### Requirement: piano keyboard appearance and label policy are usable in all appearances
+
+A keyboard SHALL place raised accidental keys at the appropriate boundaries between contiguous natural keys, distinguish natural/accidental surfaces, maintain clearly contrasted fixed label ink in both light and dark appearance, and keep correct hit targets, highlights and accessibility identifiers. Visual pitch labels SHALL be controllable via a persistent learner preference defaulting to visible; hiding visual labels SHALL NOT hide accessible note/octave names.
+
+#### Scenario: dark appearance with visible note names
+- **GIVEN** a learner opens a keyboard practice route in dark mode with note names enabled
+- **WHEN** white and black keys render
+- **THEN** labels retain legible contrast against their actual key surfaces, and accidentals overlay correct white-key boundaries
+
+#### Scenario: learner hides the key labels for self-testing
+- **GIVEN** a learner disables Show note names in one keyboard practice
+- **WHEN** another practice keyboard is opened or the app is relaunched
+- **THEN** visual names remain hidden while each key retains its complete VoiceOver pitch and octave name and the same scoring response
+
+### Requirement: repeated playback favors the newest input without blocking UI
+
+Generated offline audio SHALL be prepared off the main actor; when several play requests are queued faster than they can be synthesized, superseded pending events SHALL NOT play after the latest request. Each chord SHALL still be synthesized as a single simultaneous-note buffer; no microphone/network or theory changes are permitted.
+
+#### Scenario: rapid different chord requests
+- **GIVEN** the learner triggers several play requests quickly
+- **WHEN** the audio worker is busy
+- **THEN** obsolete waiting requests are skipped and the current chord is played from a single combined buffer
+
+#### Scenario: repeated chord playback on device
+- **GIVEN** several rounds of Hear, Check and Replay
+- **WHEN** the learner repeats audio in rapid succession
+- **THEN** the UI stays responsive and notes of each chord are heard together without accumulating stale-playback delay

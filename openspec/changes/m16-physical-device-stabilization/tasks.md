@@ -18,3 +18,12 @@
 - [ ] Owner completes `make manual-m16` on physical iPhone and iPad, with explicit exceptions logged.
 - [ ] Owner confirms matching Guideline 2.1 recording, review notes, submitted build, and any necessary App Store Connect action.
 - [ ] Owner explicitly approves taking the PR out of draft and eventual merge.
+
+## M16-001 / M16-002 focused repair
+- [x] Triage reported dark-mode keyboard and repeated-play audio symptoms; record evidence and uncertainty in OpenSpec.
+- [ ] Add focused keyboard model/layout/label policy and audio latest-request tests before implementation.
+- [ ] Implement contrast-safe piano key appearance and layered natural/accidental geometry using documented M14 extension.
+- [ ] Add persistent, localized Show note names control without changing VoiceOver key names or game scoring.
+- [ ] Move audio synthesis off main actor, coalesce superseded queued audio, and avoid repeat session activation in a running engine.
+- [ ] Validate all hosted package, iOS simulator, UI and Release gates; repair failures.
+- [ ] Owner manual dark/light iPhone/iPad keyboard and repeated playback / interruption acceptance.

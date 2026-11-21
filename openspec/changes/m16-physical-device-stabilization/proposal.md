@@ -41,3 +41,8 @@ New learning modes, design-language rewrite, unexplained scoring/audio/progress 
 4. PR CI (`make ci`, simulator build and UI acceptance) passes; Release configuration is validated using the unsigned Release build command where supported.
 5. Owner physically tests the proposed build on iPhone and iPad (or records a justified exception), with language, accessibility, rotation, audio, persistence and offline findings.
 6. Guideline 2.1 materials clearly distinguish submitted build evidence from M16 changes; any necessary build-number, screen-recording, screenshot or App Store Connect step is flagged for owner action before resubmission.
+
+## Accepted device observations — 2026-11-21
+
+- **M16-001:** unreadable natural-key note names in dark appearance. Extend the M14 design system with an authentic, accessible piano keyboard; allow the learner to explicitly toggle visual key labels (default visible, persisted, VoiceOver always names keys). Do not alter music-theory keys or scoring.
+- **M16-002:** latency/staggered chord perception after repeated sounds. Eliminate main-thread synthesis and prevent stale queued playback from overtaking the latest request. Maintain simultaneous generated chord samples and audible continuity. Real-device repetition/interruption acceptance is required to establish whether symptoms are resolved.

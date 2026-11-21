@@ -41,3 +41,9 @@ Home presents a featured **Today’s Practice** Learning Path card first, follow
 - The system supports light/dark appearance, Dynamic Type and VoiceOver.
 - Action controls target at least 44 points.
 - Card labels combine title and task summary for efficient VoiceOver scanning.
+
+## M16 shared keyboard extension
+
+The common practice keyboard represents piano geometry rather than a chromatic grid: contiguous ivory natural-key faces, shorter raised graphite accidental keys aligned over the adjacent natural-key boundary, subtle depth, and selection outlines that never rely solely on color. Natural-key note names use deliberately dark ink against ivory regardless of app appearance; accidental labels use light ink against graphite. Decorative materials must not change pitch ordering, tappable behavior, or readable contrast.
+
+The compact, persistent **Show note names** control is on the shared keyboard, defaults to on, and applies across keyboard exercises. When off it removes only visual pitch letters; VoiceOver continues to speak full note and octave labels. Localize the control in English and es-MX. Keyboard clipping, narrow screens, accessibility text sizes and rotation must be checked on physical devices.
