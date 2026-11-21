@@ -116,3 +116,23 @@ import Testing
     #expect(!slow.isEmpty)
     #expect(slow.count > fast.count)
 }
+
+@Test func simultaneousChordWaveformIsTheMixtureOfNotesStartingAtFrameZero() {
+    let pitches = [Pitch(.c, octave: 4), Pitch(.e, octave: 4), Pitch(.g, octave: 4)]
+    let chord = GeneratedChordTones.voicedSamples(for: pitches, sampleRate: 8_000, duration: 0.25)
+    let singles = pitches.map { GeneratedChordTones.samples(for: $0, sampleRate: 8_000, duration: 0.25) }
+    #expect(chord.count == 2_000)
+    for frame in [0, 20, 100, 400, 1_200] {
+        let average = singles.reduce(Float.zero) { $0 + $1[frame] } / Float(pitches.count)
+        #expect(abs(chord[frame] - average) < 0.000001)
+    }
+}
+
+@Test func newPlaybackRequestInvalidatesPendingOutdatedGeneration() {
+    let requests = PlaybackRequestGate()
+    let first = requests.next()
+    #expect(requests.isLatest(first))
+    let second = requests.next()
+    #expect(!requests.isLatest(first))
+    #expect(requests.isLatest(second))
+}

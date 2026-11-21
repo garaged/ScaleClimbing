@@ -24,3 +24,21 @@ import Testing
     let key = PianoKeyModel(pitch: Pitch(.cSharp, octave: 4))
     #expect(key.accessibilityLabel == "C sharp in octave 4")
 }
+
+@Test func pianoGeometryUsesNaturalKeysWithAccidentalsBetweenAdjacentWhites() {
+    let layout = PianoKeyboardLayout(model: .beginnerTwoOctaves)
+    #expect(layout.naturalKeys.count == 15)
+    #expect(layout.accidentals.count == 10)
+    #expect(layout.accidentals.prefix(5).map(\.precedingNaturalIndex) == [0, 1, 3, 4, 5])
+    #expect(layout.naturalKeys.first?.shortLabel == "C")
+    #expect(layout.naturalKeys.last?.shortLabel == "C")
+}
+
+@Test func standardModeConcealsNoteIdentificationAnswersWithoutHidingAccessiblity() {
+    let key = PianoKeyModel(pitch: Pitch(.c, octave: 4))
+    #expect(LearningAssistanceLevel(rawValue: "standard") == .standard)
+    #expect(!PianoKeyboardLabelPolicy.showsNames(for: .noteIdentification, assistance: .standard))
+    #expect(PianoKeyboardLabelPolicy.showsNames(for: .noteIdentification, assistance: .novice))
+    #expect(PianoKeyboardLabelPolicy.showsNames(for: .construction, assistance: .standard))
+    #expect(key.accessibilityLabel == "C in octave 4")
+}
