@@ -3,10 +3,10 @@
 ## Intake and foundation
 - [x] Inspect M15 OpenSpec, release settings, tests, manuals, CI and the current main baseline.
 - [x] Define M16 intent, constraints, scenarios and acceptance criteria in OpenSpec before implementation.
-- [ ] Add persistent device-issue intake template and acceptance script.
-- [ ] Wire `make manual-m16` and documentation integrity checks.
-- [ ] Document Guideline 2.1 submitted-build evidence and owner-only review actions.
-- [ ] Open and maintain one dedicated draft PR; do not mark ready without owner acceptance.
+- [x] Add persistent device-issue intake template and acceptance script.
+- [x] Wire `make manual-m16` and documentation integrity checks.
+- [x] Document Guideline 2.1 submitted-build evidence and owner-only review actions.
+- [x] Open one dedicated draft PR (#18); keep draft until automated and owner acceptance gates pass.
 
 ## Physical-device findings
 - [ ] Receive the first observation; record it in `issues.md` as M16-001 or explain why it is not a defect.

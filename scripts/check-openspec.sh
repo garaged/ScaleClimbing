@@ -11,6 +11,10 @@ required=(
   "$root/specs/validation/spec.md"
   "$root/changes/m0-foundation/proposal.md"
   "$root/changes/m0-foundation/tasks.md"
+  "$root/changes/m16-physical-device-stabilization/proposal.md"
+  "$root/changes/m16-physical-device-stabilization/tasks.md"
+  "$root/changes/m16-physical-device-stabilization/issues.md"
+  "$root/changes/m16-physical-device-stabilization/specs/device-stabilization/spec.md"
 )
 
 for file in "${required[@]}"; do
