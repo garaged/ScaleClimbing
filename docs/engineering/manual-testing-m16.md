@@ -26,3 +26,5 @@ Mark each line **PASS / FAIL / NOT TESTED / NOT APPLICABLE** (give a reason for 
 | Issue IDs / N/A rationale | None reported | None reported |
 
 **Exit gate:** All applicable steps pass on both device families, exceptions are justified and recorded, CI plus Release build pass, accepted issues have regression evidence, and the owner confirms any App Review build/recording/metadata actions. The PR remains draft until owner acceptance.
+
+**M16-001 note-name assistance:** In **Standard** (fresh-install default), Note Hunter displays no visual pitch letters; in **Novice**, they appear. Change the level under Practice Settings from Home, revisit the exercise, terminate/relaunch and confirm persistence. Construction/exploration keyboards should retain visual labels in both levels; VoiceOver key names should remain audible even when letters are hidden.

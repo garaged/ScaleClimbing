@@ -49,17 +49,22 @@ M16 SHALL document how to respond to Guideline 2.1 without asserting account-sid
 
 ### Requirement: piano keyboard appearance and label policy are usable in all appearances
 
-A keyboard SHALL place raised accidental keys at the appropriate boundaries between contiguous natural keys, distinguish natural/accidental surfaces, maintain clearly contrasted fixed label ink in both light and dark appearance, and keep correct hit targets, highlights and accessibility identifiers. Visual pitch labels SHALL be controllable via a persistent learner preference defaulting to visible; hiding visual labels SHALL NOT hide accessible note/octave names.
+A keyboard SHALL place raised accidental keys at the appropriate boundaries between contiguous natural keys, distinguish natural/accidental surfaces, maintain clearly contrasted fixed label ink in both light and dark appearance, and keep correct hit targets, highlights and accessibility identifiers. A persistent **Standard / Novice** learning-assistance setting SHALL control note-name hints: Standard (default) hides names when the task is to find a note; Novice shows names in those tasks; other construction/exploration keyboards retain names. Hiding visual labels SHALL NOT hide accessible note/octave names.
 
 #### Scenario: dark appearance with visible note names
-- **GIVEN** a learner opens a keyboard practice route in dark mode with note names enabled
+- **GIVEN** a learner opens a keyboard practice route in dark mode in Novice mode
 - **WHEN** white and black keys render
 - **THEN** labels retain legible contrast against their actual key surfaces, and accidentals overlay correct white-key boundaries
 
-#### Scenario: learner hides the key labels for self-testing
-- **GIVEN** a learner disables Show note names in one keyboard practice
-- **WHEN** another practice keyboard is opened or the app is relaunched
-- **THEN** visual names remain hidden while each key retains its complete VoiceOver pitch and octave name and the same scoring response
+#### Scenario: Standard mode prevents giving away note-finding answers
+- **GIVEN** a learner uses the default Standard mode
+- **WHEN** they open Note Hunter
+- **THEN** note names are visually absent, whereas construction exercises keep their helpful labels and all keys retain their complete VoiceOver name
+
+### Scenario: learner chooses Novice mode
+- **GIVEN** the learner chooses Novice in general practice settings
+- **WHEN** they open Note Hunter, navigate elsewhere and relaunch
+- **THEN** note names are visible in Note Hunter and the choice persists without altering scoring or audio
 
 ### Requirement: repeated playback favors the newest input without blocking UI
 

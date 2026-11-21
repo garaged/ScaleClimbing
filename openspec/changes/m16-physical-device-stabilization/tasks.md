@@ -23,7 +23,7 @@
 - [x] Triage reported dark-mode keyboard and repeated-play audio symptoms; record evidence and uncertainty in OpenSpec.
 - [ ] Add focused keyboard model/layout/label policy and audio latest-request tests before implementation.
 - [ ] Implement contrast-safe piano key appearance and layered natural/accidental geometry using documented M14 extension.
-- [ ] Add persistent, localized Show note names control without changing VoiceOver key names or game scoring.
+- [ ] Add localized and persistent Standard / Novice learning-assistance selector; Standard hides labels in Note Hunter by default, Novice reveals them; no impact on VoiceOver, core theory or scoring.
 - [ ] Move audio synthesis off main actor, coalesce superseded queued audio, and avoid repeat session activation in a running engine.
 - [ ] Validate all hosted package, iOS simulator, UI and Release gates; repair failures.
 - [ ] Owner manual dark/light iPhone/iPad keyboard and repeated playback / interruption acceptance.

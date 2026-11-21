@@ -44,5 +44,5 @@ New learning modes, design-language rewrite, unexplained scoring/audio/progress 
 
 ## Accepted device observations — 2026-11-21
 
-- **M16-001:** unreadable natural-key note names in dark appearance. Extend the M14 design system with an authentic, accessible piano keyboard; allow the learner to explicitly toggle visual key labels (default visible, persisted, VoiceOver always names keys). Do not alter music-theory keys or scoring.
+- **M16-001:** unreadable natural-key note names in dark appearance. Extend the M14 design system with an authentic, accessible piano keyboard; offer persistent Standard (default) / Novice learning assistance: Standard hides visual notes in Note Hunter, Novice reveals them; other keyboards keep labels, VoiceOver always names keys. Do not alter music-theory keys or scoring.
 - **M16-002:** latency/staggered chord perception after repeated sounds. Eliminate main-thread synthesis and prevent stale queued playback from overtaking the latest request. Maintain simultaneous generated chord samples and audible continuity. Real-device repetition/interruption acceptance is required to establish whether symptoms are resolved.
