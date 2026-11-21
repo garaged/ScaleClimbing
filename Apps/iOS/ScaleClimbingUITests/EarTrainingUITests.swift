@@ -544,4 +544,28 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(spanish.staticTexts["Privacidad"].exists)
     }
 
+    @MainActor
+    func testPracticeAssistanceSelectionPersistsAcrossRelaunch() {
+        let app = XCUIApplication()
+        app.launch()
+        let settings = app.buttons["home.practiceSettings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 10))
+        settings.tap()
+
+        let assistance = app.segmentedControls["settings.assistance"]
+        XCTAssertTrue(assistance.waitForExistence(timeout: 10))
+        assistance.buttons["Novice"].tap()
+        XCTAssertTrue(assistance.buttons["Novice"].isSelected)
+
+        app.terminate()
+        app.launch()
+        app.buttons["home.practiceSettings"].tap()
+        let restored = app.segmentedControls["settings.assistance"]
+        XCTAssertTrue(restored.waitForExistence(timeout: 10))
+        XCTAssertTrue(restored.buttons["Novice"].isSelected)
+
+        // Restore the default for subsequent independent UI tests.
+        restored.buttons["Standard"].tap()
+    }
+
 }
