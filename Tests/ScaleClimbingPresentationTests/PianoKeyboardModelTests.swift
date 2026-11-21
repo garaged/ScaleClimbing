@@ -42,3 +42,11 @@ import Testing
     #expect(PianoKeyboardLabelPolicy.showsNames(for: .construction, assistance: .standard))
     #expect(key.accessibilityLabel == "C in octave 4")
 }
+
+@Test func pianoInkContrastIsStableAcrossLightAndDarkAppearance() {
+    // Natural faces stay ivory even in dark mode; never use adaptive primary ink.
+    #expect(PianoKeyPalette.naturalInk.contrastRatio(with: PianoKeyPalette.naturalTop) >= 7)
+    #expect(PianoKeyPalette.naturalInk.contrastRatio(with: PianoKeyPalette.naturalBottom) >= 7)
+    #expect(PianoKeyPalette.accidentalInk.contrastRatio(with: PianoKeyPalette.accidentalTop) >= 7)
+    #expect(PianoKeyPalette.accidentalInk.contrastRatio(with: PianoKeyPalette.accidentalBottom) >= 7)
+}

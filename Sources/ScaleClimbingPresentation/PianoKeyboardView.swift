@@ -148,8 +148,8 @@ public struct PianoKeyButton: View {
                     .font(.caption.weight(.bold))
                     .foregroundStyle(
                         key.isNatural
-                            ? Color(red: 0.13, green: 0.16, blue: 0.22)
-                            : Color(red: 0.97, green: 0.98, blue: 1.00)
+                            ? PianoKeyPalette.naturalInk.color
+                            : PianoKeyPalette.accidentalInk.color
                     )
                     .minimumScaleFactor(0.8)
                     .lineLimit(1)
@@ -161,10 +161,8 @@ public struct PianoKeyButton: View {
         .background(
             LinearGradient(
                 colors: key.isNatural
-                    ? [Color(red: 1.0, green: 1.0, blue: 0.99),
-                       Color(red: 0.89, green: 0.91, blue: 0.94)]
-                    : [Color(red: 0.25, green: 0.28, blue: 0.34),
-                       Color(red: 0.06, green: 0.08, blue: 0.12)],
+                    ? [PianoKeyPalette.naturalTop.color, PianoKeyPalette.naturalBottom.color]
+                    : [PianoKeyPalette.accidentalTop.color, PianoKeyPalette.accidentalBottom.color],
                 startPoint: .top,
                 endPoint: .bottom
             ),
