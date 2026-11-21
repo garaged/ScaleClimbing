@@ -376,8 +376,16 @@ public final class GeneratedChordPlayer {
 }
 
 private final class AudioPlaybackWorker: @unchecked Sendable {
-    private let queue = DispatchQueue(
-        label: "org.garaged.ScaleClimbing.audio",
+    // Rendering is concurrent: an old long progression cannot block the newest
+    // short note from being prepared. Old render results are ignored.
+    private let renderQueue = DispatchQueue(
+        label: "org.garaged.ScaleClimbing.audio.render",
+        qos: .userInitiated,
+        attributes: .concurrent
+    )
+    // Engine and player state are confined to one serial queue.
+    private let playbackQueue = DispatchQueue(
+        label: "org.garaged.ScaleClimbing.audio.playback",
         qos: .userInitiated
     )
     private let requestGate = PlaybackRequestGate()
@@ -390,11 +398,14 @@ private final class AudioPlaybackWorker: @unchecked Sendable {
         report: @escaping @Sendable (String?) -> Void
     ) {
         let request = requestGate.next()
-        queue.async { [self] in
+        renderQueue.async { [self] in
             guard requestGate.isLatest(request) else { return }
             let samples = generate()
             guard !samples.isEmpty, requestGate.isLatest(request) else { return }
-            report(playOnQueue(samples))
+            playbackQueue.async { [self] in
+                guard requestGate.isLatest(request) else { return }
+                report(playOnQueue(samples))
+            }
         }
     }
 
