@@ -290,6 +290,25 @@ public enum GeneratedChordTones {
     }
 }
 
+/// Thread-safe request tickets: older queued audio must never play after a newer request.
+final class PlaybackRequestGate: @unchecked Sendable {
+    private let lock = NSLock()
+    private var latest: UInt64 = 0
+
+    func next() -> UInt64 {
+        lock.lock()
+        defer { lock.unlock() }
+        latest &+= 1
+        return latest
+    }
+
+    func isLatest(_ ticket: UInt64) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return ticket == latest
+    }
+}
+
 @MainActor
 public final class GeneratedChordPlayer {
     private let worker = AudioPlaybackWorker()
@@ -299,53 +318,56 @@ public final class GeneratedChordPlayer {
     public init() {}
 
     public func play(_ pitchClasses: [PitchClass]) {
-        playSamples(GeneratedChordTones.samples(for: pitchClasses, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.samples(for: pitchClasses, sampleRate: rate) }
     }
 
     public func play(_ pitch: Pitch) {
-        playSamples(GeneratedChordTones.samples(for: pitch, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.samples(for: pitch, sampleRate: rate) }
     }
 
     public func playInterval(_ pitches: [Pitch]) {
-        playSamples(GeneratedChordTones.melodicSamples(for: pitches, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.melodicSamples(for: pitches, sampleRate: rate) }
     }
 
     public func playScale(_ pitches: [Pitch]) {
-        playSamples(
+        let rate = sampleRate
+        playSamples {
             GeneratedChordTones.melodicSamples(
                 for: pitches,
-                sampleRate: sampleRate,
+                sampleRate: rate,
                 noteDuration: 0.28,
                 gapDuration: 0.10
             )
-        )
+        }
     }
 
     public func playVoicing(_ pitches: [Pitch]) {
-        playSamples(GeneratedChordTones.voicedSamples(for: pitches, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.voicedSamples(for: pitches, sampleRate: rate) }
     }
 
     public func playProgression(_ chords: [[Pitch]]) {
-        playSamples(GeneratedChordTones.progressionSamples(for: chords, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.progressionSamples(for: chords, sampleRate: rate) }
     }
 
     public func playRhythm(_ pattern: RhythmPattern) {
-        playSamples(GeneratedChordTones.rhythmSamples(for: pattern, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.rhythmSamples(for: pattern, sampleRate: rate) }
     }
 
     public func playTimbre(_ playback: TimbrePlayback) {
-        playSamples(
-            GeneratedChordTones.timbrePlaybackSamples(
-                for: playback,
-                sampleRate: sampleRate
-            )
-        )
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.timbrePlaybackSamples(for: playback, sampleRate: rate) }
     }
 
-    private func playSamples(_ samples: [Float]) {
-        guard !samples.isEmpty else { return }
-
-        worker.enqueue(samples: samples) { [weak self] error in
+    /// Only capture lightweight, Sendable values on the UI actor. Waveform synthesis
+    /// happens on the worker to keep tap handling and animations responsive.
+    private func playSamples(_ generate: @escaping @Sendable () -> [Float]) {
+        worker.enqueue(generate: generate) { [weak self] error in
             Task { @MainActor [weak self] in
                 self?.lastPlaybackError = error
             }
@@ -358,15 +380,20 @@ private final class AudioPlaybackWorker: @unchecked Sendable {
         label: "org.garaged.ScaleClimbing.audio",
         qos: .userInitiated
     )
+    private let requestGate = PlaybackRequestGate()
     private let sampleRate: Double = 44_100
     private var engine: AVAudioEngine?
     private var player: AVAudioPlayerNode?
 
     func enqueue(
-        samples: [Float],
+        generate: @escaping @Sendable () -> [Float],
         report: @escaping @Sendable (String?) -> Void
     ) {
+        let request = requestGate.next()
         queue.async { [self] in
+            guard requestGate.isLatest(request) else { return }
+            let samples = generate()
+            guard !samples.isEmpty, requestGate.isLatest(request) else { return }
             report(playOnQueue(samples))
         }
     }
@@ -415,19 +442,22 @@ private final class AudioPlaybackWorker: @unchecked Sendable {
         }
 
         do {
-            #if os(iOS)
-            try AVAudioSession.sharedInstance().setCategory(
-                .playback,
-                mode: .default,
-                options: [.mixWithOthers]
-            )
-            try AVAudioSession.sharedInstance().setActive(true)
-            #endif
-
+            // Avoid repeatedly reconfiguring the audio session for each key press.
+            // Restarting an interrupted engine still reactivates the session as needed.
             if !engine.isRunning {
+                #if os(iOS)
+                try AVAudioSession.sharedInstance().setCategory(
+                    .playback,
+                    mode: .default,
+                    options: [.mixWithOthers]
+                )
+                try AVAudioSession.sharedInstance().setActive(true)
+                #endif
                 try engine.start()
             }
 
+            // Every chord is already one mixed PCM buffer, never individually
+            // scheduled note nodes. Stop the previous event before starting the newest.
             player.stop()
             player.scheduleBuffer(buffer)
             player.play()
