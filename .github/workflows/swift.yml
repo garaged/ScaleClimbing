@@ -5,6 +5,12 @@ on:
   push:
     branches: [main]
 
+# Each new commit supersedes earlier PR check runs without cancelling other PRs
+# or main-branch validations.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
