@@ -18,6 +18,8 @@ required=(
   docs/engineering/manual-testing-m2.md
   docs/engineering/manual-testing-m16.md
   docs/engineering/manual-testing-m17.md
+  docs/engineering/manual-testing-m18.md
+  docs/engineering/m18-relational-core.md
   docs/engineering/m16-device-issue-template.md
   docs/product/app-review-guideline-2.1-m16.md
   docs/engineering/decision-log.md

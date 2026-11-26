@@ -1,0 +1,18 @@
+# M18 — Musical relational core: integration contract
+
+## Audit and design
+The existing `MusicTheoryCore` owns pitch, spelling, intervals, chord/scale catalogs, harmony, and canonical voiced triads. Reuse those types and their existing methods. `ExerciseEvaluator` currently sorts pitch-class arrays (without deduplicating them); leave that scoring behavior and every existing exercise/view model unchanged. M13 progress remains unchanged. The existing `Pitch` accepts arbitrary octave integers; M18 validates before converting untrusted pitch values to MIDI without modifying its semantics.
+
+## Public API
+- `InstrumentMapping.piano(midiRange:)` and `fretted(openStringMIDIs:fretCount:)` are failable factories; no unchecked public configuration or resolved-position initializer. `standardGuitar` uses [64,59,55,50,45,40] ordered by physical string number; fret 0 is open, 24 is included. Alternative/non-monotonic tunings are supported. Limits: 1–128 strings, fret limit 0–127, sounding MIDI 0–127. These bounds are technical safety limits, not UI offerings.
+- `InstrumentPosition` is a coordinate; `ResolvedInstrumentPosition` contains the validated mapping, coordinate and sounding `Pitch`. Identity is configuration-relative, not a global physical instrument instance or touch identifier. Different layouts/tunings are different mappings even when their coordinates overlap.
+- `pitch(at:)`, `resolve(_:)`, `positions(for:)` (exact or pitch class), `positions(in:)` (chord or directional scale) return nil/empty for invalid or unavailable pitches. Ordering is MIDI ascending for piano, string number then fret ascending for fretted instruments.
+- `MusicalRelations.interval` wraps `MelodicInterval`; use its exactMatch/samePitchClass/isOctaveDisplacement/signedSemitones properties. `isDistinctUnison` additionally checks position identity. `sharedTones` returns sorted unique pitch classes. `transposedPositions` is bounded, targets a selected mapping, and does not claim a movable fingering.
+- `RelationalAnswerCriterion.accepts(_:on:)` explicitly distinguishes pitch, class, signed interval, distinct unison, position, chord identity, triad inversion and exact voicing. Single-note criteria require one selection. Chord identity allows doubled tones, exact voicing retains multiplicity. Empty/invalid/duplicate positions and two frets on one string are rejected for simultaneous selections; this is not a complete fingering solver.
+- No serialization of mappings is introduced. M18 does not create UI, change existing routes, local progress, scoring, audio, privacy permissions or package dependencies.
+
+## M19 boundary
+Use resolved positions for geometry and string/fret identity, not pitch as a touch identifier. Existing `LiveKeyboardPlayer` and `FreeKeyboardTouchTracker` are pitch-oriented. Reuse note events where appropriate, but decide whether distinct string voices need independent articulation and release; test unison overlap, glissando, strum, cancellations and all-notes-off. Reuse existing piano range/layout and label policies where appropriate without merging instrument-specific geometry into the theory core. Sounding pitch is the contract; guitar notation's written octave shift is deferred. M21 owns playable fingering enumeration and ergonomic constraints. M24 owns mastery extensions and migration.
+
+## Verification
+Use `make check`, `make ios-build`, `make ios-release-build`, `make ios-ui-test` and `make manual-m18`. No new manual guitar test exists yet. No network, microphone, MIDI, permissions or external dependencies introduced. No App Store account/build changes.
