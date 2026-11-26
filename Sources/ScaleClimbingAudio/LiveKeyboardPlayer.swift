@@ -114,9 +114,12 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
                     frequency: GeneratedChordTones.frequency(for: Pitch(midiNumber: midi)),
                     sampleRate: Self.sampleRate
                 )
-                guard let buffer = makeBuffer(samples) else { return }
+                // Only Sendable waveform data crosses Dispatch queues. AVAudioPCMBuffer
+                // construction and access remain confined to the audio queue.
                 queue.async { [self] in
-                    buffers[midi] = buffer
+                    if let buffer = makeBuffer(samples) {
+                        buffers[midi] = buffer
+                    }
                 }
             }
         }
