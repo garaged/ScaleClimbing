@@ -6,13 +6,13 @@
 - [x] Open one stacked draft PR against M16.
 
 ## Test-first and implementation
-- [ ] Add focused geometry and polyphonic touch-tracker tests before production implementation.
-- [ ] Add audio allocator and loop-signal bounds tests before production implementation.
+- [x] Add focused geometry and polyphonic touch-tracker tests before production implementation.
+- [x] Add audio allocator and loop-signal bounds tests before production implementation.
 - [x] Implement platform-neutral range/touch model from the existing piano geometry.
 - [x] Implement iOS multitouch keyboard surface, coordinate hit-testing, VoiceOver and labels.
 - [x] Implement separate locally generated live-note polyphony engine with release envelopes.
 - [x] Wire Home entry, root, app audio service, localizations and settings.
-- [ ] Add UI navigation/persistence regression and developer manual acceptance.
+- [x] Add UI navigation/persistence regression and developer manual acceptance.
 
 ## Validation and handoff
 - [ ] Package/spec/docs/security/architecture/smoke CI green.

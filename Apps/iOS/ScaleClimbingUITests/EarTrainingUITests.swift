@@ -593,4 +593,42 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertFalse(app.buttons["atlas.check"].isEnabled)
     }
 
+    @MainActor
+    func testFreeKeyboardOpensFromHomeAndKeepsControlsAcrossRelaunch() {
+        let app = XCUIApplication()
+        app.launch()
+        let route = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == %@", "home.route.freeKeyboard"))
+            .firstMatch
+        XCTAssertTrue(route.waitForExistence(timeout: 10))
+        route.tap()
+
+        XCTAssertTrue(app.staticTexts["playground.range"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.switches["playground.noteNames"].exists)
+        XCTAssertTrue(app.buttons["playground.lower"].exists)
+        XCTAssertTrue(app.buttons["playground.higher"].exists)
+        XCTAssertTrue(app.staticTexts["playground.help"].exists)
+
+        let originalRange = app.staticTexts["playground.range"].label
+        let higher = app.buttons["playground.higher"]
+        if higher.isEnabled {
+            higher.tap()
+            XCTAssertNotEqual(app.staticTexts["playground.range"].label, originalRange)
+            app.buttons["playground.lower"].tap()
+            XCTAssertEqual(app.staticTexts["playground.range"].label, originalRange)
+        }
+
+        app.switches["playground.noteNames"].tap()
+        let currentState = app.switches["playground.noteNames"].value as? String
+        app.terminate()
+        app.launch()
+        let restoredRoute = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == %@", "home.route.freeKeyboard"))
+            .firstMatch
+        XCTAssertTrue(restoredRoute.waitForExistence(timeout: 10))
+        restoredRoute.tap()
+        XCTAssertEqual(app.switches["playground.noteNames"].value as? String, currentState)
+        app.switches["playground.noteNames"].tap() // Restore initial visible labels.
+    }
+
 }

@@ -20,3 +20,20 @@ import Testing
     #expect(AppRoute.notationTrail.regionTitle == "Notation Nook")
     #expect(AppRoute.learningPath.title == "Learning Path")
 }
+
+@Test func freeKeyboardIsAnUnscoredHomeDestinationNotAnExercise() {
+    #expect(AppRoute.freeKeyboard.title == "Free Keyboard")
+    #expect(AppRoute.freeKeyboard.practiceZone == nil)
+    #expect(AppRoute.freeKeyboard.symbolName == "pianokeys")
+    #expect(AppRoute.freeKeyboard.subtitle.contains("no score"))
+}
+
+@MainActor
+@Test func homeStillOffersEveryExerciseSeparatelyFromFreePlay() {
+    let home = HomeViewModel()
+    #expect(home.availableRoutes.contains(.freeKeyboard))
+    #expect(home.practiceZones.allSatisfy { zone in
+        !home.routes(in: zone).contains(.freeKeyboard)
+    })
+    #expect(home.featuredRoute == .learningPath)
+}
