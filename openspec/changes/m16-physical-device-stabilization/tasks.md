@@ -27,3 +27,11 @@
 - [x] Move audio synthesis off main actor, coalesce superseded queued audio, and avoid repeat session activation in a running engine.
 - [ ] Validate all hosted package, iOS simulator, UI and Release gates; repair failures.
 - [ ] Owner manual dark/light iPhone/iPad keyboard and repeated playback / interruption acceptance.
+
+## M16-003 / M16-004 follow-up from physical-device testing
+- [x] Triage rapid-note click and silent chord-building keyboard; record in OpenSpec.
+- [ ] Add focused transition-envelope/voice-reuse and exact-key pitch-policy tests before repair.
+- [ ] Add bounded fade-out between overlapping notes without delaying the newest playback.
+- [ ] Audition actual tapped pitches in Chord Forge and Chord Atlas Build, preserving scoring and full-chord actions.
+- [ ] Pass hosted package, iOS Debug/Release and UI test gates for these fixes.
+- [ ] Owner repeat-test fast key alternation, 10+ chord-building key taps and full-chord play on physical device.

@@ -79,3 +79,31 @@ Generated offline audio SHALL be prepared off the main actor; when several play 
 - **GIVEN** several rounds of Hear, Check and Replay
 - **WHEN** the learner repeats audio in rapid succession
 - **THEN** the UI stays responsive and notes of each chord are heard together without accumulating stale-playback delay
+
+### Requirement: rapid note transitions avoid hard-cut clicks
+
+Rapid replacement of generated notes SHALL not abruptly silence a nonzero waveform. The outgoing voice SHALL have a short bounded fade while the newest note starts promptly, without blocking UI input, accumulating stale events, or altering Rhythm Trail's intentionally percussive click synthesis.
+
+#### Scenario: learner alternates notes rapidly
+- **GIVEN** a generated pitch is sounding
+- **WHEN** a different pitch is tapped before the first finishes
+- **THEN** the old voice fades briefly as the new voice starts, without an artificial gap or late older request
+
+#### Scenario: a fading voice is reused
+- **GIVEN** several rapid note taps overlap the short fade window
+- **WHEN** a player voice is reused for a newer event
+- **THEN** stale fade callbacks cannot silence the newest voice
+
+### Requirement: chord-building key taps audition individual notes
+
+Chord Forge and Chord Atlas Build SHALL play the exact tapped pitch and octave through the existing generated pitch player on every piano-key tap, while continuing to update pitch-class selection and retaining existing Hear chord, Check chord, Replay attempt and scoring behavior.
+
+#### Scenario: a learner constructs a chord by pressing keys
+- **GIVEN** the learner opens Chord Forge or Chord Atlas in Build mode
+- **WHEN** they tap C4, E4 and G4 in order
+- **THEN** each key immediately auditions its respective note, each pitch class is toggled as before, and the later chord attempt still plays simultaneous tones
+
+#### Scenario: a learner deselects a pitch in the keyboard
+- **GIVEN** the pitch class C is selected
+- **WHEN** the learner taps C5
+- **THEN** C is deselected according to existing pitch-class rules, while the key press auditions C5 rather than a target chord or a C4 substitute
