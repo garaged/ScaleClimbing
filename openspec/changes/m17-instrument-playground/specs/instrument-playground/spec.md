@@ -54,3 +54,17 @@ The free-play route SHALL use generic pitch note-on/note-off events so a later f
 - **GIVEN** future fretboard development begins
 - **WHEN** an instrument-specific touch surface is added
 - **THEN** it can reuse the pitch-event audio boundary without changing M17's keyboard gameplay semantics
+
+### Requirement: portrait piano keys preserve playable proportions
+
+The Free Keyboard SHALL bound key height based on the width of each natural key instead of stretching the canvas to fill the entire portrait screen. The control panel SHALL avoid squeezing octave navigation and localized note-label controls into an overcrowded row on narrow iPhones. The unused vertical space SHALL frame the playable keyboard rather than deform it, and the landscape presentation SHALL retain its available playable area.
+
+#### Scenario: iPhone 17 portrait at default register
+- **GIVEN** a learner opens Free Keyboard on a portrait iPhone with one octave
+- **WHEN** the keyboard renders in the remaining screen space
+- **THEN** keys keep a bounded piano-like height relative to natural-key width, the black keys remain proportionally shorter, controls and help remain visible, and the keyboard never stretches to the bottom edge
+
+#### Scenario: landscape or accessibility height change
+- **GIVEN** a phone rotates to a wide landscape viewport or Dynamic Type reduces available vertical room
+- **WHEN** the layout is recalculated
+- **THEN** keys fit into the remaining height, no essential controls are obscured, and existing touch geometry continues to match rendered keys

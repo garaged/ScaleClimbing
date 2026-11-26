@@ -11,3 +11,7 @@ Use the *M17 branch build*, not the already-submitted 0.3.0 version. Record date
 7. **Audio consistency:** Compare repeated held notes with Note Hunter pitch reference and Chord Forge. No clicks, rhythmic gaps or long delay in the free-play engine. Repeat with speaker and an alternate route if available; confirm offline/no microphone permission.
 
 **Exit:** Both iPhone orientations and iPad assessed with exceptions explicitly recorded; CI and iOS Release gates green; user approval prior to merging stacked PR and re-reviewing App Store build/metadata evidence.
+
+## M17-UI-001 — Portrait proportions follow-up
+
+Owner-provided iPhone 17 iOS 27.2 simulator screenshot shows single-octave natural keys stretching from below the controls almost to the bottom of the screen, with black keys similarly elongated. This is a visual regression observation, not evidence of failed audio behavior. On the updated candidate, check that a narrow portrait viewport uses piano-like key proportions and a non-cramped control layout, and that the keyboard and instruction text remain visible without clipping. Rotate to landscape and confirm two-octave play remains comfortable; resize text if possible and verify black/white touch alignment. Verify against the actual M17 commit/device; do not mark passed from the screenshot.

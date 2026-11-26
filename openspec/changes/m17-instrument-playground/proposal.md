@@ -20,3 +20,6 @@ Let learners freely play music on their iPhone—especially in landscape—witho
 
 ## Exit / release
 Swift package and simulator/Release build + XCUITest green, owner acceptance on physical iPhone in portrait and landscape and iPad, rapid polyphonic audio smooth on speaker and alternate route if possible. Do not mark this complete solely on hosted compilation. App Store replacement build/recording remains owner-operated.
+
+## M17-UI-001 portrait polish
+The first iPhone 17 portrait simulator screenshot exposed stretched keys: the canvas expanded vertically without respecting natural-key width. Treat the key shape and narrow controls as a focused layout polish task; keep audio, multitouch, instrument range and landscape semantics unchanged. Test sizing as pure presentation logic and re-check touch geometry after any layout adjustment.

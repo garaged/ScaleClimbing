@@ -19,3 +19,9 @@
 - [ ] Simulator build, iPhone UI tests and unsigned Release build green.
 - [ ] Physical iPhone landscape/portrait and iPad test plus VoiceOver and audio route interruptions.
 - [ ] Owner explicitly accepts new play mode and reviews App Store build/evidence requirements before merging.
+
+## M17-UI-001 — Portrait piano proportions (owner screenshot, 2026-11-25)
+- [x] Triage portrait iPhone 17 simulator screenshot: white/black keys stretch across almost the full available screen height; narrow controls also compete horizontally.
+- [ ] Add a deterministic natural-key aspect/available-height sizing regression, preserving landscape width/range.
+- [ ] Cap portrait keys by available width and available height; balance space around the instrument and give narrow controls a dedicated row.
+- [ ] Verify iPhone portrait/landscape UI builds and owner device visual/touch acceptance.
