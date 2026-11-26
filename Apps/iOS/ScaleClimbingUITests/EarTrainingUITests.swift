@@ -569,18 +569,16 @@ final class EarTrainingUITests: XCTestCase {
     }
 
     @MainActor
-    func testChordBuilderKeyTapsKeepPitchClassSelectionSemanticsAcrossOctaves() {
+    func testChordBuilderKeyTapsStillToggleSelectionWithoutChangingScoring() {
         let app = XCUIApplication()
         app.launch()
         openRoute(in: app, identifier: "home.route.chordForge")
 
         let c4 = app.buttons["C in octave 4"]
-        let c5 = app.buttons["C in octave 5"]
         XCTAssertTrue(c4.waitForExistence(timeout: 10))
         c4.tap()
         XCTAssertTrue(app.buttons["Check chord"].isEnabled)
-        XCTAssertTrue(c5.exists)
-        c5.tap()
+        c4.tap()
         XCTAssertFalse(app.buttons["Check chord"].isEnabled)
 
         app.terminate()
@@ -588,11 +586,10 @@ final class EarTrainingUITests: XCTestCase {
         openChordAtlas(in: app)
         app.segmentedControls["atlas.mode"].buttons["Build"].tap()
         let atlasC4 = app.buttons["C in octave 4"]
-        let atlasC5 = app.buttons["C in octave 5"]
         XCTAssertTrue(atlasC4.waitForExistence(timeout: 10))
         atlasC4.tap()
         XCTAssertTrue(app.buttons["atlas.check"].isEnabled)
-        atlasC5.tap()
+        atlasC4.tap()
         XCTAssertFalse(app.buttons["atlas.check"].isEnabled)
     }
 

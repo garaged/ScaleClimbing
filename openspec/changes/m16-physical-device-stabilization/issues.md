@@ -65,7 +65,7 @@ For every new report, assign `M16-001`, `M16-002`, etc.; classify as **candidate
 - **Triage and cause:** code-proven missing pitch callback: Forge/Atlas keyboard `onKeyTap` closures only call `viewModel.toggle`, though the root already provides an `onPlayPitch` service for other practice screens
 - **Decision:** reuse the existing offline pitch playback callback in Forge/Atlas, playing the exact tapped key pitch and octave on every tap (including a deselect) without changing scoring, key highlights or full-chord controls. No new audio synthesis or permissions
 - **Spec/tests:** deterministic selected-key to sounding-pitch policy and existing construction interaction regression; device audible check with black/white keys and cross-octave taps
-- **Fix / commit:** `cf54927` connects exact-pitch callbacks to both builders through the existing root audio player; `70f49c0` verifies exact-pitch/octave model policy and `2432c02` checks unchanged cross-octave selection behavior in XCUITest
+- **Fix / commit:** `cf54927` connects exact-pitch callbacks to both builders through the existing root audio player; `70f49c0` verifies exact-pitch/octave model policy and `2432c02` plus this follow-up XCUITest check unchanged selection toggling; physical cross-octave audibility remains a manual check
 - **Regression sweep:** both modes, accidental and octave tap identity, selection/retry/clear/score; English/es-MX and accessibility
 - **Release impact:** replacement uploaded build and matching review recording if applicable
 - **Verification:** CI and physical re-test pending
