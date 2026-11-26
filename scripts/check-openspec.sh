@@ -14,6 +14,10 @@ required=(
   "$root/changes/m16-physical-device-stabilization/proposal.md"
   "$root/changes/m16-physical-device-stabilization/tasks.md"
   "$root/changes/m16-physical-device-stabilization/issues.md"
+  "$root/changes/m17-instrument-playground/proposal.md"
+  "$root/changes/m17-instrument-playground/tasks.md"
+  "$root/changes/m17-instrument-playground/specs/instrument-playground/spec.md"
+  "$root/specs/instrument-playground/spec.md"
   "$root/changes/m16-physical-device-stabilization/specs/device-stabilization/spec.md"
 )
 

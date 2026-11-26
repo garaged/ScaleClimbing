@@ -79,6 +79,12 @@
 - Use `make manual-m16` to check launch, layout, orientation, accessibility, audio, state recovery, locale, appearance and privacy on real devices.
 - Track Guideline 2.1 recording/review evidence against the submitted App Store build; only the owner makes Apple account-side changes.
 
+## M17 — Instrument Playground: free keyboard (proposed; stacked on M16)
+- Add a standalone Free Keyboard that uses real-time sustained note-on/off and simultaneous finger chords, independent of scoring.
+- Adapt 1–3 octave registers to phone portrait, landscape and iPad; provide starting-octave control, local label preference and VoiceOver audition.
+- Reuse the shared pitch model and keyboard colors while keeping audio polyphonic and isolated from the M16 exercise player.
+- Future guitar/fretboard surfaces may reuse the note-event audio boundary but are not in this milestone.
+
 ## Planned learning milestones
 
 | Stage | Skills and variants | Learning outcome |
