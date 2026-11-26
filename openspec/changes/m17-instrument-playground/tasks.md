@@ -1,0 +1,27 @@
+# M17 execution ledger
+
+## Spec and design
+- [x] State independent free-play intent, non-goals, live-note interface and privacy constraints.
+- [x] Define requirements for responsive geometry, gesture lifecycle, polyphony, labels, accessibility, cleanup, and manual evidence.
+- [x] Open one stacked draft PR against M16.
+
+## Test-first and implementation
+- [x] Add focused geometry and polyphonic touch-tracker tests before production implementation.
+- [x] Add audio allocator and loop-signal bounds tests before production implementation.
+- [x] Implement platform-neutral range/touch model from the existing piano geometry.
+- [x] Implement iOS multitouch keyboard surface, coordinate hit-testing, VoiceOver and labels.
+- [x] Implement separate locally generated live-note polyphony engine with release envelopes.
+- [x] Wire Home entry, root, app audio service, localizations and settings.
+- [x] Add UI navigation/persistence regression and developer manual acceptance.
+
+## Validation and handoff
+- [ ] Package/spec/docs/security/architecture/smoke CI green.
+- [ ] Simulator build, iPhone UI tests and unsigned Release build green.
+- [ ] Physical iPhone landscape/portrait and iPad test plus VoiceOver and audio route interruptions.
+- [ ] Owner explicitly accepts new play mode and reviews App Store build/evidence requirements before merging.
+
+## M17-UI-001 — Portrait piano proportions (owner screenshot, 2026-11-25)
+- [x] Triage portrait iPhone 17 simulator screenshot: white/black keys stretch across almost the full available screen height; narrow controls also compete horizontally.
+- [x] Add a deterministic natural-key aspect/available-height sizing regression, preserving landscape width/range.
+- [x] Cap portrait keys by available width and available height; balance space around the instrument and give narrow controls a dedicated row.
+- [ ] Verify iPhone portrait/landscape UI builds and owner device visual/touch acceptance.
