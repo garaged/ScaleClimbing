@@ -1,0 +1,3 @@
+# M22 — CAGED and Scale Networks
+
+Stack on M21 PR #23 at `a177614bce81dc36f79d00fb889ca93ff68aedaf`. Complete M18–M22 implementation group before combined physical-device acceptance. Derive conventional five major CAGED templates and overlapping scale regions, support all roots, major scale, major pentatonic, relative minor pentatonic and arpeggio degree overlays; bridge challenges use exact physical-position intersections. Reuse M18 mapping, M19 paging, M20/M21 selection surface and generated audio. No 3NPS curriculum, minor CAGED shape catalog, barre/fingering ergonomics, microphone or new mastery engine. Separate draft, OpenSpec, tests, English/es-MX, CI and manual gates.
