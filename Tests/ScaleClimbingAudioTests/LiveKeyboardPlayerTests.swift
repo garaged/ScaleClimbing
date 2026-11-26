@@ -41,3 +41,27 @@ import Testing
     #expect(abs(startSlope - loopSlope) < 0.0001)
     #expect(samples.contains { abs($0) > 0.04 })
 }
+
+@Test func independentGuitarStringVoiceNamespace() {
+    var registry = LiveKeyboardVoiceRegistry(maxVoices: 4)
+    #expect(registry.noteOn(midiNumber: 60) == 0)
+    #expect(registry.noteOn(voice: .guitarString(2)) == 1)
+    #expect(registry.noteOn(voice: .guitarString(3)) == 2)
+    #expect(registry.noteOff(voice: .guitarString(2)) == 1)
+    #expect(registry.activeNoteCount == 2)
+    #expect(registry.noteOff(voice: .guitarString(3)) == 2)
+    #expect(registry.noteOff(midiNumber: 60) == 0)
+}
+
+@Test func guitarPluckDecaysAndHasSafeBounds() {
+    let samples = LiveGuitarTone.samples(frequency: 261.625565, sampleRate: 8000, duration: 2)
+    #expect(samples.count == 16000)
+    #expect(samples.first == 0)
+    #expect(samples.last == 0)
+    #expect(samples.allSatisfy { $0.isFinite && abs($0) <= 0.1 })
+    let early = samples.prefix(800).map { abs($0) }.max() ?? 0
+    let late = samples.suffix(800).map { abs($0) }.max() ?? 0
+    #expect(early > 0.01)
+    #expect(late < early * 0.1)
+    #expect(LiveGuitarTone.samples(frequency: .infinity).isEmpty)
+}

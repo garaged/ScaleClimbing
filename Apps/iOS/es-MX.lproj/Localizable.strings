@@ -118,3 +118,13 @@
 "Higher octave" = "Octava superior";
 "Hold keys to sustain notes. Use several fingers for chords." = "Mantén las teclas para sostener las notas. Usa varios dedos para tocar acordes.";
 "Hear this note" = "Escuchar esta nota";
+
+/* M19 Free Fretboard */
+"Free Fretboard" = "Diapasón libre";
+"Explore guitar strings and frets, with no score." = "Explora las cuerdas y los trastes de la guitarra, sin puntuación.";
+"Tap or hold a note. Slide across strings or frets to play." = "Toca o mantén una nota. Desliza el dedo por las cuerdas o los trastes para tocar.";
+"String %d, fret %d, %@" = "Cuerda %d, traste %d, %@";
+"Frets %d–%d" = "Trastes %d–%d";
+"Standard tuning" = "Afinación estándar";
+"Lower frets" = "Trastes anteriores";
+"Higher frets" = "Trastes siguientes";
