@@ -34,3 +34,14 @@ Generated reference tones reuse existing audio; no claim of realistic guitar rec
 - While holding a triad, lift one note, re-add it, then lift another. Remaining notes must not pulse, change pitch, clip or jump in volume; ordinary interference between different pitches is expected.
 - Compare sustained free-keyboard notes with the same generated chord in Chord Forge/Voicing Lab, allowing for different sustain and loudness. If the vibration persists, report which intervals/notes, audio route, speaker volume, iOS version, and whether it follows headphones or occurs only through the built-in speaker. This distinguishes acoustic/speaker distortion from a render-path issue; no claim of a verified physical root cause is made.
 - Verify rapid retriggers, first-touch response, and route/scene transitions again. Fixed -3.74 dB live mix headroom deliberately reduces maximum output level; no count-dependent gain adjustment.
+
+## Diagnostic isolation — residual chord vibration
+
+Owner reports the vibration is less noticeable at the fixed-headroom build 4ec2d1bf2dc97c3f9094aa760b82ebf7221cdee0, but remains with three or more held piano keys. All 185 package tests passed on that head, including exact-frequency linear mix and buffer-partition tests. Do not change tuning, lower gain again, or replace the timbre before isolating the remaining symptom.
+
+Use the same build and volume for each comparison:
+1. Free Keyboard: hold C4+C5 (octave), C4+G4 (fifth), C4+E4+G4 (major), then C4+C#4+D4 (closely spaced notes). Report whether the sound is smooth periodic pulsing/roughness, gritty buzzing, or intermittent stutter.
+2. Repeat major chord with built-in speaker at low and medium volume, then headphones if available. Avoid high volume. Report whether the residual follows the output route.
+3. Compare C major reference playback in Chord Forge with a held C4/E4/G4 in Free Keyboard, and Free Fretboard's three notes. Keep volume comparable. Report which paths exhibit the effect.
+
+Ordinary interference between simultaneous pitches is not a defect. Persistent artifacts with an octave, across headphone/speaker routes, or only in live playback require further investigation. The offline AVAudioEngine graph test uses the same source adapter and mono formats as production, but cannot prove real-time device scheduling or physical speaker behavior.

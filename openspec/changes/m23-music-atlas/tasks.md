@@ -14,3 +14,6 @@
 - [x] Capture physical chord vibration regression and specify linear polyphonic mix tests.
 - [x] Implement fixed-headroom precomputed oscillator mix, actual-output-rate setup and source mixer tests.
 - [ ] Verify fresh CI and physical chord/retrigger acceptance.
+- [x] Record residual polyphonic vibration and passing 185-test package validation at 4ec2d1b.
+- [x] Add production source-node offline graph regression and route/tone diagnostic procedure, without changing tone behavior.
+- [ ] Verify graph test CI and collect physical diagnostic results before further sound-design changes.

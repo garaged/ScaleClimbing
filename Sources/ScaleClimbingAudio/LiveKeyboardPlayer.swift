@@ -195,6 +195,18 @@ final class LiveRenderMixer: @unchecked Sendable {
         slots = (0..<voiceLimit).map { _ in LiveRenderSlot(sampleRate: sampleRate) }
     }
 
+    /// Shared production/offline graph adapter. Construct on the control queue.
+    func makeSourceNode(format: AVAudioFormat) -> AVAudioSourceNode {
+        AVAudioSourceNode(format: format) { [self] isSilence, _, frames, outputData in
+            let buffers = UnsafeMutableAudioBufferListPointer(outputData)
+            guard buffers.count == 1, let data = buffers[0].mData,
+                  Int(buffers[0].mDataByteSize) >= Int(frames) * MemoryLayout<Float>.stride else { return -50 }
+            let sounding = render(into: data.assumingMemoryBound(to: Float.self), frameCount: Int(frames))
+            isSilence.pointee = ObjCBool(!sounding)
+            return 0
+        }
+    }
+
     func publish(index: Int, command: LiveVoiceCommand) {
         slots[index].publish(command)
     }
@@ -315,14 +327,7 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
                     return false
                 }
                 let renderMixer = LiveRenderMixer(voiceLimit: Self.voiceLimit, sampleRate: rate)
-                let source = AVAudioSourceNode(format: format) { isSilence, _, frames, outputData in
-                    let buffers = UnsafeMutableAudioBufferListPointer(outputData)
-                    guard buffers.count == 1, let data = buffers[0].mData,
-                          Int(buffers[0].mDataByteSize) >= Int(frames) * MemoryLayout<Float>.stride else { return -50 }
-                    let sounding = renderMixer.render(into: data.assumingMemoryBound(to: Float.self), frameCount: Int(frames))
-                    isSilence.pointee = ObjCBool(!sounding)
-                    return 0
-                }
+                let source = renderMixer.makeSourceNode(format: format)
                 created.attach(source)
                 created.connect(source, to: created.mainMixerNode, format: format)
                 mixer = renderMixer
