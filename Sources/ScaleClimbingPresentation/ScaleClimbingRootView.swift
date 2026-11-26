@@ -15,6 +15,10 @@ public struct ScaleClimbingRootView: View {
     private let onLiveNoteOff: (Pitch) -> Void
     private let onLiveAllNotesOff: () -> Void
     private let onLivePrepare: ([Pitch]) -> Void
+    private let onGuitarNoteOn: (Int, Pitch) -> Void
+    private let onGuitarNoteOff: (Int) -> Void
+    private let onGuitarPrepare: ([Pitch]) -> Void
+    private let onGuitarAudition: (Pitch) -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
@@ -29,7 +33,11 @@ public struct ScaleClimbingRootView: View {
         onLiveNoteOn: @escaping (Pitch) -> Void = { _ in },
         onLiveNoteOff: @escaping (Pitch) -> Void = { _ in },
         onLiveAllNotesOff: @escaping () -> Void = {},
-        onLivePrepare: @escaping ([Pitch]) -> Void = { _ in }
+        onLivePrepare: @escaping ([Pitch]) -> Void = { _ in },
+        onGuitarNoteOn: @escaping (Int, Pitch) -> Void = { _, _ in },
+        onGuitarNoteOff: @escaping (Int) -> Void = { _ in },
+        onGuitarPrepare: @escaping ([Pitch]) -> Void = { _ in },
+        onGuitarAudition: @escaping (Pitch) -> Void = { _ in }
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
         self.onPlayChord = onPlayChord
@@ -44,6 +52,10 @@ public struct ScaleClimbingRootView: View {
         self.onLiveNoteOff = onLiveNoteOff
         self.onLiveAllNotesOff = onLiveAllNotesOff
         self.onLivePrepare = onLivePrepare
+        self.onGuitarNoteOn = onGuitarNoteOn
+        self.onGuitarNoteOff = onGuitarNoteOff
+        self.onGuitarPrepare = onGuitarPrepare
+        self.onGuitarAudition = onGuitarAudition
     }
 
     public var body: some View {
@@ -84,6 +96,9 @@ public struct ScaleClimbingRootView: View {
                 onPrepare: onLivePrepare,
                 onAccessibleAudition: onPlayPitch
             )
+        case .freeFretboard:
+            FreeFretboardGameView(onNoteOn: onGuitarNoteOn, onNoteOff: onGuitarNoteOff,
+                onAllNotesOff: onLiveAllNotesOff, onPrepare: onGuitarPrepare, onAudition: onGuitarAudition)
         case .noteHunter:
             NoteHunterGameView(onPlayPitch: onPlayPitch)
         case .chordForge:
@@ -166,6 +181,34 @@ private struct HomeView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("home.route.freeKeyboard")
+
+                NavigationLink(value: AppRoute.freeFretboard) {
+                    HStack(spacing: 14) {
+                        Image(systemName: "guitars")
+                            .font(.title2.weight(.medium))
+                            .foregroundStyle(ScaleClimbingPalette.sky)
+                            .frame(width: 46, height: 46)
+                            .background(ScaleClimbingPalette.sky.opacity(0.12), in: RoundedRectangle(cornerRadius: 13))
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(AppCopy.text("Free Fretboard"))
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+                            Text(AppCopy.text("Explore guitar strings and frets, with no score."))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 0)
+                        Image(systemName: "arrow.right")
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(14)
+                    .background(
+                        ScaleClimbingPalette.surface(for: colorScheme),
+                        in: RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("home.route.freeFretboard")
 
                 ForEach(viewModel.practiceZones) { zone in
                     VStack(alignment: .leading, spacing: 12) {

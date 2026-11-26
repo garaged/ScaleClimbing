@@ -42,6 +42,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
     case notationTrail
     case learningPath
     case freeKeyboard
+    case freeFretboard
 
     public var id: String { rawValue }
 
@@ -60,6 +61,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .notationTrail: return AppCopy.text("Notation Trail")
         case .learningPath: return AppCopy.text("Learning Path")
         case .freeKeyboard: return AppCopy.text("Free Keyboard")
+        case .freeFretboard: return AppCopy.text("Free Fretboard")
         }
     }
 
@@ -78,6 +80,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .notationTrail: return AppCopy.text("Read staff notes and dictate short movable-Do melodies.")
         case .learningPath: return AppCopy.text("Plan local spaced reviews across your skills.")
         case .freeKeyboard: return AppCopy.text("Explore notes and chords freely, with no score.")
+        case .freeFretboard: return AppCopy.text("Explore guitar strings and frets, with no score.")
         }
     }
 
@@ -101,7 +104,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return AppCopy.text("Notation Nook")
         case .learningPath:
             return AppCopy.text("Practice Plaza")
-        case .freeKeyboard:
+        case .freeKeyboard, .freeFretboard:
             return AppCopy.text("Instrument Playground")
         }
     }
@@ -118,7 +121,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return .timeAndTimbre
         case .notationTrail:
             return .notation
-        case .learningPath, .freeKeyboard:
+        case .learningPath, .freeKeyboard, .freeFretboard:
             return nil
         }
     }
@@ -138,6 +141,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .notationTrail: return "music.note.list"
         case .learningPath: return "sparkles"
         case .freeKeyboard: return "pianokeys"
+        case .freeFretboard: return "guitars"
         }
     }
 }

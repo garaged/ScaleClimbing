@@ -631,4 +631,28 @@ final class EarTrainingUITests: XCTestCase {
         app.switches["playground.noteNames"].tap() // Restore initial visible labels.
     }
 
+    @MainActor
+    func testFreeFretboardOpensAndPagesThroughLastFret() {
+        let app = XCUIApplication()
+        app.launch()
+        let route = app.descendants(matching: .any).matching(NSPredicate(format: "identifier == %@", "home.route.freeFretboard")).firstMatch
+        XCTAssertTrue(route.waitForExistence(timeout: 10))
+        if !route.isHittable { app.swipeUp() }
+        route.tap()
+        let range = app.staticTexts["fretboard.range"]
+        XCTAssertTrue(range.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.switches["fretboard.noteNames"].exists)
+        let higher = app.buttons["fretboard.higher"]
+        let lower = app.buttons["fretboard.lower"]
+        XCTAssertFalse(lower.isEnabled)
+        for _ in 0..<25 { if higher.isEnabled { higher.tap() } }
+        XCTAssertFalse(higher.isEnabled)
+        XCTAssertTrue(range.label.contains("24"))
+        XCTAssertTrue(app.buttons["fretboard.position.1.24"].exists)
+        app.buttons["fretboard.position.1.24"].tap()
+        for _ in 0..<25 { if lower.isEnabled { lower.tap() } }
+        XCTAssertFalse(lower.isEnabled)
+        XCTAssertTrue(app.buttons["fretboard.position.6.0"].exists)
+    }
+
 }

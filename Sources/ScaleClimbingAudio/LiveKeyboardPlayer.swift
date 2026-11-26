@@ -4,9 +4,20 @@ import MusicTheoryCore
 
 /// Pure voice-allocation state. Releasing slots stay reserved until their short
 /// release ramps complete; no current note is abruptly stolen by a new press.
+enum LiveInstrumentVoice: Hashable, Sendable {
+    case piano(Int)
+    case guitarString(Int)
+    case guitarAudition
+
+    var isGuitar: Bool {
+        if case .piano = self { return false }
+        return true
+    }
+}
+
 struct LiveKeyboardVoiceRegistry {
     let maxVoices: Int
-    private var activeByPitch: [Int: Int] = [:]
+    private var activeByVoice: [LiveInstrumentVoice: Int] = [:]
     private var releasing: Set<Int> = []
 
     init(maxVoices: Int) {
@@ -14,22 +25,26 @@ struct LiveKeyboardVoiceRegistry {
         self.maxVoices = maxVoices
     }
 
-    var activeNoteCount: Int { activeByPitch.count }
+    var activeNoteCount: Int { activeByVoice.count }
 
-    mutating func noteOn(midiNumber: Int) -> Int? {
-        guard activeByPitch[midiNumber] == nil else { return nil }
-        let occupied = Set(activeByPitch.values).union(releasing)
+    mutating func noteOn(midiNumber: Int) -> Int? { noteOn(voice: .piano(midiNumber)) }
+
+    mutating func noteOn(voice: LiveInstrumentVoice) -> Int? {
+        guard activeByVoice[voice] == nil else { return nil }
+        let occupied = Set(activeByVoice.values).union(releasing)
         guard let available = (0..<maxVoices).first(where: { !occupied.contains($0) }) else {
             return nil
         }
-        activeByPitch[midiNumber] = available
+        activeByVoice[voice] = available
         return available
     }
 
-    mutating func noteOff(midiNumber: Int) -> Int? {
-        guard let voice = activeByPitch.removeValue(forKey: midiNumber) else { return nil }
-        releasing.insert(voice)
-        return voice
+    mutating func noteOff(midiNumber: Int) -> Int? { noteOff(voice: .piano(midiNumber)) }
+
+    mutating func noteOff(voice: LiveInstrumentVoice) -> Int? {
+        guard let index = activeByVoice.removeValue(forKey: voice) else { return nil }
+        releasing.insert(index)
+        return index
     }
 
     mutating func finishRelease(voice: Int) {
@@ -37,8 +52,8 @@ struct LiveKeyboardVoiceRegistry {
     }
 
     mutating func releaseAll() -> [Int] {
-        let indices = Set(activeByPitch.values).union(releasing).sorted()
-        activeByPitch.removeAll()
+        let indices = Set(activeByVoice.values).union(releasing).sorted()
+        activeByVoice.removeAll()
         releasing.removeAll()
         return indices
     }
@@ -61,6 +76,30 @@ enum LiveKeyboardTone {
         let phaseStep = 2 * Double.pi * Double(cycles) / Double(frames)
         return (0..<frames).map { frame in
             Float(0.09 * sin(phaseStep * Double(frame)))
+        }
+    }
+}
+
+/// A bounded offline additive pluck with decaying partials; not a recorded guitar.
+enum LiveGuitarTone {
+    static func samples(frequency: Double, sampleRate: Double = 44_100, duration: Double = 2) -> [Float] {
+        guard frequency.isFinite, sampleRate.isFinite, duration.isFinite,
+              frequency > 0, frequency < sampleRate / 2,
+              (100...96_000).contains(sampleRate), (0.01...3).contains(duration) else { return [] }
+        let frames = Int((sampleRate * duration).rounded())
+        let partials = [1.0, 0.43, 0.26, 0.15, 0.09, 0.05].enumerated().filter {
+            Double($0.offset + 1) * frequency < sampleRate / 2
+        }
+        return (0..<frames).map { frame in
+            let t = Double(frame) / sampleRate
+            let attack = min(1, t / 0.006)
+            let tail = min(1, Double(frames - 1 - frame) / (sampleRate * 0.025))
+            var sum = 0.0
+            for (index, gain) in partials {
+                let harmonic = Double(index + 1)
+                sum += gain * exp(-t * (2.6 + harmonic * 0.9)) * sin(2 * Double.pi * harmonic * frequency * t)
+            }
+            return Float(0.045 * attack * tail * sum)
         }
     }
 }
@@ -88,6 +127,21 @@ public final class LiveKeyboardPlayer {
     public func allNotesOff() {
         worker.allNotesOff()
     }
+
+    public func prepareGuitar(_ pitches: [Pitch]) { worker.prepare(pitches, guitar: true) }
+    public func guitarNoteOn(string: Int, pitch: Pitch) {
+        guard (1...6).contains(string), (-1...9).contains(pitch.octave),
+              (0...127).contains(pitch.midiNumber) else { return }
+        worker.noteOn(pitch, voice: .guitarString(string))
+    }
+    public func guitarNoteOff(string: Int) {
+        guard (1...6).contains(string) else { return }
+        worker.noteOff(voice: .guitarString(string))
+    }
+    public func auditionGuitar(_ pitch: Pitch) {
+        guard (-1...9).contains(pitch.octave), (0...127).contains(pitch.midiNumber) else { return }
+        worker.noteOn(pitch, voice: .guitarAudition, autoRelease: true)
+    }
 }
 
 /// Engine state, buffer cache, and voice allocator are confined to a serial
@@ -104,59 +158,72 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
     private var engine: AVAudioEngine?
     private var nodes: [AVAudioPlayerNode] = []
     private var buffers: [Int: AVAudioPCMBuffer] = [:]
+    private var guitarBuffers: [Int: AVAudioPCMBuffer] = [:]
     private var registry = LiveKeyboardVoiceRegistry(maxVoices: LiveKeyboardAudioWorker.voiceLimit)
     private var generations = Array(repeating: UInt64.zero, count: LiveKeyboardAudioWorker.voiceLimit)
 
-    func prepare(_ pitches: [Pitch]) {
-        for midi in Set(pitches.map(\.midiNumber)) {
+    func prepare(_ pitches: [Pitch], guitar: Bool = false) {
+        for midi in Set(pitches.filter { (-1...9).contains($0.octave) }.map(\.midiNumber).filter { (0...127).contains($0) }) {
             renderQueue.async { [self] in
-                let samples = LiveKeyboardTone.samples(
-                    frequency: GeneratedChordTones.frequency(for: Pitch(midiNumber: midi)),
-                    sampleRate: Self.sampleRate
-                )
+                let samples = Self.waveform(pitch: Pitch(midiNumber: midi), guitar: guitar)
                 // Only Sendable waveform data crosses Dispatch queues. AVAudioPCMBuffer
                 // construction and access remain confined to the audio queue.
                 queue.async { [self] in
                     if let buffer = makeBuffer(samples) {
-                        buffers[midi] = buffer
+                        if guitar { guitarBuffers[midi] = buffer } else { buffers[midi] = buffer }
                     }
                 }
             }
         }
     }
 
-    func noteOn(_ pitch: Pitch) {
+    private static func waveform(pitch: Pitch, guitar: Bool) -> [Float] {
+        let frequency = GeneratedChordTones.frequency(for: pitch)
+        return guitar ? LiveGuitarTone.samples(frequency: frequency, sampleRate: sampleRate)
+                      : LiveKeyboardTone.samples(frequency: frequency, sampleRate: sampleRate)
+    }
+
+    func noteOn(_ pitch: Pitch) { noteOn(pitch, voice: .piano(pitch.midiNumber)) }
+
+    func noteOn(_ pitch: Pitch, voice: LiveInstrumentVoice, autoRelease: Bool = false) {
         let midi = pitch.midiNumber
         queue.async { [self] in
-            guard ensureEngine(), let index = registry.noteOn(midiNumber: midi) else { return }
-            guard let buffer = buffers[midi] ?? makeBuffer(LiveKeyboardTone.samples(
-                frequency: GeneratedChordTones.frequency(for: pitch),
-                sampleRate: Self.sampleRate
-            )) else {
-                _ = registry.noteOff(midiNumber: midi)
+            if autoRelease { release(voice: voice) }
+            guard ensureEngine(), let index = registry.noteOn(voice: voice) else { return }
+            let cached = voice.isGuitar ? guitarBuffers[midi] : buffers[midi]
+            guard let buffer = cached ?? makeBuffer(Self.waveform(pitch: pitch, guitar: voice.isGuitar)) else {
+                _ = registry.noteOff(voice: voice)
                 registry.finishRelease(voice: index)
                 return
             }
-            buffers[midi] = buffer
+            if voice.isGuitar { guitarBuffers[midi] = buffer } else { buffers[midi] = buffer }
             generations[index] &+= 1
             let generation = generations[index]
             let node = nodes[index]
             node.stop()
             node.volume = 0
-            node.scheduleBuffer(buffer, at: nil, options: [.loops])
+            node.scheduleBuffer(buffer, at: nil, options: voice.isGuitar ? [] : [.loops])
             node.play()
             ramp(index: index, generation: generation, from: 0, to: 1, releasing: false)
+            if autoRelease {
+                queue.asyncAfter(deadline: .now() + .milliseconds(2000)) { [self] in
+                    guard generations[index] == generation else { return }
+                    release(voice: voice)
+                }
+            }
         }
     }
 
-    func noteOff(_ pitch: Pitch) {
-        queue.async { [self] in
-            guard let index = registry.noteOff(midiNumber: pitch.midiNumber) else { return }
-            // Invalidate attack-ramp callbacks before releasing; otherwise a
-            // late attack step could raise volume again during the fade-out.
-            generations[index] &+= 1
-            ramp(index: index, generation: generations[index], from: nodes[index].volume, to: 0, releasing: true)
-        }
+    func noteOff(_ pitch: Pitch) { noteOff(voice: .piano(pitch.midiNumber)) }
+
+    func noteOff(voice: LiveInstrumentVoice) {
+        queue.async { [self] in release(voice: voice) }
+    }
+
+    private func release(voice: LiveInstrumentVoice) {
+        guard let index = registry.noteOff(voice: voice) else { return }
+        generations[index] &+= 1
+        ramp(index: index, generation: generations[index], from: nodes[index].volume, to: 0, releasing: true)
     }
 
     func allNotesOff() {
