@@ -37,17 +37,17 @@ public struct LearningPathGameView: View {
 
                 ForEach(viewModel.plan) { item in
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(item.skill.title)
+                        Text(AppCopy.text(item.skill.title))
                             .font(.headline)
                         Text(
                             viewModel.progress.accessibility.simplifiedExplanations
                                 ? "Review due."
-                                : item.reason
+                                : AppCopy.text(item.reason)
                         )
                         .foregroundStyle(.secondary)
 
                         if let route = AppRoute(rawValue: item.skill.routeIdentifier) {
-                            NavigationLink("Open \(item.skill.title)", value: route)
+                            NavigationLink(String(format: AppCopy.text("Open %@"), AppCopy.text(item.skill.title)), value: route)
                                 .accessibilityIdentifier("path.open.\(item.skill.rawValue)")
                         }
 

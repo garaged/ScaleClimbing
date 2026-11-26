@@ -8,11 +8,15 @@ public struct FretboardFoundationsGameView: View {
     @AppStorage("learningAssistanceLevel") private var assistanceRaw = LearningAssistanceLevel.standard.rawValue
     private let onGuitarAudition: (Pitch) -> Void
     private let onPianoAudition: (Pitch) -> Void
+    private let onStopAudio: () -> Void
+    @Environment(\.scenePhase) private var scenePhase
 
     public init(onGuitarAudition: @escaping (Pitch) -> Void = { _ in },
-                onPianoAudition: @escaping (Pitch) -> Void = { _ in }) {
+                onPianoAudition: @escaping (Pitch) -> Void = { _ in },
+                onStopAudio: @escaping () -> Void = {}) {
         self.onGuitarAudition = onGuitarAudition
         self.onPianoAudition = onPianoAudition
+        self.onStopAudio = onStopAudio
     }
 
     private var guitar: InstrumentMapping { .standardGuitar }
@@ -85,6 +89,8 @@ public struct FretboardFoundationsGameView: View {
             .onChange(of: window) { _, value in if start != value.start { start = value.start } }
         }
         .navigationTitle(AppCopy.text("Fretboard Foundations"))
+        .onDisappear { onStopAudio() }
+        .onChange(of: scenePhase) { _, phase in if phase != .active { onStopAudio() } }
     }
 
     private var guitarAnchor: InstrumentPosition? {
@@ -93,7 +99,7 @@ public struct FretboardFoundationsGameView: View {
     }
 
     private func resetWindow() {
-        if case .fret(_, let fret) = guitarAnchor { start = max(0, fret - 2) }
+        if let anchor = guitarAnchor, case .fret(_, let fret) = anchor { start = max(0, fret - 2) }
         else { start = 0 }
     }
 

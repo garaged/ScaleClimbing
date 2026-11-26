@@ -46,7 +46,7 @@ public struct GuitarFoundationRound: Hashable, Sendable {
 /// Session scoring is deliberately independent from persisted Learning Path mastery.
 public struct GuitarFoundationSession: Sendable {
     public private(set) var mode: GuitarFoundationMode
-    private var rounds: [GuitarFoundationRound]
+    private let rounds: [GuitarFoundationRound]
     public private(set) var index = 0
     public private(set) var attempts = 0
     public private(set) var correct = 0

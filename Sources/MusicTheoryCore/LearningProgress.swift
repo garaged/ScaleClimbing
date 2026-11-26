@@ -9,6 +9,7 @@ public enum PracticeSkill: String, CaseIterable, Codable, Hashable, Sendable, Id
     case rhythm
     case timbre
     case notation
+    case guitarFoundations
 
     public var id: String { rawValue }
 
@@ -22,6 +23,7 @@ public enum PracticeSkill: String, CaseIterable, Codable, Hashable, Sendable, Id
         case .rhythm: return "Rhythm"
         case .timbre: return "Timbre"
         case .notation: return "Notation"
+        case .guitarFoundations: return "Guitar foundations"
         }
     }
 
@@ -35,6 +37,7 @@ public enum PracticeSkill: String, CaseIterable, Codable, Hashable, Sendable, Id
         case .rhythm: return "Start with pulse and meter."
         case .timbre: return "Start with tone color and partials."
         case .notation: return "Start with staff positions and note names."
+        case .guitarFoundations: return "Connect guitar notes, octaves and intervals."
         }
     }
 
@@ -48,6 +51,7 @@ public enum PracticeSkill: String, CaseIterable, Codable, Hashable, Sendable, Id
         case .rhythm: return "rhythmTrail"
         case .timbre: return "timbreLab"
         case .notation: return "notationTrail"
+        case .guitarFoundations: return "fretboardFoundations"
         }
     }
 }

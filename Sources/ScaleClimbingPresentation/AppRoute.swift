@@ -43,6 +43,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
     case learningPath
     case freeKeyboard
     case freeFretboard
+    case fretboardFoundations
 
     public var id: String { rawValue }
 
@@ -62,6 +63,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .learningPath: return AppCopy.text("Learning Path")
         case .freeKeyboard: return AppCopy.text("Free Keyboard")
         case .freeFretboard: return AppCopy.text("Free Fretboard")
+        case .fretboardFoundations: return AppCopy.text("Fretboard Foundations")
         }
     }
 
@@ -81,12 +83,13 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .learningPath: return AppCopy.text("Plan local spaced reviews across your skills.")
         case .freeKeyboard: return AppCopy.text("Explore notes and chords freely, with no score.")
         case .freeFretboard: return AppCopy.text("Explore guitar strings and frets, with no score.")
+        case .fretboardFoundations: return AppCopy.text("Find guitar notes, octaves and intervals.")
         }
     }
 
     public var regionTitle: String {
         switch self {
-        case .noteHunter:
+        case .noteHunter, .fretboardFoundations:
             return AppCopy.text("Note Harbor")
         case .chordForge, .earTraining, .voicingLab:
             return AppCopy.text("Triad Cliffs")
@@ -111,7 +114,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
 
     public var practiceZone: PracticeZone? {
         switch self {
-        case .noteHunter, .chordForge:
+        case .noteHunter, .chordForge, .fretboardFoundations:
             return .foundations
         case .earTraining, .intervalTrail:
             return .listening
@@ -141,7 +144,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .notationTrail: return "music.note.list"
         case .learningPath: return "sparkles"
         case .freeKeyboard: return "pianokeys"
-        case .freeFretboard: return "guitars"
+        case .freeFretboard, .fretboardFoundations: return "guitars"
         }
     }
 }
