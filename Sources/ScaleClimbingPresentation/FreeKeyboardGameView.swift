@@ -35,8 +35,20 @@ public struct FreeKeyboardGameView: View {
                 startingOctave: startingOctave,
                 viewportWidth: Double(proxy.size.width)
             )
+            let octaves = FreeKeyboardRange.octaveCount(forWidth: Double(proxy.size.width))
+            let compact = octaves == 1
+            let keyHeight = FreeKeyboardSizing.keyboardHeight(
+                viewportWidth: Double(proxy.size.width),
+                viewportHeight: Double(proxy.size.height)
+            )
             VStack(spacing: 10) {
-                controls(visibleOctaves: FreeKeyboardRange.octaveCount(forWidth: Double(proxy.size.width)))
+                controls(visibleOctaves: octaves, compact: compact)
+
+                // Center the proportionally sized piano in portrait rather than
+                // stretching the key faces to fill unused vertical space.
+                if compact {
+                    Spacer(minLength: 0)
+                }
 
                 #if os(iOS)
                 FreeKeyboardTouchSurface(
@@ -46,7 +58,8 @@ public struct FreeKeyboardGameView: View {
                     onNoteEvent: handleNoteEvent,
                     onAccessibleAudition: onAccessibleAudition
                 )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
+                .frame(height: CGFloat(keyHeight))
                 .accessibilityIdentifier("playground.keyboard")
                 #else
                 PianoKeyboardView(model: model, highlightedPitches: [], onKeyTap: { key in
@@ -61,6 +74,10 @@ public struct FreeKeyboardGameView: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.7)
                     .accessibilityIdentifier("playground.help")
+
+                if compact {
+                    Spacer(minLength: 0)
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
@@ -91,8 +108,39 @@ public struct FreeKeyboardGameView: View {
         }
     }
 
-    private func controls(visibleOctaves: Int) -> some View {
-        HStack(spacing: 10) {
+    @ViewBuilder
+    private func controls(visibleOctaves: Int, compact: Bool) -> some View {
+        if compact {
+            // One readable control per row avoids compressed Spanish labels on
+            // portrait phones and leaves the octave controls easy to operate.
+            VStack(spacing: 6) {
+                HStack {
+                    octaveControls(visibleOctaves: visibleOctaves)
+                    Spacer(minLength: 0)
+                }
+                noteNamesToggle
+                    .frame(maxWidth: .infinity)
+            }
+            .controlSize(.regular)
+        } else {
+            HStack(spacing: 10) {
+                octaveControls(visibleOctaves: visibleOctaves)
+                Spacer(minLength: 4)
+                noteNamesToggle
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .controlSize(.regular)
+        }
+    }
+
+    private var noteNamesToggle: some View {
+        Toggle(AppCopy.text("Note names"), isOn: $showNoteNames)
+            .font(.subheadline)
+            .accessibilityIdentifier("playground.noteNames")
+    }
+
+    private func octaveControls(visibleOctaves: Int) -> some View {
+        HStack(spacing: 12) {
             Button {
                 startingOctave = max(2, startingOctave - 1)
             } label: {
@@ -116,15 +164,7 @@ public struct FreeKeyboardGameView: View {
             .disabled(startingOctave + visibleOctaves - 1 >= 6)
             .accessibilityLabel(AppCopy.text("Higher octave"))
             .accessibilityIdentifier("playground.higher")
-
-            Spacer(minLength: 4)
-
-            Toggle(AppCopy.text("Note names"), isOn: $showNoteNames)
-                .font(.subheadline)
-                .fixedSize(horizontal: true, vertical: false)
-                .accessibilityIdentifier("playground.noteNames")
         }
-        .controlSize(.regular)
         .frame(minHeight: 44)
     }
 }
