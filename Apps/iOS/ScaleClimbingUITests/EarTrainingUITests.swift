@@ -711,4 +711,21 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(prompt.exists)
     }
 
+    @MainActor
+    func testMusicAtlasShowsExactMatchesAndPitchClassMode() {
+        let app = XCUIApplication()
+        app.launch()
+        openRoute(in: app, identifier: "home.route.musicAtlas")
+        let focus = app.staticTexts["atlas.focus"]
+        XCTAssertTrue(focus.waitForExistence(timeout: 10))
+        XCTAssertTrue(focus.label.contains("C4"))
+        let count = app.staticTexts["atlas.matchCount"]
+        XCTAssertTrue(count.label.contains("5"))
+        let pitchClass = app.buttons["Pitch class"]
+        if !pitchClass.isHittable { app.swipeUp() }
+        XCTAssertTrue(pitchClass.exists)
+        pitchClass.tap()
+        XCTAssertNotEqual(count.label, "Guitar matches: 5")
+    }
+
 }

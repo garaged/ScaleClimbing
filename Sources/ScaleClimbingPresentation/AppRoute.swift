@@ -46,6 +46,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
     case fretboardFoundations
     case guitarTriads
     case scaleNetwork
+    case musicAtlas
 
     public var id: String { rawValue }
 
@@ -68,6 +69,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .fretboardFoundations: return AppCopy.text("Fretboard Foundations")
         case .guitarTriads: return AppCopy.text("Guitar Triads")
         case .scaleNetwork: return AppCopy.text("Scale Network")
+        case .musicAtlas: return AppCopy.text("Music Atlas")
         }
     }
 
@@ -90,6 +92,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .fretboardFoundations: return AppCopy.text("Find guitar notes, octaves and intervals.")
         case .guitarTriads: return AppCopy.text("Build guitar triads, inversions and transformations.")
         case .scaleNetwork: return AppCopy.text("Connect CAGED shapes, scales and arpeggios.")
+        case .musicAtlas: return AppCopy.text("Discover musical relationships across piano and guitar.")
         }
     }
 
@@ -103,7 +106,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return AppCopy.text("Interval Ridge")
         case .chordAtlas, .harmonyPath:
             return AppCopy.text("Harmony Heights")
-        case .scaleExplorer, .scaleNetwork:
+        case .scaleExplorer, .scaleNetwork, .musicAtlas:
             return AppCopy.text("Scale Summit")
         case .rhythmTrail:
             return AppCopy.text("Rhythm Ridge")
@@ -130,7 +133,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return .timeAndTimbre
         case .notationTrail:
             return .notation
-        case .learningPath, .freeKeyboard, .freeFretboard:
+        case .learningPath, .freeKeyboard, .freeFretboard, .musicAtlas:
             return nil
         }
     }
@@ -150,6 +153,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .notationTrail: return "music.note.list"
         case .learningPath: return "sparkles"
         case .freeKeyboard: return "pianokeys"
+        case .musicAtlas: return "point.3.connected.trianglepath.dotted"
         case .freeFretboard, .fretboardFoundations, .guitarTriads, .scaleNetwork: return "guitars"
         }
     }

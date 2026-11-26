@@ -99,6 +99,8 @@ public struct ScaleClimbingRootView: View {
         case .freeFretboard:
             FreeFretboardGameView(onNoteOn: onGuitarNoteOn, onNoteOff: onGuitarNoteOff,
                 onAllNotesOff: onLiveAllNotesOff, onPrepare: onGuitarPrepare, onAudition: onGuitarAudition)
+        case .musicAtlas:
+            MusicAtlasGameView(onPiano: onPlayPitch, onGuitar: onGuitarAudition, onSequence: onPlayScale, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
         case .scaleNetwork:
             ScaleNetworkGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
         case .guitarTriads:
@@ -216,6 +218,12 @@ private struct HomeView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("home.route.freeFretboard")
+
+                NavigationLink(value: AppRoute.musicAtlas) {
+                    RouteCard(route: .musicAtlas)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("home.route.musicAtlas")
 
                 ForEach(viewModel.practiceZones) { zone in
                     VStack(alignment: .leading, spacing: 12) {
