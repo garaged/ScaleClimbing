@@ -60,31 +60,51 @@ import Testing
 }
 
 @Test func portraitFreeKeyboardKeepsNaturalKeysWithinPianoProportions() {
-    let width = 402.0
-    let height = FreeKeyboardSizing.keyboardHeight(
-        viewportWidth: width, viewportHeight: 780
-    )
-    let naturalWidth = (width - 24) / 7
-    #expect(height > naturalWidth * 3.5)
-    #expect(height <= naturalWidth * 4.6 + 0.0001)
+    let layout = InstrumentPlaygroundLayout(width: 402, height: 780)
+    let width = 378.0
+    let height = layout.keyboardHeight(surfaceWidth: width, availableHeight: 630, octaves: 1)
+    #expect(!layout.fillsAvailableHeight)
+    #expect(layout.showsHelp)
+    #expect(height > width / 7 * 3.5)
+    #expect(height <= width / 7 * 4.6 + 0.0001)
     #expect(height < 300)
-    #expect(FreeKeyboardRange.octaveCount(forWidth: width) == 1)
 }
 
-@Test func landscapeKeyboardUsesRemainingSpaceWithoutLosingTwoOctaves() {
-    let width = 844.0
-    let playableHeight = FreeKeyboardSizing.keyboardHeight(
-        viewportWidth: width, viewportHeight: 320
-    )
-    let naturalWidth = (width - 24) / 14
-    #expect(FreeKeyboardRange.octaveCount(forWidth: width) == 2)
-    #expect(playableHeight > 150)
-    #expect(playableHeight <= naturalWidth * 4.6 + 0.0001)
-    #expect(playableHeight <= 320 - 112)
+@Test func constrainedLandscapeUsesActualRemainingSpaceEvenWithOneOctave() {
+    // Safe-area-reduced physical viewport; below the old 620-point octave breakpoint.
+    for width in [540.0, 580, 619, 620, 844, 980] {
+        for height in [220.0, 260, 320, 390] {
+            let layout = InstrumentPlaygroundLayout(width: width, height: height)
+            let octaves = FreeKeyboardRange.octaveCount(forWidth: width)
+            let actualRemaining = height - 52
+            #expect(layout.fillsAvailableHeight)
+            #expect(!layout.showsHelp)
+            #expect(layout.keyboardHeight(surfaceWidth: width - 24, availableHeight: actualRemaining, octaves: octaves) == actualRemaining)
+            #expect(layout.fretboardHeight(availableHeight: actualRemaining) == actualRemaining)
+        }
+    }
 }
 
-@Test func smallViewportNeverMakesKeyboardOverlapReservedControls() {
-    #expect(FreeKeyboardSizing.keyboardHeight(viewportWidth: 390, viewportHeight: 280) <= 280 - 168)
-    #expect(FreeKeyboardSizing.keyboardHeight(viewportWidth: 844, viewportHeight: 160) <= 160 - 112)
-    #expect(FreeKeyboardSizing.keyboardHeight(viewportWidth: 390, viewportHeight: 100) == 0)
+@Test func playgroundSizingIsBoundedByMeasuredSpace() {
+    let layout = InstrumentPlaygroundLayout(width: 390, height: 280)
+    #expect(layout.fillsAvailableHeight)
+    #expect(layout.keyboardHeight(surfaceWidth: 366, availableHeight: 80, octaves: 1) == 80)
+    #expect(layout.fretboardHeight(availableHeight: 80) == 80)
+    #expect(layout.fretboardHeight(availableHeight: -5) == 0)
+    #expect(layout.keyboardHeight(surfaceWidth: 366, availableHeight: .nan, octaves: 1) == 0)
+    let portrait = InstrumentPlaygroundLayout(width: 390, height: 780)
+    #expect(portrait.fretboardHeight(availableHeight: 550) == 320)
+    #expect(portrait.fretboardHeight(availableHeight: 160) == 160)
+}
+
+@Test func resizingHighRegisterNeverExceedsB6OrChangesRequestedPreference() {
+    for width in [390.0, 844, 1024] {
+        let requestedOctave = 6
+        let model = FreeKeyboardRange.keyboard(startingOctave: requestedOctave, viewportWidth: width)
+        #expect(model.keys.last?.pitch == Pitch(.b, octave: 6))
+        #expect(model.keys.first?.pitch.octave == 7 - FreeKeyboardRange.octaveCount(forWidth: width))
+        #expect(requestedOctave == 6)
+    }
+    #expect(FreeKeyboardRange.clampedStartingOctave(Int.min, visibleOctaves: 1) == 2)
+    #expect(FreeKeyboardRange.clampedStartingOctave(Int.max, visibleOctaves: 3) == 4)
 }
