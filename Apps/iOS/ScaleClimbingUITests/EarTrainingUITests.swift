@@ -679,4 +679,15 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["fretPractice.prompt"].label.contains("C#"))
     }
 
+    @MainActor
+    func testGuitarTriadsRouteConstructionControls() {
+        let app = XCUIApplication()
+        app.launch()
+        openRoute(in: app, identifier: "home.route.guitarTriads")
+        XCTAssertTrue(app.staticTexts["guitarTriad.prompt"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["guitarTriad.prompt"].label.contains("C"))
+        XCTAssertFalse(app.buttons["guitarTriad.check"].isEnabled)
+        XCTAssertTrue(app.buttons["guitarTriad.position.1.0"].exists || app.buttons["guitarTriad.position.1.3"].exists)
+    }
+
 }
