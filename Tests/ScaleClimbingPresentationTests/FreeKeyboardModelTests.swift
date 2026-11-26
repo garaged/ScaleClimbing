@@ -58,3 +58,33 @@ import Testing
     #expect(model.keys.first?.accessibilityLabel == "C in octave 3")
     #expect(model.keys.last?.accessibilityLabel == "B in octave 3")
 }
+
+@Test func portraitFreeKeyboardKeepsNaturalKeysWithinPianoProportions() {
+    let width = 402.0
+    let height = FreeKeyboardSizing.keyboardHeight(
+        viewportWidth: width, viewportHeight: 780
+    )
+    let naturalWidth = (width - 24) / 7
+    #expect(height > naturalWidth * 3.5)
+    #expect(height <= naturalWidth * 4.6 + 0.0001)
+    #expect(height < 300)
+    #expect(FreeKeyboardRange.octaveCount(forWidth: width) == 1)
+}
+
+@Test func landscapeKeyboardUsesRemainingSpaceWithoutLosingTwoOctaves() {
+    let width = 844.0
+    let playableHeight = FreeKeyboardSizing.keyboardHeight(
+        viewportWidth: width, viewportHeight: 320
+    )
+    let naturalWidth = (width - 24) / 14
+    #expect(FreeKeyboardRange.octaveCount(forWidth: width) == 2)
+    #expect(playableHeight > 150)
+    #expect(playableHeight <= naturalWidth * 4.6 + 0.0001)
+    #expect(playableHeight <= 320 - 112)
+}
+
+@Test func smallViewportNeverMakesKeyboardOverlapReservedControls() {
+    #expect(FreeKeyboardSizing.keyboardHeight(viewportWidth: 390, viewportHeight: 280) <= 280 - 168)
+    #expect(FreeKeyboardSizing.keyboardHeight(viewportWidth: 844, viewportHeight: 160) <= 160 - 112)
+    #expect(FreeKeyboardSizing.keyboardHeight(viewportWidth: 390, viewportHeight: 100) == 0)
+}
