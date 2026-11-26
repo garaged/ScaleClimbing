@@ -43,7 +43,7 @@ public struct FreeFretboardGameView: View {
                 FreeFretboardTouchSurface(window: window, showNoteNames: showNoteNames,
                     isActive: scenePhase == .active, onEvent: handle, onAudition: onAudition)
                     .frame(height: max(80, min(wide ? 360 : 320, proxy.size.height - (wide ? 82 : 145))))
-                    .accessibilityIdentifier("fretboard.surface")
+
                 #else
                 ScrollView {
                     VStack(spacing: 4) {

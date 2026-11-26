@@ -26,6 +26,15 @@ struct FreeFretboardTouchSurface: UIViewRepresentable {
 final class FretboardCanvas: UIView {
     private final class AccessiblePosition: UIAccessibilityElement {
         var audition: (() -> Void)?
+        weak var canvas: UIView?
+        var localRect: CGRect = .zero
+        override var accessibilityFrame: CGRect {
+            get {
+                guard let canvas, canvas.window != nil else { return .zero }
+                return UIAccessibility.convertToScreenCoordinates(localRect, in: canvas)
+            }
+            set { super.accessibilityFrame = newValue }
+        }
         override func accessibilityActivate() -> Bool { audition?(); return true }
     }
     private var fretWindow = FretboardWindow(start: 0, width: 320)
@@ -75,6 +84,7 @@ final class FretboardCanvas: UIView {
     override func didMoveToWindow() {
         super.didMoveToWindow()
         if self.window == nil { releaseTouches() }
+        else { rebuildAccessibility() }
     }
 
     private func emit(_ events: [FretboardNoteEvent]) {
@@ -127,7 +137,8 @@ final class FretboardCanvas: UIView {
                 element.accessibilityLabel = String(format: AppCopy.text("String %d, fret %d, %@"), string, fret, pitch.description)
                 element.accessibilityIdentifier = "fretboard.position.\(string).\(fret)"
                 element.accessibilityHint = AppCopy.text("Hear this note")
-                element.accessibilityFrameInContainerSpace = cg(rect)
+                element.canvas = self
+                element.localRect = cg(rect)
                 element.audition = { [weak self] in
                     guard self?.active == true else { return }
                     self?.audition(pitch)
