@@ -10,6 +10,7 @@ public struct PianoKeyboardView: View {
     public let purpose: PianoKeyboardPurpose
     public let highlightedPitchClasses: Set<PitchClass>
     public let highlightedPitches: Set<Pitch>
+    public let focusedPitches: Set<Pitch>
     public let onKeyTap: (PianoKeyModel) -> Void
 
     public init(
@@ -22,6 +23,7 @@ public struct PianoKeyboardView: View {
         self.purpose = purpose
         self.highlightedPitchClasses = highlightedPitchClass.map { [$0] } ?? []
         self.highlightedPitches = []
+        self.focusedPitches = []
         self.onKeyTap = onKeyTap
     }
 
@@ -35,12 +37,14 @@ public struct PianoKeyboardView: View {
         self.purpose = purpose
         self.highlightedPitchClasses = highlightedPitchClasses
         self.highlightedPitches = []
+        self.focusedPitches = []
         self.onKeyTap = onKeyTap
     }
 
     public init(
         model: PianoKeyboardModel,
         highlightedPitches: Set<Pitch>,
+        focusedPitches: Set<Pitch> = [],
         purpose: PianoKeyboardPurpose = .construction,
         onKeyTap: @escaping (PianoKeyModel) -> Void
     ) {
@@ -48,6 +52,7 @@ public struct PianoKeyboardView: View {
         self.purpose = purpose
         self.highlightedPitchClasses = []
         self.highlightedPitches = highlightedPitches
+        self.focusedPitches = focusedPitches
         self.onKeyTap = onKeyTap
     }
 
@@ -97,6 +102,7 @@ public struct PianoKeyboardView: View {
             isHighlighted: highlightedPitchClasses.contains(key.pitchClass)
                 || highlightedPitches.contains(key.pitch),
             showsNoteName: showsNoteNames,
+            isFocused: focusedPitches.contains(key.pitch),
             onTap: { onKeyTap(key) }
         )
     }
@@ -110,17 +116,20 @@ public struct PianoKeyButton: View {
     public let key: PianoKeyModel
     public let isHighlighted: Bool
     public let showsNoteName: Bool
+    public let isFocused: Bool
     public let onTap: () -> Void
 
     public init(
         key: PianoKeyModel,
         isHighlighted: Bool = false,
         showsNoteName: Bool = true,
+        isFocused: Bool = false,
         onTap: @escaping () -> Void
     ) {
         self.key = key
         self.isHighlighted = isHighlighted
         self.showsNoteName = showsNoteName
+        self.isFocused = isFocused
         self.onTap = onTap
     }
 
@@ -137,11 +146,19 @@ public struct PianoKeyButton: View {
         .buttonStyle(.plain)
         .accessibilityLabel(key.accessibilityLabel)
         .accessibilityHint(AppCopy.text("Tap to choose a key"))
-        .accessibilityAddTraits(isHighlighted ? [.isSelected] : [])
+        .accessibilityAddTraits(isHighlighted || isFocused ? [.isSelected] : [])
+        .accessibilityValue(isFocused ? AppCopy.text("Matching position") : "")
     }
 
     private var keyFace: some View {
         VStack {
+            if isFocused {
+                Image(systemName: "scope")
+                    .font(.caption.bold())
+                    .foregroundStyle(key.isNatural ? Color.black : Color.white)
+                    .padding(.top, 8)
+                    .accessibilityHidden(true)
+            }
             Spacer(minLength: 0)
             if showsNoteName {
                 Text(key.shortLabel)
