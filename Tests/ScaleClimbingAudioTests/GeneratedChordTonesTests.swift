@@ -144,7 +144,7 @@ import Testing
     #expect(levels.first == 1)
     #expect(levels.last == 0)
     #expect(levels.allSatisfy { $0 >= 0 && $0 <= 1 })
-    #expect(zip(levels, levels.dropFirst()).allSatisfy { $0 >= $1 })
+    #expect(zip(levels, levels.dropFirst()).allSatisfy { $0.0 >= $0.1 })
 }
 
 @Test func staleFadeCallbacksCannotMuteVoiceReusedForNewNote() {
