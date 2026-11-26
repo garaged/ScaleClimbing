@@ -153,7 +153,11 @@ public final class LiveKeyboardPlayer {
 private final class LiveRenderSlot: @unchecked Sendable {
     private let command = Atomic<UInt64>(0)
     private let finished = Atomic<UInt64>(0)
-    private var voice = LiveRenderVoice()
+    private var voice: LiveRenderVoice
+
+    init(sampleRate: Double) {
+        voice = LiveRenderVoice(sampleRate: sampleRate)
+    }
 
     func publish(_ value: LiveVoiceCommand) {
         command.store(value.packed, ordering: .releasing)
@@ -180,12 +184,45 @@ private final class LiveRenderSlot: @unchecked Sendable {
     }
 }
 
+/// The exact mixer used by the source callback and offline regression tests.
+final class LiveRenderMixer: @unchecked Sendable {
+    // Fixed -3.74 dB headroom; even ten full-level piano voices cannot exceed
+    // 0.585. No count-dependent normalization or limiter-induced modulation.
+    static let outputGain: Float = 0.65
+    private let slots: [LiveRenderSlot]
+
+    init(voiceLimit: Int, sampleRate: Double) {
+        slots = (0..<voiceLimit).map { _ in LiveRenderSlot(sampleRate: sampleRate) }
+    }
+
+    func publish(index: Int, command: LiveVoiceCommand) {
+        slots[index].publish(command)
+    }
+
+    func didFinish(index: Int, generation: UInt64) -> Bool {
+        slots[index].didFinish(generation: generation)
+    }
+
+    @discardableResult
+    func render(into output: UnsafeMutablePointer<Float>, frameCount: Int) -> Bool {
+        output.update(repeating: 0, count: frameCount)
+        var sounding = false
+        for slot in slots {
+            if slot.render(into: output, frameCount: frameCount) { sounding = true }
+        }
+        if sounding {
+            for frame in 0..<frameCount { output[frame] *= Self.outputGain }
+        }
+        return sounding
+    }
+}
+
 /// Engine and allocator are confined to the control queue. The AVAudioSourceNode
 /// owns a fixed set of render slots, shared only through atomic command words.
 private final class LiveKeyboardAudioWorker: @unchecked Sendable {
     private static let voiceLimit = 10
     private let queue = DispatchQueue(label: "org.garaged.ScaleClimbing.live-keyboard.audio", qos: .userInitiated)
-    private let slots = (0..<LiveKeyboardAudioWorker.voiceLimit).map { _ in LiveRenderSlot() }
+    private var mixer: LiveRenderMixer?
     private var engine: AVAudioEngine?
     private var registry = LiveKeyboardVoiceRegistry(maxVoices: LiveKeyboardAudioWorker.voiceLimit)
     private var generations = Array(repeating: UInt64.zero, count: LiveKeyboardAudioWorker.voiceLimit)
@@ -249,53 +286,52 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
     private func publish(index: Int, gate: Bool) -> UInt64 {
         let generation = (generations[index] + 1) & LiveVoiceCommand.generationMask
         generations[index] = generation == 0 ? 1 : generation
-        slots[index].publish(LiveVoiceCommand(generation: generations[index], midi: lastMIDIs[index],
+        mixer?.publish(index: index, command: LiveVoiceCommand(generation: generations[index], midi: lastMIDIs[index],
             guitar: lastGuitar[index], gate: gate))
         return generations[index]
     }
 
     private func reapReleasedSlots() {
-        for index in registry.releasingIndices where slots[index].didFinish(generation: generations[index]) {
+        guard let mixer else { return }
+        for index in registry.releasingIndices where mixer.didFinish(index: index, generation: generations[index]) {
             registry.finishRelease(voice: index)
         }
     }
 
     private func ensureEngine() -> Bool {
-        if engine == nil {
-            let created = AVAudioEngine()
-            guard let format = AVAudioFormat(standardFormatWithSampleRate: LiveRenderVoice.sampleRate, channels: 1) else {
-                return false
-            }
-            let renderSlots = slots
-            let source = AVAudioSourceNode(format: format) { isSilence, _, frames, outputData in
-                let buffers = UnsafeMutableAudioBufferListPointer(outputData)
-                guard buffers.count == 1, let data = buffers[0].mData else { return -50 }
-                let count = Int(frames)
-                let output = data.assumingMemoryBound(to: Float.self)
-                output.update(repeating: 0, count: count)
-                var sounding = false
-                for slot in renderSlots {
-                    if slot.render(into: output, frameCount: count) { sounding = true }
+        if engine?.isRunning == true { return true }
+        do {
+            #if os(iOS)
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+            #endif
+            if engine == nil {
+                let created = AVAudioEngine()
+                let outputRate = created.outputNode.outputFormat(forBus: 0).sampleRate
+                let rate = outputRate.isFinite && (8_000...192_000).contains(outputRate)
+                    ? outputRate : LiveRenderVoice.sampleRate
+                guard let format = AVAudioFormat(standardFormatWithSampleRate: rate, channels: 1) else {
+                    return false
                 }
-                isSilence.pointee = ObjCBool(!sounding)
-                return 0
+                let renderMixer = LiveRenderMixer(voiceLimit: Self.voiceLimit, sampleRate: rate)
+                let source = AVAudioSourceNode(format: format) { isSilence, _, frames, outputData in
+                    let buffers = UnsafeMutableAudioBufferListPointer(outputData)
+                    guard buffers.count == 1, let data = buffers[0].mData,
+                          Int(buffers[0].mDataByteSize) >= Int(frames) * MemoryLayout<Float>.stride else { return -50 }
+                    let sounding = renderMixer.render(into: data.assumingMemoryBound(to: Float.self), frameCount: Int(frames))
+                    isSilence.pointee = ObjCBool(!sounding)
+                    return 0
+                }
+                created.attach(source)
+                created.connect(source, to: created.mainMixerNode, format: format)
+                mixer = renderMixer
+                engine = created
             }
-            created.attach(source)
-            created.connect(source, to: created.mainMixerNode, format: format)
-            engine = created
-        }
-        guard let engine else { return false }
-        if !engine.isRunning {
-            do {
-                #if os(iOS)
-                try AVAudioSession.sharedInstance().setCategory(
-                    .playback, mode: .default, options: [.mixWithOthers]
-                )
-                try AVAudioSession.sharedInstance().setActive(true)
-                #endif
-                try engine.start()
-            } catch { return false }
-        }
-        return true
+            guard let engine else { return false }
+            engine.prepare()
+            try engine.start()
+            return true
+        } catch { return false }
     }
 }

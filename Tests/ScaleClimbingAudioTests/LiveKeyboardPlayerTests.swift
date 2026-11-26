@@ -1,3 +1,4 @@
+import Foundation
 import MusicTheoryCore
 @testable import ScaleClimbingAudio
 import Testing
@@ -83,7 +84,8 @@ import Testing
     #expect(voice.gain <= gainBefore)
     for _ in 0..<LiveRenderVoice.releaseFrames { _ = voice.nextSample() }
     #expect(voice.isSilent)
-    #expect(voice.nextSample() == 0)
+    let silentSample = voice.nextSample()
+    #expect(silentSample == 0)
     #expect(voice.generation == 2)
 }
 
@@ -135,7 +137,8 @@ import Testing
 @Test func liveGuitarReleaseRemainsFiniteAndReachesSilence() {
     var voice = LiveRenderVoice()
     voice.apply(LiveVoiceCommand(generation: 1, midi: 64, guitar: true, gate: true))
-    #expect(voice.nextSample() == 0)
+    let silentSample = voice.nextSample()
+    #expect(silentSample == 0)
     var peak: Float = 0
     for _ in 0..<2000 { peak = max(peak, abs(voice.nextSample())) }
     #expect(peak > 0.01)
@@ -154,7 +157,8 @@ import Testing
     var voice = LiveRenderVoice()
     voice.apply(command)
     #expect(voice.isSilent)
-    #expect(voice.nextSample() == 0)
+    let silentSample = voice.nextSample()
+    #expect(silentSample == 0)
     #expect(voice.generation == 83)
 }
 
