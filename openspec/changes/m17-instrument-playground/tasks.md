@@ -3,15 +3,15 @@
 ## Spec and design
 - [x] State independent free-play intent, non-goals, live-note interface and privacy constraints.
 - [x] Define requirements for responsive geometry, gesture lifecycle, polyphony, labels, accessibility, cleanup, and manual evidence.
-- [ ] Open one stacked draft PR against M16.
+- [x] Open one stacked draft PR against M16.
 
 ## Test-first and implementation
 - [ ] Add focused geometry and polyphonic touch-tracker tests before production implementation.
 - [ ] Add audio allocator and loop-signal bounds tests before production implementation.
-- [ ] Implement platform-neutral range/touch model from the existing piano geometry.
-- [ ] Implement iOS multitouch keyboard surface, coordinate hit-testing, VoiceOver and labels.
-- [ ] Implement separate locally generated live-note polyphony engine with release envelopes.
-- [ ] Wire Home entry, root, app audio service, localizations and settings.
+- [x] Implement platform-neutral range/touch model from the existing piano geometry.
+- [x] Implement iOS multitouch keyboard surface, coordinate hit-testing, VoiceOver and labels.
+- [x] Implement separate locally generated live-note polyphony engine with release envelopes.
+- [x] Wire Home entry, root, app audio service, localizations and settings.
 - [ ] Add UI navigation/persistence regression and developer manual acceptance.
 
 ## Validation and handoff

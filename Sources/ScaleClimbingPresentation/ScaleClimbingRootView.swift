@@ -11,6 +11,10 @@ public struct ScaleClimbingRootView: View {
     private let onPlayProgression: ([[Pitch]]) -> Void
     private let onPlayRhythm: (RhythmPattern) -> Void
     private let onPlayTimbre: (TimbrePlayback) -> Void
+    private let onLiveNoteOn: (Pitch) -> Void
+    private let onLiveNoteOff: (Pitch) -> Void
+    private let onLiveAllNotesOff: () -> Void
+    private let onLivePrepare: ([Pitch]) -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
@@ -21,7 +25,11 @@ public struct ScaleClimbingRootView: View {
         onPlayScale: @escaping ([Pitch]) -> Void = { _ in },
         onPlayProgression: @escaping ([[Pitch]]) -> Void = { _ in },
         onPlayRhythm: @escaping (RhythmPattern) -> Void = { _ in },
-        onPlayTimbre: @escaping (TimbrePlayback) -> Void = { _ in }
+        onPlayTimbre: @escaping (TimbrePlayback) -> Void = { _ in },
+        onLiveNoteOn: @escaping (Pitch) -> Void = { _ in },
+        onLiveNoteOff: @escaping (Pitch) -> Void = { _ in },
+        onLiveAllNotesOff: @escaping () -> Void = {},
+        onLivePrepare: @escaping ([Pitch]) -> Void = { _ in }
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
         self.onPlayChord = onPlayChord
@@ -32,6 +40,10 @@ public struct ScaleClimbingRootView: View {
         self.onPlayProgression = onPlayProgression
         self.onPlayRhythm = onPlayRhythm
         self.onPlayTimbre = onPlayTimbre
+        self.onLiveNoteOn = onLiveNoteOn
+        self.onLiveNoteOff = onLiveNoteOff
+        self.onLiveAllNotesOff = onLiveAllNotesOff
+        self.onLivePrepare = onLivePrepare
     }
 
     public var body: some View {
@@ -64,6 +76,14 @@ public struct ScaleClimbingRootView: View {
     @ViewBuilder
     private func destination(for route: AppRoute) -> some View {
         switch route {
+        case .freeKeyboard:
+            FreeKeyboardGameView(
+                onNoteOn: onLiveNoteOn,
+                onNoteOff: onLiveNoteOff,
+                onAllNotesOff: onLiveAllNotesOff,
+                onPrepare: onLivePrepare,
+                onAccessibleAudition: onPlayPitch
+            )
         case .noteHunter:
             NoteHunterGameView(onPlayPitch: onPlayPitch)
         case .chordForge:
@@ -118,6 +138,34 @@ private struct HomeView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("home.route.\(viewModel.featuredRoute.rawValue)")
+
+                NavigationLink(value: AppRoute.freeKeyboard) {
+                    HStack(spacing: 14) {
+                        Image(systemName: "pianokeys")
+                            .font(.title2.weight(.medium))
+                            .foregroundStyle(ScaleClimbingPalette.sky)
+                            .frame(width: 46, height: 46)
+                            .background(ScaleClimbingPalette.sky.opacity(0.12), in: RoundedRectangle(cornerRadius: 13))
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(AppCopy.text("Free Keyboard"))
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+                            Text(AppCopy.text("Explore notes and chords freely, with no score."))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 0)
+                        Image(systemName: "arrow.right")
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(14)
+                    .background(
+                        ScaleClimbingPalette.surface(for: colorScheme),
+                        in: RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("home.route.freeKeyboard")
 
                 ForEach(viewModel.practiceZones) { zone in
                     VStack(alignment: .leading, spacing: 12) {

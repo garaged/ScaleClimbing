@@ -41,6 +41,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
     case timbreLab
     case notationTrail
     case learningPath
+    case freeKeyboard
 
     public var id: String { rawValue }
 
@@ -58,6 +59,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .timbreLab: return AppCopy.text("Timbre Lab")
         case .notationTrail: return AppCopy.text("Notation Trail")
         case .learningPath: return AppCopy.text("Learning Path")
+        case .freeKeyboard: return AppCopy.text("Free Keyboard")
         }
     }
 
@@ -75,6 +77,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .timbreLab: return AppCopy.text("Hear harmonics, timbre and controlled tuning differences.")
         case .notationTrail: return AppCopy.text("Read staff notes and dictate short movable-Do melodies.")
         case .learningPath: return AppCopy.text("Plan local spaced reviews across your skills.")
+        case .freeKeyboard: return AppCopy.text("Explore notes and chords freely, with no score.")
         }
     }
 
@@ -98,6 +101,8 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return AppCopy.text("Notation Nook")
         case .learningPath:
             return AppCopy.text("Practice Plaza")
+        case .freeKeyboard:
+            return AppCopy.text("Instrument Playground")
         }
     }
 
@@ -113,7 +118,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return .timeAndTimbre
         case .notationTrail:
             return .notation
-        case .learningPath:
+        case .learningPath, .freeKeyboard:
             return nil
         }
     }
@@ -132,6 +137,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .timbreLab: return "waveform"
         case .notationTrail: return "music.note.list"
         case .learningPath: return "sparkles"
+        case .freeKeyboard: return "pianokeys"
         }
     }
 }
