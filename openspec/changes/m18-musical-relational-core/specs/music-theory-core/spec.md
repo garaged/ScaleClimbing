@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: instrument positions have bounded distinct identity
-The core SHALL map a configurable chromatic piano range and a fretted instrument with open-string MIDI pitches and inclusive fret limits to sounding pitches. Strings are numbered from 1 (highest string in standard tuning) to 6 (lowest), not sorted by pitch; fret zero is open. Position identity is configuration-relative. Invalid configurations, coordinates and pitches SHALL be rejected without trapping. MIDI range is 0–127. Position enumeration SHALL be stable: piano ascending, fretted string number ascending then fret ascending.
+The core SHALL map a configurable chromatic piano range and a fretted instrument with open-string MIDI pitches and inclusive fret limits to sounding pitches. String count is bounded to 1–128 and the inclusive fret limit to 0–127, with every sounding pitch within MIDI range. Strings are numbered from 1 (highest string in standard tuning) to 6 (lowest), not sorted by pitch; fret zero is open. Position identity is configuration-relative. Invalid configurations, coordinates and pitches SHALL be rejected without trapping. MIDI range is 0–127. Position enumeration SHALL be stable: piano ascending, fretted string number ascending then fret ascending.
 
 #### Scenario: standard guitar has five middle C positions
 - **GIVEN** standard tuning and 24 frets

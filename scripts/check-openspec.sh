@@ -14,6 +14,9 @@ required=(
   "$root/changes/m16-physical-device-stabilization/proposal.md"
   "$root/changes/m16-physical-device-stabilization/tasks.md"
   "$root/changes/m16-physical-device-stabilization/issues.md"
+  "$root/changes/m18-musical-relational-core/proposal.md"
+  "$root/changes/m18-musical-relational-core/tasks.md"
+  "$root/changes/m18-musical-relational-core/specs/music-theory-core/spec.md"
   "$root/changes/m17-instrument-playground/proposal.md"
   "$root/changes/m17-instrument-playground/tasks.md"
   "$root/changes/m17-instrument-playground/specs/instrument-playground/spec.md"
@@ -34,7 +37,7 @@ for spec in "$root"/specs/*/spec.md; do
   grep -q '^#### Scenario:' "$spec" || { echo "$spec missing at least one scenario" >&2; exit 1; }
 done
 
-for change_spec in "$root"/changes/m0-foundation/specs/*/spec.md; do
+for change_spec in "$root"/changes/m0-foundation/specs/*/spec.md "$root"/changes/m18-musical-relational-core/specs/*/spec.md; do
   [[ -e "$change_spec" ]] || continue
   grep -Eq '^## (ADDED|MODIFIED|REMOVED) Requirements' "$change_spec" || {
     echo "$change_spec missing change requirement section" >&2
