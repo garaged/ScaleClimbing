@@ -10,8 +10,13 @@ public enum FreeKeyboardRange {
         return 1
     }
 
+    public static func clampedStartingOctave(_ requested: Int, visibleOctaves: Int) -> Int {
+        min(max(2, requested), 7 - max(1, min(3, visibleOctaves)))
+    }
+
     public static func keyboard(startingOctave: Int, viewportWidth: Double) -> PianoKeyboardModel {
         let octaves = octaveCount(forWidth: viewportWidth)
+        let startingOctave = clampedStartingOctave(startingOctave, visibleOctaves: octaves)
         return .chromaticRange(
             from: Pitch(.c, octave: startingOctave),
             through: Pitch(.b, octave: startingOctave + octaves - 1)
@@ -19,24 +24,6 @@ public enum FreeKeyboardRange {
     }
 }
 
-
-/// Screen-aware height for the free-play canvas. Key depth is proportional to
-/// the natural-key width, not the height of the enclosing GeometryReader.
-/// The reserved area protects octave/label controls and the instruction line
-/// on compact and landscape layouts, including smaller device heights.
-public enum FreeKeyboardSizing {
-    public static func keyboardHeight(
-        viewportWidth: Double,
-        viewportHeight: Double
-    ) -> Double {
-        let octaves = FreeKeyboardRange.octaveCount(forWidth: viewportWidth)
-        let naturalKeyWidth = max(0, viewportWidth - 24) / Double(octaves * 7)
-        let preferred = naturalKeyWidth * 4.6
-        let reservedHeight: Double = octaves == 1 ? 168 : 112
-        let usableHeight = max(0, viewportHeight - reservedHeight)
-        return min(preferred, usableHeight)
-    }
-}
 
 /// All rectangles are local to the instrument surface; UIKit drawing and
 /// hit-testing use the exact same geometry. Raised accidental keys win hits.
