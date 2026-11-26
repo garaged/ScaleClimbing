@@ -73,13 +73,13 @@
 - English plus Spanish (Mexico) learner-facing presentation localization, with theory notation preserved.
 - Signing, release, privacy, App Store metadata, UX, and manual acceptance preflight. Account-side actions remain owner-operated.
 
-## M16 — Physical-device stabilization and App Review follow-up (active)
+## M16 — Physical-device stabilization and App Review follow-up (completed; PR #18 merged)
 - Triage physical iPhone and iPad findings as reproducible regression candidates in OpenSpec; fix accepted defects in minimal slices, backed by focused tests and device acceptance.
 - Protect the M14 visual system, offline audio, saved progress, all routes, accessible controls, and English/es-MX learning copy.
 - Use `make manual-m16` to check launch, layout, orientation, accessibility, audio, state recovery, locale, appearance and privacy on real devices.
 - Track Guideline 2.1 recording/review evidence against the submitted App Store build; only the owner makes Apple account-side changes.
 
-## M17 — Instrument Playground: free keyboard (active; draft PR #19)
+## M17 — Instrument Playground: free keyboard (completed; PR #19 merged)
 - Add a standalone Free Keyboard that uses real-time sustained note-on/off and simultaneous finger chords, independent of scoring.
 - Adapt 1–3 octave registers to phone portrait, landscape and iPad; provide starting-octave control, local label preference and VoiceOver audition.
 - Reuse the shared pitch model and keyboard colors while keeping audio polyphonic and isolated from the M16 exercise player.
@@ -106,5 +106,26 @@
 4. Introduce controlled audio comparisons (same loudness/timbre; isolate one variable) before mixed, realistic exercises.
 5. Deliver each stage using OpenSpec, deterministic Swift tests, simulator UI automation and a short human listening/accessibility check.
 
+## Next initiative — Relational music learning and guitar
+
+Baseline: M17 merged at `9d246a2dbd5f499ed7a87b23cec2cf1e0aed79b1`. M16/M17 engineering completion does not imply App Store approval or a replacement submission.
+
+The Global Relational Network (GRN) is a project-specific architectural and pedagogical working name: a typed, deterministic set of musical relationship queries over existing theory models and instrument mappings. It is not a claim of a standardized guitar pedagogy, a graph database, or a new theory engine. Guitar is the first new instrument; piano remains fully supported.
+
+| Milestone | Scope | Depends on | Exit outcome |
+|---|---|---|---|
+| M18 — Musical Relational Core | Extend existing MusicTheoryCore with bounded instrument-position mapping, typed relationship queries and explicit answer semantics; standard guitar tuning as a test fixture | M17 | Same musical concepts across piano and guitar; all existing exercises unchanged |
+| M19 — Guitar Instrument Playground | Free Fretboard, responsive layout, touch/strum interaction and shared live-note audio boundary; position identity and duplicate-pitch lifetime | M18 | Accessible offline virtual guitar, unscored, usable on phone and iPad |
+| M20 — Fretboard Foundations | Guitar note/position, unison, octave and interval practice; Standard/Novice guidance; first guitar Learning Path skills | M19 | Learners navigate the fretboard beyond memorized labels |
+| M21 — Triads and Voicings | Chord Forge/Atlas guitar variants, playable triads, inversions and major/minor transformations | M20 | Distinguish chord identity, inversion, octave and physical fingering |
+| M22 — CAGED and Scale Networks | Overlapping shapes, scale degrees, arpeggios, pentatonics and bridges; validate shape reachability and G/B tuning discontinuity | M21 | Navigate the neck via relationships, not isolated boxes |
+| M23 — Music Atlas | Interactive cross-instrument exploration of note, interval, chord, scale and key relationships; progressive disclosure | M22 | Discover connected musical structures with sound and visual mappings |
+| M24 — Relational Mastery | Extend M13 Learning Path with explicit evidence and instrument-specific skills, conservative transfer, stable local progress migration | M20–M23 | Explainable recommendations without conflating practice, review and mastery |
+| M25 — Physical Guitar Recognition (discovery gated) | On-device monophonic detection, permission/privacy review, latency and accuracy benchmark; no fingering inference from pitch | M20; independent of M24 | Feasibility and acceptance gate before production microphone features |
+| M26 — Harmonic Navigation | Voice leading, chord-tone targeting, progression practice and guided improvisation; virtual instrument first | M21–M24 | Apply knowledge musically; microphone optional, not a prerequisite |
+
+M18 is the next proposed delivery milestone; later stages are provisional and may be reordered or split based on physical-device acceptance and evidence. No runtime dependencies, cloud services, new permissions or App Store changes are introduced by M18–M24. Standard six-string E2–A2–D3–G3–B3–E4, 12-tone equal temperament and sounding-pitch semantics are the first guitar baseline; alternative tunings are modeled without requiring UI support. Preserve existing English/es-MX, VoiceOver, appearance and scoring contracts. Each implementation milestone uses OpenSpec, tests, CI and applicable owner manual acceptance. See [M18 proposal](../../openspec/changes/m18-musical-relational-core/proposal.md).
+
 ## Later platform and input expansion
-- MIDI keyboard input; microphone monophonic pitch detection with permission/privacy review; guitar/fretboard exercises; macOS; desktop platforms.
+- MIDI keyboard input, additional fretted instruments, macOS and desktop platforms; permission-bearing features require separate security/privacy review.
+
