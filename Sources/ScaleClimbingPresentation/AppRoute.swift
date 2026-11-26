@@ -44,6 +44,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
     case freeKeyboard
     case freeFretboard
     case fretboardFoundations
+    case guitarTriads
 
     public var id: String { rawValue }
 
@@ -64,6 +65,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .freeKeyboard: return AppCopy.text("Free Keyboard")
         case .freeFretboard: return AppCopy.text("Free Fretboard")
         case .fretboardFoundations: return AppCopy.text("Fretboard Foundations")
+        case .guitarTriads: return AppCopy.text("Guitar Triads")
         }
     }
 
@@ -84,6 +86,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .freeKeyboard: return AppCopy.text("Explore notes and chords freely, with no score.")
         case .freeFretboard: return AppCopy.text("Explore guitar strings and frets, with no score.")
         case .fretboardFoundations: return AppCopy.text("Find guitar notes, octaves and intervals.")
+        case .guitarTriads: return AppCopy.text("Build guitar triads, inversions and transformations.")
         }
     }
 
@@ -91,7 +94,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         switch self {
         case .noteHunter, .fretboardFoundations:
             return AppCopy.text("Note Harbor")
-        case .chordForge, .earTraining, .voicingLab:
+        case .chordForge, .earTraining, .voicingLab, .guitarTriads:
             return AppCopy.text("Triad Cliffs")
         case .intervalTrail:
             return AppCopy.text("Interval Ridge")
@@ -118,7 +121,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
             return .foundations
         case .earTraining, .intervalTrail:
             return .listening
-        case .voicingLab, .chordAtlas, .scaleExplorer, .harmonyPath:
+        case .voicingLab, .chordAtlas, .scaleExplorer, .harmonyPath, .guitarTriads:
             return .harmony
         case .rhythmTrail, .timbreLab:
             return .timeAndTimbre
@@ -144,7 +147,7 @@ public enum AppRoute: String, CaseIterable, Codable, Hashable, Identifiable, Sen
         case .notationTrail: return "music.note.list"
         case .learningPath: return "sparkles"
         case .freeKeyboard: return "pianokeys"
-        case .freeFretboard, .fretboardFoundations: return "guitars"
+        case .freeFretboard, .fretboardFoundations, .guitarTriads: return "guitars"
         }
     }
 }

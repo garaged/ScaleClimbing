@@ -160,3 +160,22 @@
 "Guitar foundations" = "Fundamentos de guitarra";
 "Connect guitar notes, octaves and intervals." = "Conecta notas, octavas e intervalos en la guitarra.";
 "Open %@" = "Abrir %@";
+
+/* M21 guitar triads */
+"Guitar Triads" = "Tríadas en guitarra";
+"Build guitar triads, inversions and transformations." = "Construye tríadas, inversiones y transformaciones en guitarra.";
+"Strings %d–%d" = "Cuerdas %d–%d";
+"Use three adjacent strings; fretted notes span at most four frets." = "Usa tres cuerdas contiguas; las notas pisadas abarcan como máximo cuatro trastes.";
+"Construct triad" = "Construir tríada";
+"Find inversion" = "Encontrar inversión";
+"Change major/minor" = "Cambiar mayor/menor";
+"Build %@." = "Construye %@.";
+"Build %@ — %@." = "Construye %@ — %@.";
+"Change %@ to %@ by moving only the third." = "Cambia %@ a %@ moviendo solo la tercera.";
+"Correct. The chord and requested shape agree." = "Correcto. El acorde y la posición solicitada coinciden.";
+"Right chord tones; check the inversion, span or requested transformation." = "Notas correctas; revisa la inversión, extensión o transformación solicitada.";
+"Not yet. Check the root, third and fifth." = "Aún no. Revisa la fundamental, tercera y quinta.";
+"Choose one position on each requested string." = "Elige una posición en cada cuerda solicitada.";
+"Root position" = "Posición fundamental";
+"First inversion" = "Primera inversión";
+"Second inversion" = "Segunda inversión";

@@ -1,0 +1,3 @@
+# M21 — Guitar triads manual acceptance
+
+Use latest stacked tip after M22; record SHA/device/OS/locale/orientation. Open Guitar Triads from Home. In construction select three requested strings and confirm correct/wrong notes, clear, retry and lock. Try multiple chord shapes, all inversions and groups; compare reference and attempted chords. Check transformation changes only the third, including C major G5/B5/E3 to C minor G5/B4/E3. Test paging and audio, disabled strings, light/dark, VoiceOver and Spanish. Confirm piano chord routes and Learning Path unchanged. Geometric span is not an ergonomic guarantee. No merge before owner approval.
