@@ -690,4 +690,25 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(app.buttons["guitarTriad.position.1.0"].exists || app.buttons["guitarTriad.position.1.3"].exists)
     }
 
+    @MainActor
+    func testScaleNetworkShowsAdjacentShapesAndBridge() {
+        let app = XCUIApplication()
+        app.launch()
+        openRoute(in: app, identifier: "home.route.scaleNetwork")
+        let shape = app.staticTexts["scaleNetwork.shape"]
+        XCTAssertTrue(shape.waitForExistence(timeout: 10))
+        XCTAssertTrue(shape.label.contains("C"))
+        let next = app.buttons["scaleNetwork.nextShape"]
+        let original = shape.label
+        next.tap()
+        XCTAssertNotEqual(shape.label, original)
+        let bridge = app.buttons["scaleNetwork.bridge"]
+        for _ in 0..<5 { if !bridge.isHittable { app.swipeUp() } }
+        XCTAssertTrue(bridge.isEnabled)
+        bridge.tap()
+        let prompt = app.staticTexts["scaleNetwork.bridgePrompt"]
+        for _ in 0..<5 { if !prompt.isHittable { app.swipeDown() } }
+        XCTAssertTrue(prompt.exists)
+    }
+
 }

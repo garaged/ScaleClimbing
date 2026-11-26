@@ -14,6 +14,9 @@ required=(
   "$root/changes/m16-physical-device-stabilization/proposal.md"
   "$root/changes/m16-physical-device-stabilization/tasks.md"
   "$root/changes/m16-physical-device-stabilization/issues.md"
+  "$root/changes/m22-caged-scale-networks/proposal.md"
+  "$root/changes/m22-caged-scale-networks/tasks.md"
+  "$root/changes/m22-caged-scale-networks/specs/learning-gameplay/spec.md"
   "$root/changes/m21-guitar-triads-voicings/proposal.md"
   "$root/changes/m21-guitar-triads-voicings/tasks.md"
   "$root/changes/m21-guitar-triads-voicings/specs/learning-gameplay/spec.md"
@@ -47,7 +50,7 @@ for spec in "$root"/specs/*/spec.md; do
   grep -q '^#### Scenario:' "$spec" || { echo "$spec missing at least one scenario" >&2; exit 1; }
 done
 
-for change_spec in "$root"/changes/m0-foundation/specs/*/spec.md "$root"/changes/m18-musical-relational-core/specs/*/spec.md "$root"/changes/m19-free-fretboard/specs/*/spec.md "$root"/changes/m20-fretboard-foundations/specs/*/spec.md "$root"/changes/m21-guitar-triads-voicings/specs/*/spec.md; do
+for change_spec in "$root"/changes/m0-foundation/specs/*/spec.md "$root"/changes/m18-musical-relational-core/specs/*/spec.md "$root"/changes/m19-free-fretboard/specs/*/spec.md "$root"/changes/m20-fretboard-foundations/specs/*/spec.md "$root"/changes/m21-guitar-triads-voicings/specs/*/spec.md "$root"/changes/m22-caged-scale-networks/specs/*/spec.md; do
   [[ -e "$change_spec" ]] || continue
   grep -Eq '^## (ADDED|MODIFIED|REMOVED) Requirements' "$change_spec" || {
     echo "$change_spec missing change requirement section" >&2

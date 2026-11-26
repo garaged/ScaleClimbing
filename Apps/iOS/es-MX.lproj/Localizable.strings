@@ -179,3 +179,27 @@
 "Root position" = "Posición fundamental";
 "First inversion" = "Primera inversión";
 "Second inversion" = "Segunda inversión";
+
+/* M22 scale network */
+"Scale Network" = "Red de escalas";
+"Connect CAGED shapes, scales and arpeggios." = "Conecta formas CAGED, escalas y arpegios.";
+"Overlay" = "Capa";
+"%@ major — %@ form" = "%@ mayor — forma %@";
+"Region: frets %d–%d" = "Región: trastes %d–%d";
+"Overlay tonic: %@" = "Tónica de la capa: %@";
+"Previous shape" = "Forma anterior";
+"Next shape" = "Siguiente forma";
+"Find a shared tone between %@ and %@ forms." = "Encuentra una nota compartida entre las formas %@ y %@.";
+"Shared region: frets %d–%d" = "Región compartida: trastes %d–%d";
+"R marks the overlay tonic; outlined notes are the major chord shape." = "R marca la tónica; las notas con contorno forman el acorde mayor.";
+"Hear shape" = "Escuchar forma";
+"Exit bridge" = "Salir del puente";
+"Bridge challenge" = "Desafío de conexión";
+"Major scale" = "Escala mayor";
+"Major pentatonic" = "Pentatónica mayor";
+"Relative minor pentatonic" = "Pentatónica menor relativa";
+"Major arpeggio" = "Arpegio mayor";
+"Correct. This position connects both regions." = "Correcto. Esta posición conecta ambas regiones.";
+"Not yet. Choose a tone in both regions." = "Aún no. Elige una nota en ambas regiones.";
+"Find one position that belongs to both regions." = "Encuentra una posición que pertenezca a ambas regiones.";
+"Explore the chord shape and surrounding scale tones." = "Explora la forma del acorde y las notas de la escala que la rodean.";

@@ -13,13 +13,16 @@ public struct FretboardSelectionView: View {
     public let selectedPositions: Set<InstrumentPosition>
     public let allowedStrings: Set<Int>
     public let identifierPrefix: String
+    public let overlayLabels: [InstrumentPosition: String]
+    public let shapePositions: Set<InstrumentPosition>
     public let onSelect: (InstrumentPosition) -> Void
     private let guitar = InstrumentMapping.standardGuitar
 
     public init(window: FretboardWindow, showNames: Bool, anchor: InstrumentPosition? = nil,
                 selected: InstrumentPosition? = nil, result: Bool? = nil, locked: Bool = false,
                 selectedPositions: Set<InstrumentPosition> = [], allowedStrings: Set<Int> = Set(1...6),
-                identifierPrefix: String = "fretPractice", onSelect: @escaping (InstrumentPosition) -> Void) {
+                identifierPrefix: String = "fretPractice", overlayLabels: [InstrumentPosition: String] = [:],
+                shapePositions: Set<InstrumentPosition> = [], onSelect: @escaping (InstrumentPosition) -> Void) {
         self.window = window
         self.showNames = showNames
         self.anchor = anchor
@@ -29,6 +32,8 @@ public struct FretboardSelectionView: View {
         self.selectedPositions = selectedPositions
         self.allowedStrings = allowedStrings
         self.identifierPrefix = identifierPrefix
+        self.overlayLabels = overlayLabels
+        self.shapePositions = shapePositions
         self.onSelect = onSelect
     }
 
@@ -62,6 +67,8 @@ public struct FretboardSelectionView: View {
         let pitch = guitar.pitch(at: position)
         let isSelected = position == selected || selectedPositions.contains(position)
         let isAnchor = position == anchor
+        let overlay = overlayLabels[position]
+        let isShape = shapePositions.contains(position)
         return Button { onSelect(position) } label: {
             ZStack {
                 Rectangle().fill(Color(red: 0.25, green: 0.17, blue: 0.12))
@@ -70,12 +77,13 @@ public struct FretboardSelectionView: View {
                     Spacer(minLength: 0)
                     Rectangle().fill(.white.opacity(0.6)).frame(width: fret == 0 ? 3 : 1)
                 }
-                if isSelected || isAnchor || showNames {
+                if isSelected || isAnchor || showNames || overlay != nil || isShape {
                     Circle().fill(isSelected ? (result == nil ? ScaleClimbingPalette.sky : result == true ? Color.green.opacity(0.85) : Color.orange.opacity(0.9))
-                        : isAnchor ? ScaleClimbingPalette.sky : Color.black.opacity(0.8))
+                        : isAnchor ? ScaleClimbingPalette.sky : overlay == "R" ? ScaleClimbingPalette.emerald : overlay != nil ? ScaleClimbingPalette.violet : Color.black.opacity(0.8))
                         .frame(width: 27, height: 27)
-                    if showNames || isAnchor || isSelected {
-                        Text(pitch?.pitchClass.sharpName ?? "").font(.caption2.bold()).foregroundStyle(.white)
+                        .overlay(Circle().strokeBorder(isShape ? Color.white : Color.clear, lineWidth: 2))
+                    if showNames || isAnchor || isSelected || overlay != nil || isShape {
+                        Text(isSelected ? pitch?.pitchClass.sharpName ?? "" : overlay ?? pitch?.pitchClass.sharpName ?? "").font(.caption2.bold()).foregroundStyle(.white)
                     }
                 } else if [3,5,7,9,12,15,17,19,21,24].contains(fret) && string == 3 {
                     Circle().fill(.white.opacity(0.4)).frame(width: 5, height: 5)
