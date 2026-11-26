@@ -128,3 +128,35 @@
 "Standard tuning" = "Afinación estándar";
 "Lower frets" = "Trastes anteriores";
 "Higher frets" = "Trastes siguientes";
+
+/* M20 fretboard foundations */
+"Fretboard Foundations" = "Fundamentos del diapasón";
+"Find guitar notes, octaves and intervals." = "Encuentra notas, octavas e intervalos en la guitarra.";
+"Practice mode" = "Modo de práctica";
+"Round %d of %d" = "Ronda %d de %d";
+"%d/%d correct" = "%d/%d correctas";
+"Blue marks the starting position." = "El azul marca la posición inicial.";
+"Next round" = "Siguiente ronda";
+"Piano reference: %@" = "Referencia de piano: %@";
+"Guitar Note Hunter" = "Cazador de notas en guitarra";
+"Exact pitch" = "Altura exacta";
+"Unison Explorer" = "Explorador de unísonos";
+"Octave Explorer" = "Explorador de octavas";
+"Interval Navigator" = "Navegador de intervalos";
+"Piano to guitar" = "Del piano a la guitarra";
+"Find any %@ on the guitar." = "Encuentra cualquier %@ en la guitarra.";
+"Find the same piano pitch on guitar: %@." = "Encuentra la misma altura del piano en la guitarra: %@.";
+"Find exactly %@ on the guitar." = "Encuentra exactamente %@ en la guitarra.";
+"Find the same pitch at a different position." = "Encuentra la misma altura en otra posición.";
+"Find one octave above the starting note." = "Encuentra una octava arriba de la nota inicial.";
+"Find one octave below the starting note." = "Encuentra una octava abajo de la nota inicial.";
+"Find %d semitones above the starting note." = "Encuentra %d semitonos arriba de la nota inicial.";
+"Find %d semitones below the starting note." = "Encuentra %d semitonos abajo de la nota inicial.";
+"Choose a fretboard position." = "Elige una posición del diapasón.";
+"Correct." = "Correcto.";
+"Not yet. Try another position." = "Aún no. Prueba otra posición.";
+"You played %@." = "Tocaste %@.";
+"Distance: %+d semitones." = "Distancia: %+d semitonos.";
+"Guitar foundations" = "Fundamentos de guitarra";
+"Connect guitar notes, octaves and intervals." = "Conecta notas, octavas e intervalos en la guitarra.";
+"Open %@" = "Abrir %@";

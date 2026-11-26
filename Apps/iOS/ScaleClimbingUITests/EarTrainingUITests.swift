@@ -655,4 +655,28 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(app.buttons["fretboard.position.6.0"].exists)
     }
 
+    @MainActor
+    func testFretboardFoundationsScoresAndLocksCorrectAnswer() {
+        let app = XCUIApplication()
+        app.launch()
+        openRoute(in: app, identifier: "home.route.fretboardFoundations")
+        let prompt = app.staticTexts["fretPractice.prompt"]
+        XCTAssertTrue(prompt.waitForExistence(timeout: 10))
+        XCTAssertTrue(prompt.label.contains("C"))
+        let wrong = app.buttons["fretPractice.position.1.0"]
+        let correct = app.buttons["fretPractice.position.2.1"]
+        XCTAssertTrue(wrong.waitForExistence(timeout: 10))
+        if !wrong.isHittable { app.swipeUp() }
+        wrong.tap()
+        XCTAssertTrue(app.staticTexts["fretPractice.score"].label.contains("0/1"))
+        if !correct.isHittable { app.swipeUp() }
+        correct.tap()
+        XCTAssertTrue(app.staticTexts["fretPractice.score"].label.contains("1/2"))
+        XCTAssertFalse(correct.isEnabled)
+        let next = app.buttons["fretPractice.next"]
+        if !next.isHittable { app.swipeUp() }
+        next.tap()
+        XCTAssertTrue(app.staticTexts["fretPractice.prompt"].label.contains("C#"))
+    }
+
 }
