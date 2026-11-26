@@ -67,7 +67,7 @@ public struct ScaleClimbingRootView: View {
         case .noteHunter:
             NoteHunterGameView(onPlayPitch: onPlayPitch)
         case .chordForge:
-            ChordForgeGameView(onPlayChord: onPlayChord)
+            ChordForgeGameView(onPlayChord: onPlayChord, onPlayPitch: onPlayPitch)
         case .earTraining:
             EarTrainingGameView(onPlayChord: onPlayChord)
         case .intervalTrail:
@@ -75,7 +75,7 @@ public struct ScaleClimbingRootView: View {
         case .voicingLab:
             VoicingLabGameView(onPlayVoicing: onPlayVoicing)
         case .chordAtlas:
-            ChordAtlasGameView(onPlayVoicing: onPlayVoicing)
+            ChordAtlasGameView(onPlayVoicing: onPlayVoicing, onPlayPitch: onPlayPitch)
         case .scaleExplorer:
             ScaleExplorerGameView(onPlayScale: onPlayScale)
         case .harmonyPath:

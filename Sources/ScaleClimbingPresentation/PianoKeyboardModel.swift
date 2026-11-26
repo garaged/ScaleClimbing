@@ -120,3 +120,9 @@ public struct PianoKeyboardLayout: Sendable {
         }
     }
 }
+
+/// Exact audible pitch selected by tapping a physical piano key, including octave.
+/// Chord-scoring logic continues to compare pitch classes independently.
+public enum PianoKeyAudition {
+    public static func pitch(for key: PianoKeyModel) -> Pitch { key.pitch }
+}
