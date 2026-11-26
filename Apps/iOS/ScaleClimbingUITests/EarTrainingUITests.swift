@@ -728,4 +728,72 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertNotEqual(count.label, "Guitar matches: 5")
     }
 
+    @MainActor
+    func testPlaygroundLandscapeKeepsControlsTogetherAndPlayableCanvas() {
+        let device = XCUIDevice.shared
+        device.orientation = .portrait
+        defer { device.orientation = .portrait }
+
+        let app = XCUIApplication()
+        app.launch()
+        openRoute(in: app, identifier: "home.route.freeKeyboard")
+        let pianoRange = app.staticTexts["playground.range"]
+        XCTAssertTrue(pianoRange.waitForExistence(timeout: 10))
+        device.orientation = .landscapeLeft
+        let landscape = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _, _ in app.frame.width > app.frame.height },
+            object: nil
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [landscape], timeout: 10), .completed)
+        let pianoToggle = app.switches["playground.noteNames"]
+        let pianoLower = app.buttons["playground.lower"]
+        let pianoHigher = app.buttons["playground.higher"]
+        XCTAssertTrue(pianoToggle.waitForExistence(timeout: 10))
+        XCTAssertTrue(pianoToggle.isHittable)
+        XCTAssertTrue(pianoLower.exists)
+        XCTAssertTrue(pianoHigher.exists)
+        XCTAssertLessThan(abs(pianoToggle.frame.midY - pianoRange.frame.midY), 25)
+        XCTAssertLessThan(abs(pianoToggle.frame.midY - pianoHigher.frame.midY), 25)
+        let whiteKey = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@", "playground.key.", "C in octave")).firstMatch
+        XCTAssertTrue(whiteKey.waitForExistence(timeout: 10))
+        XCTAssertGreaterThan(whiteKey.frame.height, app.frame.height * 0.40)
+        XCTAssertGreaterThanOrEqual(whiteKey.frame.minY, pianoHigher.frame.maxY - 2)
+        XCTAssertFalse(app.staticTexts["playground.help"].exists)
+        let pianoState = pianoToggle.value as? String
+        pianoToggle.tap()
+        XCTAssertNotEqual(pianoToggle.value as? String, pianoState)
+        pianoToggle.tap()
+
+        app.terminate()
+        device.orientation = .portrait
+        app.launch()
+        openRoute(in: app, identifier: "home.route.freeFretboard")
+        let fretRange = app.staticTexts["fretboard.range"]
+        XCTAssertTrue(fretRange.waitForExistence(timeout: 10))
+        device.orientation = .landscapeLeft
+        let guitarLandscape = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _, _ in app.frame.width > app.frame.height },
+            object: nil
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [guitarLandscape], timeout: 10), .completed)
+        let fretToggle = app.switches["fretboard.noteNames"]
+        let fretHigher = app.buttons["fretboard.higher"]
+        XCTAssertTrue(fretToggle.waitForExistence(timeout: 10))
+        XCTAssertTrue(fretToggle.isHittable)
+        XCTAssertLessThan(abs(fretToggle.frame.midY - fretRange.frame.midY), 25)
+        XCTAssertLessThan(abs(fretToggle.frame.midY - fretHigher.frame.midY), 25)
+        let firstString = app.buttons["fretboard.position.1.0"]
+        let lastString = app.buttons["fretboard.position.6.0"]
+        XCTAssertTrue(firstString.waitForExistence(timeout: 10))
+        XCTAssertTrue(lastString.exists)
+        XCTAssertGreaterThan(lastString.frame.maxY - firstString.frame.minY, app.frame.height * 0.35)
+        XCTAssertGreaterThanOrEqual(firstString.frame.minY, fretHigher.frame.maxY - 2)
+        XCTAssertFalse(app.staticTexts["fretboard.help"].exists)
+        let fretState = fretToggle.value as? String
+        fretToggle.tap()
+        XCTAssertNotEqual(fretToggle.value as? String, fretState)
+        fretToggle.tap()
+        firstString.tap()
+    }
+
 }

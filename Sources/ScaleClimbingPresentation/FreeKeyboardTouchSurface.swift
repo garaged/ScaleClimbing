@@ -38,6 +38,16 @@ struct FreeKeyboardTouchSurface: UIViewRepresentable {
 final class FreeKeyboardCanvasView: UIView {
     private final class AccessiblePianoKey: UIAccessibilityElement {
         var onActivate: (() -> Void)?
+        weak var canvas: UIView?
+        var localRect: CGRect = .zero
+
+        override var accessibilityFrame: CGRect {
+            get {
+                guard let canvas, canvas.window != nil else { return .zero }
+                return UIAccessibility.convertToScreenCoordinates(localRect, in: canvas)
+            }
+            set { super.accessibilityFrame = newValue }
+        }
 
         override func accessibilityActivate() -> Bool {
             onActivate?()
@@ -105,6 +115,12 @@ final class FreeKeyboardCanvasView: UIView {
             rebuildAccessibilityElements()
             setNeedsDisplay()
         }
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window == nil { releaseTouches() }
+        else { rebuildAccessibilityElements() }
     }
 
     private var keyboardGeometry: FreeKeyboardGeometry {
@@ -177,7 +193,9 @@ final class FreeKeyboardCanvasView: UIView {
             element.accessibilityTraits = .button
             element.accessibilityLabel = key.accessibilityLabel
             element.accessibilityHint = AppCopy.text("Hear this note")
-            element.accessibilityFrameInContainerSpace = CGRect(
+            element.accessibilityIdentifier = "playground.key.\(key.id)"
+            element.canvas = self
+            element.localRect = CGRect(
                 x: local.x, y: local.y, width: local.width, height: local.height
             )
             element.onActivate = { [weak self] in

@@ -49,7 +49,6 @@ public struct FreeKeyboardGameView: View {
                         onAccessibleAudition: onAccessibleAudition)
                         .frame(width: canvas.size.width, height: CGFloat(height))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .accessibilityIdentifier("playground.keyboard")
                     #else
                     PianoKeyboardView(model: model, highlightedPitches: [], onKeyTap: { key in
                         onAccessibleAudition(key.pitch)
