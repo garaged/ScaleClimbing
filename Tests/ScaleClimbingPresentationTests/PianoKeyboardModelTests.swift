@@ -50,3 +50,13 @@ import Testing
     #expect(PianoKeyPalette.accidentalInk.contrastRatio(with: PianoKeyPalette.accidentalTop) >= 7)
     #expect(PianoKeyPalette.accidentalInk.contrastRatio(with: PianoKeyPalette.accidentalBottom) >= 7)
 }
+
+@Test func chordKeyboardAuditionsPhysicalPitchAndOctaveNotOnlyPitchClass() {
+    let c4 = PianoKeyModel(pitch: Pitch(.c, octave: 4))
+    let c5 = PianoKeyModel(pitch: Pitch(.c, octave: 5))
+    let black = PianoKeyModel(pitch: Pitch(.fSharp, octave: 4))
+    #expect(PianoKeyAudition.pitch(for: c4) == Pitch(.c, octave: 4))
+    #expect(PianoKeyAudition.pitch(for: c5) == Pitch(.c, octave: 5))
+    #expect(PianoKeyAudition.pitch(for: black) == Pitch(.fSharp, octave: 4))
+    #expect(PianoKeyAudition.pitch(for: c4) != PianoKeyAudition.pitch(for: c5))
+}

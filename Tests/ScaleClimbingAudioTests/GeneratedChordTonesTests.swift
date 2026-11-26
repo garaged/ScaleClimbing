@@ -136,3 +136,30 @@ import Testing
     #expect(!requests.isLatest(first))
     #expect(requests.isLatest(second))
 }
+
+@Test func quickReleaseRampsOldVoiceToSilenceWithoutDelayedStart() {
+    #expect(PlaybackReleaseFade.stepCount >= 8)
+    #expect(PlaybackReleaseFade.durationMilliseconds <= 30)
+    let levels = (0...PlaybackReleaseFade.stepCount).map(PlaybackReleaseFade.volume)
+    #expect(levels.first == 1)
+    #expect(levels.last == 0)
+    #expect(levels.allSatisfy { $0 >= 0 && $0 <= 1 })
+    #expect(zip(levels, levels.dropFirst()).allSatisfy { $0 >= $1 })
+}
+
+@Test func staleFadeCallbacksCannotMuteVoiceReusedForNewNote() {
+    var voices = PlaybackVoiceState(voiceCount: 3)
+    let first = voices.advance()
+    #expect(first.current == 0)
+    #expect(first.previous == nil)
+    let second = voices.advance()
+    #expect(second.current == 1)
+    #expect(second.previous == 0)
+    #expect(voices.canFade(voice: first.current, generation: first.generation))
+    _ = voices.advance()
+    let reused = voices.advance()
+    #expect(reused.current == 0)
+    #expect(!voices.canFade(voice: first.current, generation: first.generation))
+    #expect(!voices.canFade(voice: reused.current, generation: reused.generation))
+    #expect(voices.canFade(voice: reused.previous!, generation: 1))
+}
