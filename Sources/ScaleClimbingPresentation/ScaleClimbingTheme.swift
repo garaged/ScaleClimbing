@@ -91,3 +91,41 @@ public extension View {
             .controlSize(.large)
     }
 }
+
+/// Fixed-surface piano colors. These do not follow the system text color:
+/// natural keys remain ivory even under dark appearance.
+public struct PianoKeyRGB: Sendable {
+    public let red: Double
+    public let green: Double
+    public let blue: Double
+
+    public init(_ red: Double, _ green: Double, _ blue: Double) {
+        self.red = red
+        self.green = green
+        self.blue = blue
+    }
+
+    public var color: Color { Color(red: red, green: green, blue: blue) }
+
+    private var relativeLuminance: Double {
+        func linear(_ component: Double) -> Double {
+            component <= 0.04045 ? component / 12.92 : pow((component + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue)
+    }
+
+    public func contrastRatio(with other: PianoKeyRGB) -> Double {
+        let lighter = max(relativeLuminance, other.relativeLuminance)
+        let darker = min(relativeLuminance, other.relativeLuminance)
+        return (lighter + 0.05) / (darker + 0.05)
+    }
+}
+
+public enum PianoKeyPalette {
+    public static let naturalTop = PianoKeyRGB(1.0, 1.0, 0.99)
+    public static let naturalBottom = PianoKeyRGB(0.89, 0.91, 0.94)
+    public static let naturalInk = PianoKeyRGB(0.13, 0.16, 0.22)
+    public static let accidentalTop = PianoKeyRGB(0.25, 0.28, 0.34)
+    public static let accidentalBottom = PianoKeyRGB(0.06, 0.08, 0.12)
+    public static let accidentalInk = PianoKeyRGB(0.97, 0.98, 1.0)
+}

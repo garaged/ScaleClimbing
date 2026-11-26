@@ -43,6 +43,14 @@ public struct ScaleClimbingRootView: View {
                 .toolbar {
                     ToolbarItem(placement: .automatic) {
                         NavigationLink {
+                            PracticeSettingsView()
+                        } label: {
+                            Label("Practice settings", systemImage: "slider.horizontal.3")
+                        }
+                        .accessibilityIdentifier("home.practiceSettings")
+                    }
+                    ToolbarItem(placement: .automatic) {
+                        NavigationLink {
                             AboutView()
                         } label: {
                             Label("About & Support", systemImage: "info.circle")
@@ -59,7 +67,7 @@ public struct ScaleClimbingRootView: View {
         case .noteHunter:
             NoteHunterGameView(onPlayPitch: onPlayPitch)
         case .chordForge:
-            ChordForgeGameView(onPlayChord: onPlayChord)
+            ChordForgeGameView(onPlayChord: onPlayChord, onPlayPitch: onPlayPitch)
         case .earTraining:
             EarTrainingGameView(onPlayChord: onPlayChord)
         case .intervalTrail:
@@ -67,7 +75,7 @@ public struct ScaleClimbingRootView: View {
         case .voicingLab:
             VoicingLabGameView(onPlayVoicing: onPlayVoicing)
         case .chordAtlas:
-            ChordAtlasGameView(onPlayVoicing: onPlayVoicing)
+            ChordAtlasGameView(onPlayVoicing: onPlayVoicing, onPlayPitch: onPlayPitch)
         case .scaleExplorer:
             ScaleExplorerGameView(onPlayScale: onPlayScale)
         case .harmonyPath:
@@ -226,6 +234,32 @@ private struct RouteCard: View {
     }
 }
 
+
+private struct PracticeSettingsView: View {
+    @AppStorage("learningAssistanceLevel") private var assistanceRaw = LearningAssistanceLevel.standard.rawValue
+
+    var body: some View {
+        PracticeScreen {
+            PracticeCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Learning assistance")
+                        .font(.headline)
+                    Picker("Learning assistance", selection: $assistanceRaw) {
+                        Text("Standard").tag(LearningAssistanceLevel.standard.rawValue)
+                        Text("Novice").tag(LearningAssistanceLevel.novice.rawValue)
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("settings.assistance")
+
+                    Text("Standard hides note names in Note Hunter so answers are not revealed. Novice shows them as a learning aid. Other keyboards keep their labels.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .navigationTitle("Practice settings")
+    }
+}
 
 private struct AboutView: View {
     @Environment(\.colorScheme) private var colorScheme

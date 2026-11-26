@@ -544,4 +544,53 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(spanish.staticTexts["Privacidad"].exists)
     }
 
+    @MainActor
+    func testPracticeAssistanceSelectionPersistsAcrossRelaunch() {
+        let app = XCUIApplication()
+        app.launch()
+        let settings = app.buttons["home.practiceSettings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 10))
+        settings.tap()
+
+        let assistance = app.segmentedControls["settings.assistance"]
+        XCTAssertTrue(assistance.waitForExistence(timeout: 10))
+        assistance.buttons["Novice"].tap()
+        XCTAssertTrue(assistance.buttons["Novice"].isSelected)
+
+        app.terminate()
+        app.launch()
+        app.buttons["home.practiceSettings"].tap()
+        let restored = app.segmentedControls["settings.assistance"]
+        XCTAssertTrue(restored.waitForExistence(timeout: 10))
+        XCTAssertTrue(restored.buttons["Novice"].isSelected)
+
+        // Restore the default for subsequent independent UI tests.
+        restored.buttons["Standard"].tap()
+    }
+
+    @MainActor
+    func testChordBuilderKeyTapsStillToggleSelectionWithoutChangingScoring() {
+        let app = XCUIApplication()
+        app.launch()
+        openRoute(in: app, identifier: "home.route.chordForge")
+
+        let c4 = app.buttons["C in octave 4"]
+        XCTAssertTrue(c4.waitForExistence(timeout: 10))
+        c4.tap()
+        XCTAssertTrue(app.buttons["Check chord"].isEnabled)
+        c4.tap()
+        XCTAssertFalse(app.buttons["Check chord"].isEnabled)
+
+        app.terminate()
+        app.launch()
+        openChordAtlas(in: app)
+        app.segmentedControls["atlas.mode"].buttons["Build"].tap()
+        let atlasC4 = app.buttons["C in octave 4"]
+        XCTAssertTrue(atlasC4.waitForExistence(timeout: 10))
+        atlasC4.tap()
+        XCTAssertTrue(app.buttons["atlas.check"].isEnabled)
+        atlasC4.tap()
+        XCTAssertFalse(app.buttons["atlas.check"].isEnabled)
+    }
+
 }

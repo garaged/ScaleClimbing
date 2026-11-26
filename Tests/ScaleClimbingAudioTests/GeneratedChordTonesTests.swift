@@ -116,3 +116,50 @@ import Testing
     #expect(!slow.isEmpty)
     #expect(slow.count > fast.count)
 }
+
+@Test func simultaneousChordWaveformIsTheMixtureOfNotesStartingAtFrameZero() {
+    let pitches = [Pitch(.c, octave: 4), Pitch(.e, octave: 4), Pitch(.g, octave: 4)]
+    let chord = GeneratedChordTones.voicedSamples(for: pitches, sampleRate: 8_000, duration: 0.25)
+    let singles = pitches.map { GeneratedChordTones.samples(for: $0, sampleRate: 8_000, duration: 0.25) }
+    #expect(chord.count == 2_000)
+    for frame in [0, 20, 100, 400, 1_200] {
+        let average = singles.reduce(Float.zero) { $0 + $1[frame] } / Float(pitches.count)
+        #expect(abs(chord[frame] - average) < 0.000001)
+    }
+}
+
+@Test func newPlaybackRequestInvalidatesPendingOutdatedGeneration() {
+    let requests = PlaybackRequestGate()
+    let first = requests.next()
+    #expect(requests.isLatest(first))
+    let second = requests.next()
+    #expect(!requests.isLatest(first))
+    #expect(requests.isLatest(second))
+}
+
+@Test func quickReleaseRampsOldVoiceToSilenceWithoutDelayedStart() {
+    #expect(PlaybackReleaseFade.stepCount >= 8)
+    #expect(PlaybackReleaseFade.durationMilliseconds <= 30)
+    let levels = (0...PlaybackReleaseFade.stepCount).map(PlaybackReleaseFade.volume)
+    #expect(levels.first == 1)
+    #expect(levels.last == 0)
+    #expect(levels.allSatisfy { $0 >= 0 && $0 <= 1 })
+    #expect(zip(levels, levels.dropFirst()).allSatisfy { $0.0 >= $0.1 })
+}
+
+@Test func staleFadeCallbacksCannotMuteVoiceReusedForNewNote() {
+    var voices = PlaybackVoiceState(voiceCount: 3)
+    let first = voices.advance()
+    #expect(first.current == 0)
+    #expect(first.previous == nil)
+    let second = voices.advance()
+    #expect(second.current == 1)
+    #expect(second.previous == 0)
+    #expect(voices.canFade(voice: first.current, generation: first.generation))
+    _ = voices.advance()
+    let reused = voices.advance()
+    #expect(reused.current == 0)
+    #expect(!voices.canFade(voice: first.current, generation: first.generation))
+    #expect(!voices.canFade(voice: reused.current, generation: reused.generation))
+    #expect(voices.canFade(voice: reused.previous!, generation: 1))
+}

@@ -68,10 +68,16 @@
 - Featured Learning Path, grouped practice-zone home, and shared screen/feedback presentation across all existing exercises.
 - Gameplay, audio, routes and identifiers remain stable while visual hierarchy, Dynamic Type and VoiceOver polish improve.
 
-## M15 — App Store readiness, localization, and final product finish (active)
+## M15 — App Store readiness, localization, and final product finish (completed)
 - Accessible About & Support, repository sponsors metadata, and explicit external-link wording.
 - English plus Spanish (Mexico) learner-facing presentation localization, with theory notation preserved.
 - Signing, release, privacy, App Store metadata, UX, and manual acceptance preflight. Account-side actions remain owner-operated.
+
+## M16 — Physical-device stabilization and App Review follow-up (active)
+- Triage physical iPhone and iPad findings as reproducible regression candidates in OpenSpec; fix accepted defects in minimal slices, backed by focused tests and device acceptance.
+- Protect the M14 visual system, offline audio, saved progress, all routes, accessible controls, and English/es-MX learning copy.
+- Use `make manual-m16` to check launch, layout, orientation, accessibility, audio, state recovery, locale, appearance and privacy on real devices.
+- Track Guideline 2.1 recording/review evidence against the submitted App Store build; only the owner makes Apple account-side changes.
 
 ## Planned learning milestones
 

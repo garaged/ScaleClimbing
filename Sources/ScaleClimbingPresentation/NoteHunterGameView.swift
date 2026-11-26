@@ -44,6 +44,7 @@ public struct NoteHunterGameView: View {
         PianoKeyboardView(
             model: viewModel.keyboard,
             highlightedPitchClass: viewModel.selectedPitchClass,
+            purpose: .noteIdentification,
             onKeyTap: { key in
                 onPlayPitch(key.pitch)
                 viewModel.submit(key)

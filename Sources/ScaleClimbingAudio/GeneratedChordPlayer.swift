@@ -290,6 +290,25 @@ public enum GeneratedChordTones {
     }
 }
 
+/// Thread-safe request tickets: older queued audio must never play after a newer request.
+final class PlaybackRequestGate: @unchecked Sendable {
+    private let lock = NSLock()
+    private var latest: UInt64 = 0
+
+    func next() -> UInt64 {
+        lock.lock()
+        defer { lock.unlock() }
+        latest &+= 1
+        return latest
+    }
+
+    func isLatest(_ ticket: UInt64) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return ticket == latest
+    }
+}
+
 @MainActor
 public final class GeneratedChordPlayer {
     private let worker = AudioPlaybackWorker()
@@ -299,53 +318,56 @@ public final class GeneratedChordPlayer {
     public init() {}
 
     public func play(_ pitchClasses: [PitchClass]) {
-        playSamples(GeneratedChordTones.samples(for: pitchClasses, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.samples(for: pitchClasses, sampleRate: rate) }
     }
 
     public func play(_ pitch: Pitch) {
-        playSamples(GeneratedChordTones.samples(for: pitch, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.samples(for: pitch, sampleRate: rate) }
     }
 
     public func playInterval(_ pitches: [Pitch]) {
-        playSamples(GeneratedChordTones.melodicSamples(for: pitches, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.melodicSamples(for: pitches, sampleRate: rate) }
     }
 
     public func playScale(_ pitches: [Pitch]) {
-        playSamples(
+        let rate = sampleRate
+        playSamples {
             GeneratedChordTones.melodicSamples(
                 for: pitches,
-                sampleRate: sampleRate,
+                sampleRate: rate,
                 noteDuration: 0.28,
                 gapDuration: 0.10
             )
-        )
+        }
     }
 
     public func playVoicing(_ pitches: [Pitch]) {
-        playSamples(GeneratedChordTones.voicedSamples(for: pitches, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.voicedSamples(for: pitches, sampleRate: rate) }
     }
 
     public func playProgression(_ chords: [[Pitch]]) {
-        playSamples(GeneratedChordTones.progressionSamples(for: chords, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.progressionSamples(for: chords, sampleRate: rate) }
     }
 
     public func playRhythm(_ pattern: RhythmPattern) {
-        playSamples(GeneratedChordTones.rhythmSamples(for: pattern, sampleRate: sampleRate))
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.rhythmSamples(for: pattern, sampleRate: rate) }
     }
 
     public func playTimbre(_ playback: TimbrePlayback) {
-        playSamples(
-            GeneratedChordTones.timbrePlaybackSamples(
-                for: playback,
-                sampleRate: sampleRate
-            )
-        )
+        let rate = sampleRate
+        playSamples { GeneratedChordTones.timbrePlaybackSamples(for: playback, sampleRate: rate) }
     }
 
-    private func playSamples(_ samples: [Float]) {
-        guard !samples.isEmpty else { return }
-
-        worker.enqueue(samples: samples) { [weak self] error in
+    /// Only capture lightweight, Sendable values on the UI actor. Waveform synthesis
+    /// happens on the worker to keep tap handling and animations responsive.
+    private func playSamples(_ generate: @escaping @Sendable () -> [Float]) {
+        worker.enqueue(generate: generate) { [weak self] error in
             Task { @MainActor [weak self] in
                 self?.lastPlaybackError = error
             }
@@ -353,52 +375,116 @@ public final class GeneratedChordPlayer {
     }
 }
 
+/// A bounded release for the old voice when a new key is pressed.
+/// The new note is scheduled immediately: the fade only affects the outgoing voice.
+struct PlaybackReleaseFade {
+    static let stepCount = 12
+    static let stepMilliseconds = 2
+    static let durationMilliseconds = stepCount * stepMilliseconds
+
+    static func volume(_ step: Int) -> Float {
+        Float(max(0, stepCount - min(max(step, 0), stepCount))) / Float(stepCount)
+    }
+}
+
+struct PlaybackVoiceChange {
+    let current: Int
+    let previous: Int?
+    let generation: UInt64
+}
+
+/// Used only on the serial playback queue. Generations invalidate fade callbacks
+/// when a voice is recycled for a later key press.
+struct PlaybackVoiceState {
+    private(set) var activeVoiceIndex: Int?
+    private var generations: [UInt64]
+
+    init(voiceCount: Int) {
+        precondition(voiceCount >= 2)
+        generations = Array(repeating: 0, count: voiceCount)
+    }
+
+    mutating func advance() -> PlaybackVoiceChange {
+        let previous = activeVoiceIndex
+        let next = previous.map { ($0 + 1) % generations.count } ?? 0
+        generations[next] &+= 1
+        activeVoiceIndex = next
+        return PlaybackVoiceChange(
+            current: next,
+            previous: previous,
+            generation: generations[next]
+        )
+    }
+
+    func generation(for voice: Int) -> UInt64 {
+        generations[voice]
+    }
+
+    func canFade(voice: Int, generation: UInt64) -> Bool {
+        activeVoiceIndex != voice && generations[voice] == generation
+    }
+}
+
 private final class AudioPlaybackWorker: @unchecked Sendable {
-    private let queue = DispatchQueue(
-        label: "org.garaged.ScaleClimbing.audio",
+    // Waveform rendering may proceed concurrently, so slow previous requests
+    // cannot block the newest pitch from being generated.
+    private let renderQueue = DispatchQueue(
+        label: "org.garaged.ScaleClimbing.audio.render",
+        qos: .userInitiated,
+        attributes: .concurrent
+    )
+    // All AVAudioEngine and voice state changes remain serialized.
+    private let playbackQueue = DispatchQueue(
+        label: "org.garaged.ScaleClimbing.audio.playback",
         qos: .userInitiated
     )
+    private let requestGate = PlaybackRequestGate()
     private let sampleRate: Double = 44_100
     private var engine: AVAudioEngine?
-    private var player: AVAudioPlayerNode?
+    private var players: [AVAudioPlayerNode] = []
+    private var voiceState = PlaybackVoiceState(voiceCount: 3)
 
     func enqueue(
-        samples: [Float],
+        generate: @escaping @Sendable () -> [Float],
         report: @escaping @Sendable (String?) -> Void
     ) {
-        queue.async { [self] in
-            report(playOnQueue(samples))
+        let request = requestGate.next()
+        renderQueue.async { [self] in
+            guard requestGate.isLatest(request) else { return }
+            let samples = generate()
+            guard !samples.isEmpty, requestGate.isLatest(request) else { return }
+            playbackQueue.async { [self] in
+                guard requestGate.isLatest(request) else { return }
+                report(playOnQueue(samples))
+            }
         }
     }
 
     private func playOnQueue(_ samples: [Float]) -> String? {
         let engine: AVAudioEngine
-        let player: AVAudioPlayerNode
-
-        if let existingEngine = self.engine, let existingPlayer = self.player {
-            engine = existingEngine
-            player = existingPlayer
+        if let existing = self.engine {
+            engine = existing
         } else {
-            engine = AVAudioEngine()
-            player = AVAudioPlayerNode()
-            engine.attach(player)
-
+            let created = AVAudioEngine()
             guard let format = AVAudioFormat(
-                standardFormatWithSampleRate: sampleRate,
-                channels: 1
+                standardFormatWithSampleRate: sampleRate, channels: 1
             ) else {
                 return "Unable to create an audio format."
             }
 
-            engine.connect(player, to: engine.mainMixerNode, format: format)
-            self.engine = engine
-            self.player = player
+            for _ in 0..<3 {
+                let voice = AVAudioPlayerNode()
+                created.attach(voice)
+                created.connect(voice, to: created.mainMixerNode, format: format)
+                players.append(voice)
+            }
+            engine = created
+            self.engine = created
         }
 
         guard
             let format = AVAudioFormat(
-                standardFormatWithSampleRate: sampleRate,
-                channels: 1
+                standardFormatWithSampleRate: sampleRate, channels: 1
             ),
             let buffer = AVAudioPCMBuffer(
                 pcmFormat: format,
@@ -415,25 +501,53 @@ private final class AudioPlaybackWorker: @unchecked Sendable {
         }
 
         do {
-            #if os(iOS)
-            try AVAudioSession.sharedInstance().setCategory(
-                .playback,
-                mode: .default,
-                options: [.mixWithOthers]
-            )
-            try AVAudioSession.sharedInstance().setActive(true)
-            #endif
-
             if !engine.isRunning {
+                #if os(iOS)
+                try AVAudioSession.sharedInstance().setCategory(
+                    .playback,
+                    mode: .default,
+                    options: [.mixWithOthers]
+                )
+                try AVAudioSession.sharedInstance().setActive(true)
+                #endif
                 try engine.start()
             }
 
-            player.stop()
-            player.scheduleBuffer(buffer)
-            player.play()
+            let change = voiceState.advance()
+            let next = players[change.current]
+            // Reusing an older, already faded voice does not cut off the
+            // current one. Its previous fade generation is now invalid.
+            next.stop()
+            next.volume = 1
+            next.scheduleBuffer(buffer)
+            next.play()
+
+            if let old = change.previous {
+                releaseOldVoice(old, generation: voiceState.generation(for: old))
+            }
             return nil
         } catch {
             return String(describing: error)
+        }
+    }
+
+    private func releaseOldVoice(_ index: Int, generation: UInt64) {
+        // Volume release is brief (24 ms); it overlaps the new note's existing
+        // attack envelope instead of introducing a gap before playback.
+        // Serialized, generation-guarded callbacks cannot mute a reused voice.
+        for step in 1...PlaybackReleaseFade.stepCount {
+            playbackQueue.asyncAfter(
+                deadline: .now() + .milliseconds(step * PlaybackReleaseFade.stepMilliseconds)
+            ) { [self] in
+                guard voiceState.canFade(voice: index, generation: generation) else {
+                    return
+                }
+                let old = players[index]
+                old.volume = PlaybackReleaseFade.volume(step)
+                if step == PlaybackReleaseFade.stepCount {
+                    old.stop()
+                }
+            }
         }
     }
 }

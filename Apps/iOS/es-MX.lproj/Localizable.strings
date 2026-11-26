@@ -101,3 +101,11 @@
 "Check and hear the selected notes. If incorrect, adjust the notes and try again." = "Comprueba y escucha las notas seleccionadas. Si son incorrectas, ajústalas e inténtalo de nuevo.";
 "Find the exact keys and octave positions. Lowest note determines inversion." = "Encuentra las teclas y octavas exactas. La nota más grave determina la inversión.";
 "Move to the next note hunter prompt" = "Avanza a la siguiente nota objetivo";
+
+"Practice settings" = "Ajustes de práctica";
+"Learning assistance" = "Ayuda para aprender";
+"Standard" = "Estándar";
+"Novice" = "Principiante";
+"Standard hides note names in Note Hunter so answers are not revealed. Novice shows them as a learning aid. Other keyboards keep their labels." = "El modo Estándar oculta los nombres de las notas en Cazador de notas para no revelar las respuestas. El modo Principiante los muestra como apoyo. Los demás teclados conservan sus etiquetas.";
+"Piano keyboard" = "Teclado de piano";
+"Tap to choose a key" = "Toca una tecla para elegirla";

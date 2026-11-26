@@ -77,3 +77,52 @@ public extension PitchClass {
         }
     }
 }
+
+public enum LearningAssistanceLevel: String, CaseIterable, Sendable {
+    case standard
+    case novice
+}
+
+public enum PianoKeyboardPurpose: Sendable {
+    case construction
+    case noteIdentification
+}
+
+/// Standard mode must not give away the answer in pitch-finding exercises.
+public enum PianoKeyboardLabelPolicy {
+    public static func showsNames(
+        for purpose: PianoKeyboardPurpose,
+        assistance: LearningAssistanceLevel
+    ) -> Bool {
+        purpose != .noteIdentification || assistance == .novice
+    }
+}
+
+public struct PianoAccidentalPlacement: Sendable {
+    public let key: PianoKeyModel
+    /// Index of the white key immediately before the raised accidental.
+    public let precedingNaturalIndex: Int
+}
+
+/// Model-driven piano geometry; no SwiftUI coordinates or device-specific assumptions.
+public struct PianoKeyboardLayout: Sendable {
+    public let naturalKeys: [PianoKeyModel]
+    public let accidentals: [PianoAccidentalPlacement]
+
+    public init(model: PianoKeyboardModel) {
+        let naturalKeys = model.keys.filter(\.isNatural)
+        self.naturalKeys = naturalKeys
+        self.accidentals = model.keys.filter(\.isAccidental).compactMap { accidental in
+            guard let preceding = naturalKeys.lastIndex(where: {
+                $0.pitch.midiNumber < accidental.pitch.midiNumber
+            }) else { return nil }
+            return PianoAccidentalPlacement(key: accidental, precedingNaturalIndex: preceding)
+        }
+    }
+}
+
+/// Exact audible pitch selected by tapping a physical piano key, including octave.
+/// Chord-scoring logic continues to compare pitch classes independently.
+public enum PianoKeyAudition {
+    public static func pitch(for key: PianoKeyModel) -> Pitch { key.pitch }
+}

@@ -4,13 +4,16 @@ import SwiftUI
 public struct ChordAtlasGameView: View {
     @StateObject private var viewModel: ChordAtlasViewModel
     private let onPlayVoicing: ([Pitch]) -> Void
+    private let onPlayPitch: (Pitch) -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> ChordAtlasViewModel = ChordAtlasViewModel(),
-        onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in }
+        onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in },
+        onPlayPitch: @escaping (Pitch) -> Void = { _ in }
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
         self.onPlayVoicing = onPlayVoicing
+        self.onPlayPitch = onPlayPitch
     }
 
     public var body: some View {
@@ -69,7 +72,10 @@ public struct ChordAtlasGameView: View {
                     PianoKeyboardView(
                         model: viewModel.keyboard,
                         highlightedPitchClasses: viewModel.selectedPitchClasses,
-                        onKeyTap: { key in viewModel.toggle(key.pitchClass) }
+                        onKeyTap: { key in
+                            viewModel.toggle(key.pitchClass)
+                            onPlayPitch(PianoKeyAudition.pitch(for: key))
+                        }
                     )
                     Text(AppCopy.learnerText(viewModel.selectionText))
                         .font(.callout.monospaced())
