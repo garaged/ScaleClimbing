@@ -8,3 +8,5 @@
 - [x] Specify owner-reported physical landscape layout defect and add regression test source.
 - [x] Implement shared measured layout, range clamping, landscape UI regression test and device checklist.
 - [ ] Verify current-head CI and repeat physical-device playground acceptance.
+- [x] Specify recurring physical-device retrigger click and write render-envelope regression tests.
+- [ ] Implement and validate sample-continuous live audio.
