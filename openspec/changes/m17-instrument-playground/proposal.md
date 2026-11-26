@@ -4,7 +4,7 @@
 Let learners freely play music on their iPhone—especially in landscape—without exercise prompts, scoring, or progress updates. Start with an expressive, offline polyphonic piano. Guitar fretboard and other instruments remain future work, but use a minimal note-on/note-off interface so those surfaces can share the live-sound service later.
 
 ## Delivery boundary
-- Branch: `agent/m17-instrument-playground`, based on M16 draft `agent/m16-physical-device-stabilization`. Draft PR targets that branch; retarget to `main` only after M16 merges.
+- Branch: `agent/m17-instrument-playground`, originally stacked on M16; M16 PR #18 merged as `42448e03`. Draft PR #19 now targets `main` directly. Preserve the separate M17 diff and history.
 - M16 is a stabilization PR. M17 MUST NOT modify M16 issue decisions, audio regressions, submitted 0.3.0 build, or App Store account state.
 - Navigation: a prominent **Free Keyboard** entry on Home, separate from graded practice zones and Learning Path.
 - Interactive on-device piano: press and hold to sustain notes, multiple simultaneous touches for chords, glide between adjacent keys, release on finger-up/cancel/scene-background/navigation.

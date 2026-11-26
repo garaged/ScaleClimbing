@@ -104,8 +104,8 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
     private var engine: AVAudioEngine?
     private var nodes: [AVAudioPlayerNode] = []
     private var buffers: [Int: AVAudioPCMBuffer] = [:]
-    private var registry = LiveKeyboardVoiceRegistry(maxVoices: voiceLimit)
-    private var generations = Array(repeating: UInt64.zero, count: voiceLimit)
+    private var registry = LiveKeyboardVoiceRegistry(maxVoices: LiveKeyboardAudioWorker.voiceLimit)
+    private var generations = Array(repeating: UInt64.zero, count: LiveKeyboardAudioWorker.voiceLimit)
 
     func prepare(_ pitches: [Pitch]) {
         for midi in Set(pitches.map(\.midiNumber)) {

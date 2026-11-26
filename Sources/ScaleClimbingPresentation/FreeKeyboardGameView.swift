@@ -42,6 +42,7 @@ public struct FreeKeyboardGameView: View {
                 FreeKeyboardTouchSurface(
                     model: model,
                     showNoteNames: showNoteNames,
+                    isActive: scenePhase == .active,
                     onNoteEvent: handleNoteEvent,
                     onAccessibleAudition: onAccessibleAudition
                 )

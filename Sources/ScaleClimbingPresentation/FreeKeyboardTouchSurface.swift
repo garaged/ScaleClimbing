@@ -8,6 +8,7 @@ import UIKit
 struct FreeKeyboardTouchSurface: UIViewRepresentable {
     let model: PianoKeyboardModel
     let showNoteNames: Bool
+    let isActive: Bool
     let onNoteEvent: (FreeKeyboardNoteEvent) -> Void
     let onAccessibleAudition: (Pitch) -> Void
 
@@ -16,6 +17,7 @@ struct FreeKeyboardTouchSurface: UIViewRepresentable {
         view.configure(
             model: model,
             showsNoteNames: showNoteNames,
+            isActive: isActive,
             onNoteEvent: onNoteEvent,
             onAccessibleAudition: onAccessibleAudition
         )
@@ -26,6 +28,7 @@ struct FreeKeyboardTouchSurface: UIViewRepresentable {
         view.configure(
             model: model,
             showsNoteNames: showNoteNames,
+            isActive: isActive,
             onNoteEvent: onNoteEvent,
             onAccessibleAudition: onAccessibleAudition
         )
@@ -72,9 +75,14 @@ final class FreeKeyboardCanvasView: UIView {
     func configure(
         model: PianoKeyboardModel,
         showsNoteNames: Bool,
+        isActive: Bool,
         onNoteEvent: @escaping (FreeKeyboardNoteEvent) -> Void,
         onAccessibleAudition: @escaping (Pitch) -> Void
     ) {
+        if !isActive {
+            // UIKit may not deliver touchesCancelled before scene deactivation.
+            releaseTouches()
+        }
         if self.model != model {
             releaseTouches()
             self.model = model
@@ -217,8 +225,8 @@ final class FreeKeyboardCanvasView: UIView {
         context.saveGState()
         shape.addClip()
         let colors: [CGColor] = [
-            UIColor(red: top.red, green: top.green, blue: top.blue, alpha: 1).cgColor,
-            UIColor(red: bottom.red, green: bottom.green, blue: bottom.blue, alpha: 1).cgColor
+            UIColor(red: CGFloat(top.red), green: CGFloat(top.green), blue: CGFloat(top.blue), alpha: 1).cgColor,
+            UIColor(red: CGFloat(bottom.red), green: CGFloat(bottom.green), blue: CGFloat(bottom.blue), alpha: 1).cgColor
         ]
         if let gradient = CGGradient(
             colorsSpace: CGColorSpaceCreateDeviceRGB(),
@@ -247,7 +255,7 @@ final class FreeKeyboardCanvasView: UIView {
         let ink = key.isNatural ? PianoKeyPalette.naturalInk : PianoKeyPalette.accidentalInk
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
-            .foregroundColor: UIColor(red: ink.red, green: ink.green, blue: ink.blue, alpha: 1)
+            .foregroundColor: UIColor(red: CGFloat(ink.red), green: CGFloat(ink.green), blue: CGFloat(ink.blue), alpha: 1)
         ]
         let label = key.shortLabel as NSString
         let measured = label.size(withAttributes: attributes)
