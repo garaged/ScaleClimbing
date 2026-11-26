@@ -46,3 +46,8 @@ New learning modes, design-language rewrite, unexplained scoring/audio/progress 
 
 - **M16-001:** unreadable natural-key note names in dark appearance. Extend the M14 design system with an authentic, accessible piano keyboard; offer persistent Standard (default) / Novice learning assistance: Standard hides visual notes in Note Hunter, Novice reveals them; other keyboards keep labels, VoiceOver always names keys. Do not alter music-theory keys or scoring.
 - **M16-002:** latency/staggered chord perception after repeated sounds. Eliminate main-thread synthesis and prevent stale queued playback from overtaking the latest request. Maintain simultaneous generated chord samples and audible continuity. Real-device repetition/interruption acceptance is required to establish whether symptoms are resolved.
+
+## Additional device findings (2026-11-25)
+
+- **M16-003:** frequent clicking between rapidly played notes. The previously active playback node was forcibly stopped mid-waveform; fix with a brief bounded outgoing release while the new note starts, guarding callbacks when a voice is reused. This remains a device listening acceptance item.
+- **M16-004:** Chord Forge and Chord Atlas Build keyboard selections were silent. Reuse the existing `onPlayPitch` callback for each tapped key, including its exact octave, independently of pitch-class scoring. Keep Hear/Check/Replay playing complete chords.
