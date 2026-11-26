@@ -3,13 +3,16 @@ import Testing
 
 @Test func atlasFocusPreservesExactPitchAndClassAcrossInstruments() {
     var atlas = MusicAtlas()
-    #expect(atlas.select(.pianoKey(midi: 60), on: MusicAtlas.piano))
+    let selectedPiano = atlas.select(.pianoKey(midi: 60), on: MusicAtlas.piano)
+    #expect(selectedPiano)
     #expect(atlas.matches(on: .standardGuitar, equivalence: .exactPitch) == [.fret(string: 2, fret: 1), .fret(string: 3, fret: 5), .fret(string: 4, fret: 10), .fret(string: 5, fret: 15), .fret(string: 6, fret: 20)])
     #expect(atlas.matches(on: .standardGuitar, equivalence: .pitchClass).count > 5)
-    #expect(atlas.select(.fret(string: 5, fret: 3), on: .standardGuitar))
+    let selectedGuitar = atlas.select(.fret(string: 5, fret: 3), on: .standardGuitar)
+    #expect(selectedGuitar)
     #expect(atlas.focus == Pitch(.c, octave: 3))
     #expect(atlas.matches(on: MusicAtlas.piano, equivalence: .exactPitch) == [.pianoKey(midi: 48)])
-    #expect(!atlas.select(.fret(string: 7, fret: 0), on: .standardGuitar))
+    let selectedInvalid = atlas.select(.fret(string: 7, fret: 0), on: .standardGuitar)
+    #expect(!selectedInvalid)
     #expect(atlas.focus == Pitch(.c, octave: 3))
 }
 
