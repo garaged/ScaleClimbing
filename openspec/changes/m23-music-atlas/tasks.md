@@ -9,4 +9,5 @@
 - [x] Implement shared measured layout, range clamping, landscape UI regression test and device checklist.
 - [ ] Verify current-head CI and repeat physical-device playground acceptance.
 - [x] Specify recurring physical-device retrigger click and write render-envelope regression tests.
-- [ ] Implement and validate sample-continuous live audio.
+- [x] Implement sample-continuous live audio and render-acknowledged release reservation.
+- [ ] Verify current-head CI and real-device rapid-tap audio, polyphony, latency, route transitions and background/foreground behavior.

@@ -170,3 +170,16 @@ The Free Keyboard and Free Fretboard SHALL reserve a single horizontal control s
 - **GIVEN** es-MX or larger text and a constrained viewport
 - **WHEN** the full control label cannot fit horizontally
 - **THEN** the compact control retains the accessible Note names label and the same persisted toggle; controls remain tappable without overlapping the canvas.
+
+### Requirement: sample-continuous live instrument retrigger
+Live piano and guitar audio SHALL apply attack and release envelopes at the audio sample rate rather than wall-clock volume steps. A voice SHALL remain reserved until its render-side release reaches zero; cleanup and repeated all-notes-off SHALL NOT truncate a nonzero sample or reassign a fading slot. Independent piano keys and guitar strings SHALL retain their own lifetimes. No allocation, blocking lock or dispatch operation is permitted in the audio render loop. Rapid taps, slides, overlapping notes and scene transitions require physical listening acceptance.
+
+#### Scenario: rapid repeated taps
+- **GIVEN** a sounding key at an arbitrary waveform phase
+- **WHEN** it is released and retriggered before its tail ends
+- **THEN** the previous voice fades to zero while a new voice starts at zero gain, with no forced phase discontinuity or abrupt volume jump.
+
+#### Scenario: all notes off followed by immediate input
+- **GIVEN** sounding or fading voices
+- **WHEN** all notes off occurs twice and a new note arrives
+- **THEN** fading slots remain reserved until the render callback confirms silence, and a free slot can start the new note.

@@ -141,7 +141,10 @@ import Testing
     #expect(peak > 0.01)
     #expect(peak <= 0.1)
     voice.apply(LiveVoiceCommand(generation: 2, midi: 64, guitar: true, gate: false))
-    for _ in 0..<LiveRenderVoice.releaseFrames { #expect(voice.nextSample().isFinite) }
+    for _ in 0..<LiveRenderVoice.releaseFrames {
+        let sample = voice.nextSample()
+        #expect(sample.isFinite)
+    }
     #expect(voice.isSilent)
 }
 
