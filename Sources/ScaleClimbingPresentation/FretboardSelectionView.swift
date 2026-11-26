@@ -10,18 +10,25 @@ public struct FretboardSelectionView: View {
     public let selected: InstrumentPosition?
     public let result: Bool?
     public let locked: Bool
+    public let selectedPositions: Set<InstrumentPosition>
+    public let allowedStrings: Set<Int>
+    public let identifierPrefix: String
     public let onSelect: (InstrumentPosition) -> Void
     private let guitar = InstrumentMapping.standardGuitar
 
     public init(window: FretboardWindow, showNames: Bool, anchor: InstrumentPosition? = nil,
                 selected: InstrumentPosition? = nil, result: Bool? = nil, locked: Bool = false,
-                onSelect: @escaping (InstrumentPosition) -> Void) {
+                selectedPositions: Set<InstrumentPosition> = [], allowedStrings: Set<Int> = Set(1...6),
+                identifierPrefix: String = "fretPractice", onSelect: @escaping (InstrumentPosition) -> Void) {
         self.window = window
         self.showNames = showNames
         self.anchor = anchor
         self.selected = selected
         self.result = result
         self.locked = locked
+        self.selectedPositions = selectedPositions
+        self.allowedStrings = allowedStrings
+        self.identifierPrefix = identifierPrefix
         self.onSelect = onSelect
     }
 
@@ -47,13 +54,13 @@ public struct FretboardSelectionView: View {
             }
         }
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("fretPractice.board")
+        .accessibilityIdentifier("\(identifierPrefix).board")
     }
 
     private func cell(string: Int, fret: Int) -> some View {
         let position = InstrumentPosition.fret(string: string, fret: fret)
         let pitch = guitar.pitch(at: position)
-        let isSelected = position == selected
+        let isSelected = position == selected || selectedPositions.contains(position)
         let isAnchor = position == anchor
         return Button { onSelect(position) } label: {
             ZStack {
@@ -64,7 +71,7 @@ public struct FretboardSelectionView: View {
                     Rectangle().fill(.white.opacity(0.6)).frame(width: fret == 0 ? 3 : 1)
                 }
                 if isSelected || isAnchor || showNames {
-                    Circle().fill(isSelected ? (result == true ? Color.green.opacity(0.85) : Color.orange.opacity(0.9))
+                    Circle().fill(isSelected ? (result == nil ? ScaleClimbingPalette.sky : result == true ? Color.green.opacity(0.85) : Color.orange.opacity(0.9))
                         : isAnchor ? ScaleClimbingPalette.sky : Color.black.opacity(0.8))
                         .frame(width: 27, height: 27)
                     if showNames || isAnchor || isSelected {
@@ -77,9 +84,10 @@ public struct FretboardSelectionView: View {
             .frame(maxWidth: .infinity, minHeight: 44)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain).disabled(locked)
+        .buttonStyle(.plain).disabled(locked || !allowedStrings.contains(string))
+        .opacity(allowedStrings.contains(string) ? 1 : 0.5)
         .accessibilityLabel(String(format: AppCopy.text("String %d, fret %d, %@"), string, fret, pitch?.description ?? ""))
         .accessibilityAddTraits(isSelected || isAnchor ? [.isSelected] : [])
-        .accessibilityIdentifier("fretPractice.position.\(string).\(fret)")
+        .accessibilityIdentifier("\(identifierPrefix).position.\(string).\(fret)")
     }
 }
