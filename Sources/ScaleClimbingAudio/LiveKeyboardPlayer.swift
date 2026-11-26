@@ -152,6 +152,9 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
     func noteOff(_ pitch: Pitch) {
         queue.async { [self] in
             guard let index = registry.noteOff(midiNumber: pitch.midiNumber) else { return }
+            // Invalidate attack-ramp callbacks before releasing; otherwise a
+            // late attack step could raise volume again during the fade-out.
+            generations[index] &+= 1
             ramp(index: index, generation: generations[index], from: nodes[index].volume, to: 0, releasing: true)
         }
     }
