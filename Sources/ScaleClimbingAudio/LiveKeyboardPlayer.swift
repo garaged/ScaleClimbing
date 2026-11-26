@@ -1,6 +1,7 @@
 import AVFoundation
 import Foundation
 import MusicTheoryCore
+import Synchronization
 
 /// Pure voice-allocation state. Releasing slots stay reserved until their short
 /// release ramps complete; no current note is abruptly stolen by a new press.
@@ -26,6 +27,7 @@ struct LiveKeyboardVoiceRegistry {
     }
 
     var activeNoteCount: Int { activeByVoice.count }
+    var releasingIndices: [Int] { releasing.sorted() }
 
     mutating func noteOn(midiNumber: Int) -> Int? { noteOn(voice: .piano(midiNumber)) }
 
@@ -52,9 +54,9 @@ struct LiveKeyboardVoiceRegistry {
     }
 
     mutating func releaseAll() -> [Int] {
-        let indices = Set(activeByVoice.values).union(releasing).sorted()
+        let indices = activeByVoice.values.sorted()
+        releasing.formUnion(indices)
         activeByVoice.removeAll()
-        releasing.removeAll()
         return indices
     }
 }
@@ -144,67 +146,74 @@ public final class LiveKeyboardPlayer {
     }
 }
 
-/// Engine state, buffer cache, and voice allocator are confined to a serial
-/// queue; waveform synthesis happens on a separate background render queue.
+/// Control commands are published by one serial producer. The render callback
+/// alone owns oscillator state; an atomic acknowledgement reserves release tails
+/// until the final sample has reached silence. No dispatch, locking or allocation
+/// is required while mixing samples.
+private final class LiveRenderSlot: @unchecked Sendable {
+    private let command = Atomic<UInt64>(0)
+    private let finished = Atomic<UInt64>(0)
+    private var voice = LiveRenderVoice()
+
+    func publish(_ value: LiveVoiceCommand) {
+        command.store(value.packed, ordering: .releasing)
+    }
+
+    func didFinish(generation: UInt64) -> Bool {
+        finished.load(ordering: .acquiring) == generation
+    }
+
+    func render(into output: UnsafeMutablePointer<Float>, frameCount: Int) -> Bool {
+        let next = LiveVoiceCommand(packed: command.load(ordering: .acquiring))
+        if next.generation != voice.generation { voice.apply(next) }
+        if voice.isSilent {
+            if !next.gate { finished.store(next.generation, ordering: .releasing) }
+            return false
+        }
+        for frame in 0..<frameCount {
+            output[frame] += voice.nextSample()
+        }
+        if voice.isSilent && !next.gate {
+            finished.store(next.generation, ordering: .releasing)
+        }
+        return true
+    }
+}
+
+/// Engine and allocator are confined to the control queue. The AVAudioSourceNode
+/// owns a fixed set of render slots, shared only through atomic command words.
 private final class LiveKeyboardAudioWorker: @unchecked Sendable {
     private static let voiceLimit = 10
-    private static let sampleRate: Double = 44_100
-    private static let rampSteps = 10
-    private static let rampDurationMilliseconds = 30
-
     private let queue = DispatchQueue(label: "org.garaged.ScaleClimbing.live-keyboard.audio", qos: .userInitiated)
-    private let renderQueue = DispatchQueue(label: "org.garaged.ScaleClimbing.live-keyboard.render", qos: .utility, attributes: .concurrent)
-
+    private let slots = (0..<LiveKeyboardAudioWorker.voiceLimit).map { _ in LiveRenderSlot() }
     private var engine: AVAudioEngine?
-    private var nodes: [AVAudioPlayerNode] = []
-    private var buffers: [Int: AVAudioPCMBuffer] = [:]
-    private var guitarBuffers: [Int: AVAudioPCMBuffer] = [:]
     private var registry = LiveKeyboardVoiceRegistry(maxVoices: LiveKeyboardAudioWorker.voiceLimit)
     private var generations = Array(repeating: UInt64.zero, count: LiveKeyboardAudioWorker.voiceLimit)
+    private var lastMIDIs = Array(repeating: 0, count: LiveKeyboardAudioWorker.voiceLimit)
+    private var lastGuitar = Array(repeating: false, count: LiveKeyboardAudioWorker.voiceLimit)
 
     func prepare(_ pitches: [Pitch], guitar: Bool = false) {
-        for midi in Set(pitches.filter { (-1...9).contains($0.octave) }.map(\.midiNumber).filter { (0...127).contains($0) }) {
-            renderQueue.async { [self] in
-                let samples = Self.waveform(pitch: Pitch(midiNumber: midi), guitar: guitar)
-                // Only Sendable waveform data crosses Dispatch queues. AVAudioPCMBuffer
-                // construction and access remain confined to the audio queue.
-                queue.async { [self] in
-                    if let buffer = makeBuffer(samples) {
-                        if guitar { guitarBuffers[midi] = buffer } else { buffers[midi] = buffer }
-                    }
-                }
-            }
-        }
+        // Oscillators need no waveform cache. Warm the output graph before the
+        // first touch; the previous graph also remained active after playback.
+        guard !pitches.isEmpty else { return }
+        queue.async { [self] in _ = ensureEngine() }
     }
 
-    private static func waveform(pitch: Pitch, guitar: Bool) -> [Float] {
-        let frequency = GeneratedChordTones.frequency(for: pitch)
-        return guitar ? LiveGuitarTone.samples(frequency: frequency, sampleRate: sampleRate)
-                      : LiveKeyboardTone.samples(frequency: frequency, sampleRate: sampleRate)
+    func noteOn(_ pitch: Pitch) {
+        guard (-1...9).contains(pitch.octave), (0...127).contains(pitch.midiNumber) else { return }
+        noteOn(pitch, voice: .piano(pitch.midiNumber))
     }
-
-    func noteOn(_ pitch: Pitch) { noteOn(pitch, voice: .piano(pitch.midiNumber)) }
 
     func noteOn(_ pitch: Pitch, voice: LiveInstrumentVoice, autoRelease: Bool = false) {
         let midi = pitch.midiNumber
         queue.async { [self] in
             if autoRelease { release(voice: voice) }
-            guard ensureEngine(), let index = registry.noteOn(voice: voice) else { return }
-            let cached = voice.isGuitar ? guitarBuffers[midi] : buffers[midi]
-            guard let buffer = cached ?? makeBuffer(Self.waveform(pitch: pitch, guitar: voice.isGuitar)) else {
-                _ = registry.noteOff(voice: voice)
-                registry.finishRelease(voice: index)
-                return
-            }
-            if voice.isGuitar { guitarBuffers[midi] = buffer } else { buffers[midi] = buffer }
-            generations[index] &+= 1
-            let generation = generations[index]
-            let node = nodes[index]
-            node.stop()
-            node.volume = 0
-            node.scheduleBuffer(buffer, at: nil, options: voice.isGuitar ? [] : [.loops])
-            node.play()
-            ramp(index: index, generation: generation, from: 0, to: 1, releasing: false)
+            guard ensureEngine() else { return }
+            reapReleasedSlots()
+            guard let index = registry.noteOn(voice: voice) else { return }
+            lastMIDIs[index] = midi
+            lastGuitar[index] = voice.isGuitar
+            let generation = publish(index: index, gate: true)
             if autoRelease {
                 queue.asyncAfter(deadline: .now() + .milliseconds(2000)) { [self] in
                     guard generations[index] == generation else { return }
@@ -214,7 +223,10 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
         }
     }
 
-    func noteOff(_ pitch: Pitch) { noteOff(voice: .piano(pitch.midiNumber)) }
+    func noteOff(_ pitch: Pitch) {
+        guard (-1...9).contains(pitch.octave), (0...127).contains(pitch.midiNumber) else { return }
+        noteOff(voice: .piano(pitch.midiNumber))
+    }
 
     func noteOff(voice: LiveInstrumentVoice) {
         queue.async { [self] in release(voice: voice) }
@@ -222,34 +234,56 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
 
     private func release(voice: LiveInstrumentVoice) {
         guard let index = registry.noteOff(voice: voice) else { return }
-        generations[index] &+= 1
-        ramp(index: index, generation: generations[index], from: nodes[index].volume, to: 0, releasing: true)
+        _ = publish(index: index, gate: false)
+        reapReleasedSlots()
     }
 
     func allNotesOff() {
         queue.async { [self] in
-            for index in registry.releaseAll() {
-                generations[index] &+= 1 // Cancel any callbacks from previous attacks/releases.
-                ramp(index: index, generation: generations[index], from: nodes[index].volume, to: 0, releasing: true)
-            }
+            for index in registry.releaseAll() { _ = publish(index: index, gate: false) }
+            reapReleasedSlots()
+        }
+    }
+
+    @discardableResult
+    private func publish(index: Int, gate: Bool) -> UInt64 {
+        let generation = (generations[index] + 1) & LiveVoiceCommand.generationMask
+        generations[index] = generation == 0 ? 1 : generation
+        slots[index].publish(LiveVoiceCommand(generation: generations[index], midi: lastMIDIs[index],
+            guitar: lastGuitar[index], gate: gate))
+        return generations[index]
+    }
+
+    private func reapReleasedSlots() {
+        for index in registry.releasingIndices where slots[index].didFinish(generation: generations[index]) {
+            registry.finishRelease(voice: index)
         }
     }
 
     private func ensureEngine() -> Bool {
         if engine == nil {
             let created = AVAudioEngine()
-            guard let format = AVAudioFormat(standardFormatWithSampleRate: Self.sampleRate, channels: 1) else {
+            guard let format = AVAudioFormat(standardFormatWithSampleRate: LiveRenderVoice.sampleRate, channels: 1) else {
                 return false
             }
-            for _ in 0..<Self.voiceLimit {
-                let node = AVAudioPlayerNode()
-                created.attach(node)
-                created.connect(node, to: created.mainMixerNode, format: format)
-                nodes.append(node)
+            let renderSlots = slots
+            let source = AVAudioSourceNode(format: format) { isSilence, _, frames, outputData in
+                let buffers = UnsafeMutableAudioBufferListPointer(outputData)
+                guard buffers.count == 1, let data = buffers[0].mData else { return -50 }
+                let count = Int(frames)
+                let output = data.assumingMemoryBound(to: Float.self)
+                output.update(repeating: 0, count: count)
+                var sounding = false
+                for slot in renderSlots {
+                    if slot.render(into: output, frameCount: count) { sounding = true }
+                }
+                isSilence.pointee = ObjCBool(!sounding)
+                return 0
             }
+            created.attach(source)
+            created.connect(source, to: created.mainMixerNode, format: format)
             engine = created
         }
-
         guard let engine else { return false }
         if !engine.isRunning {
             do {
@@ -260,46 +294,8 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
                 try AVAudioSession.sharedInstance().setActive(true)
                 #endif
                 try engine.start()
-            } catch {
-                return false
-            }
+            } catch { return false }
         }
         return true
-    }
-
-    private func makeBuffer(_ samples: [Float]) -> AVAudioPCMBuffer? {
-        guard !samples.isEmpty,
-              let format = AVAudioFormat(standardFormatWithSampleRate: Self.sampleRate, channels: 1),
-              let buffer = AVAudioPCMBuffer(
-                  pcmFormat: format, frameCapacity: AVAudioFrameCount(samples.count)
-              ),
-              let channel = buffer.floatChannelData?[0] else { return nil }
-
-        buffer.frameLength = AVAudioFrameCount(samples.count)
-        for index in samples.indices { channel[index] = samples[index] }
-        return buffer
-    }
-
-    private func ramp(
-        index: Int,
-        generation: UInt64,
-        from initial: Float,
-        to target: Float,
-        releasing: Bool
-    ) {
-        for step in 1...Self.rampSteps {
-            queue.asyncAfter(
-                deadline: .now() + .milliseconds(step * Self.rampDurationMilliseconds / Self.rampSteps)
-            ) { [self] in
-                guard generations[index] == generation else { return }
-                let fraction = Float(step) / Float(Self.rampSteps)
-                nodes[index].volume = initial + (target - initial) * fraction
-                if releasing && step == Self.rampSteps {
-                    nodes[index].stop()
-                    nodes[index].volume = 0
-                    registry.finishRelease(voice: index)
-                }
-            }
-        }
     }
 }
