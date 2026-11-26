@@ -99,6 +99,8 @@ public struct ScaleClimbingRootView: View {
         case .freeFretboard:
             FreeFretboardGameView(onNoteOn: onGuitarNoteOn, onNoteOff: onGuitarNoteOff,
                 onAllNotesOff: onLiveAllNotesOff, onPrepare: onGuitarPrepare, onAudition: onGuitarAudition)
+        case .scaleNetwork:
+            ScaleNetworkGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
         case .guitarTriads:
             GuitarTriadsGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
         case .fretboardFoundations:
