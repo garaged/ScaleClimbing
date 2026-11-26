@@ -61,3 +61,16 @@ Live piano and guitar audio SHALL apply attack and release envelopes at the audi
 - **GIVEN** sounding or fading voices
 - **WHEN** all notes off occurs twice and a new note arrives
 - **THEN** fading slots remain reserved until the render callback confirms silence, and a free slot can start the new note.
+
+### Requirement: stable polyphonic live mix
+Live instrument mixing SHALL use constant output headroom independent of the active voice count, preserve each held voice's frequency, phase and amplitude, and avoid render-time trigonometric or exponential setup. The source SHOULD use the active audio output sample rate at graph creation; attack/release durations remain time-based at either 44.1 or 48 kHz. The actual source mix SHALL be tested for block-partition invariance, bounded peak and agreement with a linear sum of exact-frequency tones. No dynamic gain pumping, arbitrary detuning or removal of legitimate musical beating is permitted.
+
+#### Scenario: held triad
+- **GIVEN** C4, E4 and G4 held simultaneously
+- **WHEN** successive render buffers are produced
+- **THEN** the sustained signal matches the fixed-gain linear sum at the requested pitches, with no buffer-boundary amplitude reset or additional modulation.
+
+#### Scenario: release one chord tone
+- **GIVEN** three held piano voices
+- **WHEN** one note is released
+- **THEN** its own envelope fades to zero, while the amplitude of the other two remains unchanged.

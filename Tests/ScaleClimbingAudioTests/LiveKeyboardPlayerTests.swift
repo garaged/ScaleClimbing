@@ -157,3 +157,81 @@ import Testing
     #expect(voice.nextSample() == 0)
     #expect(voice.generation == 83)
 }
+
+@Test func liveTriadMatchesLinearReferenceAtBothHardwareRates() {
+    for rate in [44_100.0, 48_000.0] {
+        let mixer = LiveRenderMixer(voiceLimit: 10, sampleRate: rate)
+        let midis = [60, 64, 67]
+        for (index, midi) in midis.enumerated() {
+            mixer.publish(index: index, command: LiveVoiceCommand(generation: 1, midi: midi, guitar: false, gate: true))
+        }
+        var output = Array(repeating: Float.zero, count: Int(rate / 2))
+        output.withUnsafeMutableBufferPointer { buffer in
+            guard let base = buffer.baseAddress else { return }
+            var offset = 0
+            for length in [127, 512, 31, 1024, 256, 333] {
+                _ = mixer.render(into: base.advanced(by: offset), frameCount: length)
+                offset += length
+            }
+            _ = mixer.render(into: base.advanced(by: offset), frameCount: buffer.count - offset)
+        }
+        let start = Int(rate * 0.02)
+        var maxError: Float = 0
+        for frame in start..<output.count {
+            let reference = midis.reduce(0.0) { sum, midi in
+                sum + sin(2 * Double.pi * 440 * pow(2, Double(midi - 69) / 12) * Double(frame) / rate)
+            }
+            let expected = Float(0.09 * reference) * LiveRenderMixer.outputGain
+            maxError = max(maxError, abs(output[frame] - expected))
+        }
+        #expect(maxError < 0.0001)
+        #expect(output.allSatisfy { $0.isFinite && abs($0) <= 0.27 * LiveRenderMixer.outputGain + 0.0001 })
+    }
+}
+
+@Test func liveMixIsIndependentOfBlockPartitionAndOtherVoiceRelease() {
+    let a = LiveRenderMixer(voiceLimit: 3, sampleRate: 48_000)
+    let b = LiveRenderMixer(voiceLimit: 3, sampleRate: 48_000)
+    for index in 0..<3 {
+        let command = LiveVoiceCommand(generation: 1, midi: [60, 64, 67][index], guitar: false, gate: true)
+        a.publish(index: index, command: command)
+        b.publish(index: index, command: command)
+    }
+    func render(_ mixer: LiveRenderMixer, count: Int) -> [Float] {
+        var output = Array(repeating: Float.zero, count: count)
+        output.withUnsafeMutableBufferPointer {
+            _ = mixer.render(into: $0.baseAddress!, frameCount: count)
+        }
+        return output
+    }
+    let whole = render(a, count: 2048)
+    let split = render(b, count: 127) + render(b, count: 511) + render(b, count: 1410)
+    #expect(whole == split)
+    a.publish(index: 2, command: LiveVoiceCommand(generation: 2, midi: 67, guitar: false, gate: false))
+    let released = render(a, count: 2000)
+    let held = render(b, count: 2000)
+    #expect(a.didFinish(index: 2, generation: 2))
+    #expect(!b.didFinish(index: 2, generation: 2))
+    #expect(released.first == held.first)
+    let two = LiveRenderMixer(voiceLimit: 2, sampleRate: 48_000)
+    for index in 0..<2 {
+        two.publish(index: index, command: LiveVoiceCommand(generation: 1, midi: [60, 64][index], guitar: false, gate: true))
+    }
+    let reference = render(two, count: 4048)
+    for frame in 1441..<2000 {
+        #expect(abs(released[frame] - reference[2048 + frame]) < 0.000001)
+    }
+}
+
+@Test func tenVoiceMixReservesHeadroomWithoutChangingHeldNoteGain() {
+    let mixer = LiveRenderMixer(voiceLimit: 10, sampleRate: 44_100)
+    for index in 0..<10 {
+        mixer.publish(index: index, command: LiveVoiceCommand(generation: 1, midi: 60, guitar: false, gate: true))
+    }
+    var output = Array(repeating: Float.zero, count: 4096)
+    output.withUnsafeMutableBufferPointer {
+        _ = mixer.render(into: $0.baseAddress!, frameCount: $0.count)
+    }
+    #expect(output.allSatisfy { $0.isFinite && abs($0) <= 0.6 })
+    #expect(output.contains { abs($0) > 0.4 })
+}

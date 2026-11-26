@@ -11,3 +11,5 @@
 - [x] Specify recurring physical-device retrigger click and write render-envelope regression tests.
 - [x] Implement sample-continuous live audio and render-acknowledged release reservation.
 - [ ] Verify current-head CI and real-device rapid-tap audio, polyphony, latency, route transitions and background/foreground behavior.
+- [x] Capture physical chord vibration regression and specify linear polyphonic mix tests.
+- [ ] Implement fixed-headroom, precomputed oscillator mix and verify both rates.
