@@ -65,7 +65,7 @@ struct LiveRenderVoice {
     private let d6: Double
     private var p1 = 0.0, p2 = 0.0, p3 = 0.0, p4 = 0.0, p5 = 0.0, p6 = 0.0
 
-    init(sampleRate: Double = Self.sampleRate) {
+    init(sampleRate: Double = LiveRenderVoice.sampleRate) {
         let rate = sampleRate.isFinite && (8_000...192_000).contains(sampleRate) ? sampleRate : Self.sampleRate
         self.rate = rate
         table = Self.sineTable

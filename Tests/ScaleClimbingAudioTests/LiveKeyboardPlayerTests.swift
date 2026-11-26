@@ -239,3 +239,24 @@ import Testing
     #expect(output.allSatisfy { $0.isFinite && abs($0) <= 0.6 })
     #expect(output.contains { abs($0) > 0.4 })
 }
+
+@Test func liveSixStringMixStaysBoundedAndReleasesAt48kHz() {
+    let mixer = LiveRenderMixer(voiceLimit: 10, sampleRate: 48_000)
+    for (index, midi) in [64, 59, 55, 50, 45, 40].enumerated() {
+        mixer.publish(index: index, command: LiveVoiceCommand(generation: 1, midi: midi, guitar: true, gate: true))
+    }
+    var output = Array(repeating: Float.zero, count: 4096)
+    output.withUnsafeMutableBufferPointer {
+        _ = mixer.render(into: $0.baseAddress!, frameCount: $0.count)
+    }
+    #expect(output.allSatisfy { $0.isFinite && abs($0) < 0.4 })
+    #expect(output.contains { abs($0) > 0.01 })
+    for (index, midi) in [64, 59, 55, 50, 45, 40].enumerated() {
+        mixer.publish(index: index, command: LiveVoiceCommand(generation: 2, midi: midi, guitar: true, gate: false))
+    }
+    output.withUnsafeMutableBufferPointer {
+        _ = mixer.render(into: $0.baseAddress!, frameCount: $0.count)
+    }
+    #expect(output.dropFirst(1440).allSatisfy { $0 == 0 })
+    #expect((0..<6).allSatisfy { mixer.didFinish(index: $0, generation: 2) })
+}

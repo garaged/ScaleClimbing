@@ -26,3 +26,11 @@ Generated reference tones reuse existing audio; no claim of realistic guitar rec
 - Repeat on Free Fretboard: repeated same position, rapid slides on one string, two strings with same sounding pitch, simultaneous different strings. Preserve pluck decay and note-release semantics.
 - Rotate or change visible range while holding notes, leave the instrument, background and resume, and try speaker and headphones if available. No hanging voice or abrupt transient; verify first-touch latency remains acceptable and existing guided exercise audio still works.
 - Record device/OS, audio output route, exact SHA and whether the sound is a distinct click or a natural note attack. Simulator CI verifies build, waveform math and allocation; physical listening is authoritative for output artifacts. No new microphone or recording permission.
+
+## Physical polyphonic vibration regression
+
+- The owner confirmed the repeated-key click is gone on the preceding sample-continuous build, but reported a vibration/buzz with two notes, increasing with three. This correction must retain click-free behavior.
+- Hold C4 alone, C4–G4 (fifth), C4–E4 (third), C4–E4–G4 (major triad) and C4–C5 (octave) for 3–5 seconds each. Repeat at low and moderate speaker volume; compare with headphones if available. Repeat on the guitar.
+- While holding a triad, lift one note, re-add it, then lift another. Remaining notes must not pulse, change pitch, clip or jump in volume; ordinary interference between different pitches is expected.
+- Compare sustained free-keyboard notes with the same generated chord in Chord Forge/Voicing Lab, allowing for different sustain and loudness. If the vibration persists, report which intervals/notes, audio route, speaker volume, iOS version, and whether it follows headphones or occurs only through the built-in speaker. This distinguishes acoustic/speaker distortion from a render-path issue; no claim of a verified physical root cause is made.
+- Verify rapid retriggers, first-touch response, and route/scene transitions again. Fixed -3.74 dB live mix headroom deliberately reduces maximum output level; no count-dependent gain adjustment.

@@ -12,4 +12,5 @@
 - [x] Implement sample-continuous live audio and render-acknowledged release reservation.
 - [ ] Verify current-head CI and real-device rapid-tap audio, polyphony, latency, route transitions and background/foreground behavior.
 - [x] Capture physical chord vibration regression and specify linear polyphonic mix tests.
-- [ ] Implement fixed-headroom, precomputed oscillator mix and verify both rates.
+- [x] Implement fixed-headroom precomputed oscillator mix, actual-output-rate setup and source mixer tests.
+- [ ] Verify fresh CI and physical chord/retrigger acceptance.
