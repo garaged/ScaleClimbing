@@ -19,3 +19,5 @@
 - [ ] Verify graph test CI and collect physical diagnostic results before further sound-design changes.
 - [x] Reproduce owner's exact offline graph error numerically as a fixed -3 dB gain; constrain reference comparison to unity or sqrt(0.5) with unchanged residual tolerance.
 - [ ] Verify revised graph test on CI and owner's Mac.
+- [x] Record owner-approved direction for natural generated piano sound; specify tone, decay and spectral tests.
+- [ ] Implement piano profile and validate current-head CI and listening acceptance.
