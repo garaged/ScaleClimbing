@@ -3,6 +3,7 @@ import SwiftUI
 
 public struct ScaleClimbingRootView: View {
     @StateObject private var viewModel: HomeViewModel
+    @Environment(\.scenePhase) private var scenePhase
     private let onPlayChord: ([PitchClass]) -> Void
     private let onPlayPitch: (Pitch) -> Void
     private let onPlayInterval: ([Pitch]) -> Void
@@ -19,6 +20,7 @@ public struct ScaleClimbingRootView: View {
     private let onGuitarNoteOff: (Int) -> Void
     private let onGuitarPrepare: ([Pitch]) -> Void
     private let onGuitarAudition: (Pitch) -> Void
+    private let onPianoAudition: (Pitch) -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
@@ -37,17 +39,18 @@ public struct ScaleClimbingRootView: View {
         onGuitarNoteOn: @escaping (Int, Pitch) -> Void = { _, _ in },
         onGuitarNoteOff: @escaping (Int) -> Void = { _ in },
         onGuitarPrepare: @escaping ([Pitch]) -> Void = { _ in },
-        onGuitarAudition: @escaping (Pitch) -> Void = { _ in }
+        onGuitarAudition: @escaping (Pitch) -> Void = { _ in },
+        onPianoAudition: ((Pitch) -> Void)? = nil
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
-        self.onPlayChord = onPlayChord
-        self.onPlayPitch = onPlayPitch
-        self.onPlayInterval = onPlayInterval
-        self.onPlayVoicing = onPlayVoicing
-        self.onPlayScale = onPlayScale
-        self.onPlayProgression = onPlayProgression
-        self.onPlayRhythm = onPlayRhythm
-        self.onPlayTimbre = onPlayTimbre
+        self.onPlayChord = { value in onLiveAllNotesOff(); onPlayChord(value) }
+        self.onPlayPitch = { value in onLiveAllNotesOff(); onPlayPitch(value) }
+        self.onPlayInterval = { value in onLiveAllNotesOff(); onPlayInterval(value) }
+        self.onPlayVoicing = { value in onLiveAllNotesOff(); onPlayVoicing(value) }
+        self.onPlayScale = { value in onLiveAllNotesOff(); onPlayScale(value) }
+        self.onPlayProgression = { value in onLiveAllNotesOff(); onPlayProgression(value) }
+        self.onPlayRhythm = { value in onLiveAllNotesOff(); onPlayRhythm(value) }
+        self.onPlayTimbre = { value in onLiveAllNotesOff(); onPlayTimbre(value) }
         self.onLiveNoteOn = onLiveNoteOn
         self.onLiveNoteOff = onLiveNoteOff
         self.onLiveAllNotesOff = onLiveAllNotesOff
@@ -56,6 +59,7 @@ public struct ScaleClimbingRootView: View {
         self.onGuitarNoteOff = onGuitarNoteOff
         self.onGuitarPrepare = onGuitarPrepare
         self.onGuitarAudition = onGuitarAudition
+        self.onPianoAudition = onPianoAudition ?? onPlayPitch
     }
 
     public var body: some View {
@@ -63,6 +67,12 @@ public struct ScaleClimbingRootView: View {
             HomeView(viewModel: viewModel)
                 .navigationDestination(for: AppRoute.self) { route in
                     destination(for: route)
+                        .onAppear {
+                            if [.musicAtlas, .scaleNetwork, .guitarTriads, .fretboardFoundations, .noteHunter, .chordForge, .voicingLab, .chordAtlas, .scaleExplorer].contains(route) {
+                                onLivePrepare([Pitch(.c, octave: 4)])
+                            }
+                        }
+                        .onDisappear { onLiveAllNotesOff() }
                 }
                 .toolbar {
                     ToolbarItem(placement: .automatic) {
@@ -83,6 +93,7 @@ public struct ScaleClimbingRootView: View {
                     }
                 }
         }
+        .onChange(of: scenePhase) { _, phase in if phase != .active { onLiveAllNotesOff() } }
     }
 
     @ViewBuilder
@@ -94,34 +105,34 @@ public struct ScaleClimbingRootView: View {
                 onNoteOff: onLiveNoteOff,
                 onAllNotesOff: onLiveAllNotesOff,
                 onPrepare: onLivePrepare,
-                onAccessibleAudition: onPlayPitch
+                onAccessibleAudition: onPianoAudition
             )
         case .freeFretboard:
             FreeFretboardGameView(onNoteOn: onGuitarNoteOn, onNoteOff: onGuitarNoteOff,
                 onAllNotesOff: onLiveAllNotesOff, onPrepare: onGuitarPrepare, onAudition: onGuitarAudition)
         case .musicAtlas:
-            MusicAtlasGameView(onPiano: onPlayPitch, onGuitar: onGuitarAudition, onSequence: onPlayScale, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
+            MusicAtlasGameView(onPiano: onPianoAudition, onGuitar: onGuitarAudition, onSequence: onPlayScale, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
         case .scaleNetwork:
             ScaleNetworkGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
         case .guitarTriads:
             GuitarTriadsGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
         case .fretboardFoundations:
-            FretboardFoundationsGameView(onGuitarAudition: onGuitarAudition, onPianoAudition: onPlayPitch,
-                onStopAudio: onLiveAllNotesOff)
+            FretboardFoundationsGameView(onGuitarAudition: onGuitarAudition, onPianoAudition: onPianoAudition,
+                onPianoReference: onPlayPitch, onStopAudio: onLiveAllNotesOff)
         case .noteHunter:
-            NoteHunterGameView(onPlayPitch: onPlayPitch)
+            NoteHunterGameView(onPlayPitch: onPianoAudition)
         case .chordForge:
-            ChordForgeGameView(onPlayChord: onPlayChord, onPlayPitch: onPlayPitch)
+            ChordForgeGameView(onPlayChord: onPlayChord, onPlayPitch: onPianoAudition)
         case .earTraining:
             EarTrainingGameView(onPlayChord: onPlayChord)
         case .intervalTrail:
             IntervalTrailGameView(onPlayInterval: onPlayInterval)
         case .voicingLab:
-            VoicingLabGameView(onPlayVoicing: onPlayVoicing)
+            VoicingLabGameView(onPlayVoicing: onPlayVoicing, onPlayPitch: onPianoAudition)
         case .chordAtlas:
-            ChordAtlasGameView(onPlayVoicing: onPlayVoicing, onPlayPitch: onPlayPitch)
+            ChordAtlasGameView(onPlayVoicing: onPlayVoicing, onPlayPitch: onPianoAudition)
         case .scaleExplorer:
-            ScaleExplorerGameView(onPlayScale: onPlayScale)
+            ScaleExplorerGameView(onPlayScale: onPlayScale, onPlayPitch: onPianoAudition)
         case .harmonyPath:
             HarmonyPathGameView(onPlayProgression: onPlayProgression)
         case .rhythmTrail:

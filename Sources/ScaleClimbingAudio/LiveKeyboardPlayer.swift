@@ -7,12 +7,15 @@ import Synchronization
 /// release ramps complete; no current note is abruptly stolen by a new press.
 enum LiveInstrumentVoice: Hashable, Sendable {
     case piano(Int)
+    case pianoAudition
     case guitarString(Int)
     case guitarAudition
 
     var isGuitar: Bool {
-        if case .piano = self { return false }
-        return true
+        switch self {
+        case .piano, .pianoAudition: return false
+        case .guitarString, .guitarAudition: return true
+        }
     }
 }
 
@@ -143,9 +146,14 @@ public final class LiveKeyboardPlayer {
         guard (1...6).contains(string) else { return }
         worker.noteOff(voice: .guitarString(string))
     }
+    public func auditionPiano(_ pitch: Pitch) {
+        guard (-1...9).contains(pitch.octave), (0...127).contains(pitch.midiNumber) else { return }
+        worker.noteOn(pitch, voice: .pianoAudition, autoReleaseMilliseconds: 450)
+    }
+
     public func auditionGuitar(_ pitch: Pitch) {
         guard (-1...9).contains(pitch.octave), (0...127).contains(pitch.midiNumber) else { return }
-        worker.noteOn(pitch, voice: .guitarAudition, autoRelease: true)
+        worker.noteOn(pitch, voice: .guitarAudition, autoReleaseMilliseconds: 2000)
     }
 }
 
@@ -260,20 +268,20 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
         noteOn(pitch, voice: .piano(pitch.midiNumber))
     }
 
-    func noteOn(_ pitch: Pitch, voice: LiveInstrumentVoice, autoRelease: Bool = false) {
+    func noteOn(_ pitch: Pitch, voice: LiveInstrumentVoice, autoReleaseMilliseconds: Int? = nil) {
         let midi = pitch.midiNumber
         queue.async { [self] in
-            if autoRelease { release(voice: voice, fast: true) }
+            if autoReleaseMilliseconds != nil { release(voice: voice, fast: true) }
             guard ensureEngine() else { return }
             reapReleasedSlots()
             guard let index = registry.noteOn(voice: voice) else { return }
             lastMIDIs[index] = midi
             lastGuitar[index] = voice.isGuitar
             let generation = publish(index: index, gate: true)
-            if autoRelease {
-                queue.asyncAfter(deadline: .now() + .milliseconds(2000)) { [self] in
+            if let milliseconds = autoReleaseMilliseconds {
+                queue.asyncAfter(deadline: .now() + .milliseconds(milliseconds)) { [self] in
                     guard generations[index] == generation else { return }
-                    release(voice: voice, fast: true)
+                    release(voice: voice, fast: voice.isGuitar)
                 }
             }
         }
