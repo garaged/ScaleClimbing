@@ -99,14 +99,28 @@ private func harmonicAmplitude(_ samples: ArraySlice<Float>, frequency: Double, 
 }
 
 @Test func pianoUpperPartialsStayBelowNyquist() {
-    // At 8 kHz MIDI 108 has a fundamental near 2093 Hz; only the
-    // fundamental is below Nyquist. Check that the second does not alias.
+    // C7 (MIDI 96) is about 2093 Hz. At 8 kHz only its fundamental
+    // lies below the 4000 Hz Nyquist limit.
     let rate = 8_000.0
-    let samples = pianoSamples(midi: 108, rate: rate, duration: 0.3)
+    let midi = 96
+    let samples = pianoSamples(midi: midi, rate: rate, duration: 0.3)
     let region = samples[400..<2000]
-    let f = 440 * pow(2, Double(108 - 69) / 12)
+    let f = 440 * pow(2, Double(midi - 69) / 12)
+    #expect(f < rate / 2)
+    #expect(2 * f > rate / 2)
     let fundamental = harmonicAmplitude(region, frequency: f, rate: rate)
     let foldedSecond = abs(2 * f - rate)
     #expect(fundamental > 0.01)
     #expect(harmonicAmplitude(region, frequency: foldedSecond, rate: rate) < fundamental * 0.05)
+}
+
+@Test func pianoFundamentalAboveNyquistIsSilent() {
+    // C8 (MIDI 108) is about 4186 Hz and cannot be represented at 8 kHz.
+    let rate = 8_000.0
+    let midi = 108
+    let f = 440 * pow(2, Double(midi - 69) / 12)
+    #expect(f > rate / 2)
+    let samples = pianoSamples(midi: midi, rate: rate, duration: 0.3)
+    #expect(samples.count == 2400)
+    #expect(samples.allSatisfy { $0 == 0 })
 }
