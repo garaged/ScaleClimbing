@@ -755,6 +755,61 @@ final class EarTrainingUITests: XCTestCase {
     }
 
     @MainActor
+    func testFreeInstrumentSlidesDoNotNavigateBack() {
+        let app = XCUIApplication()
+        let device = XCUIDevice.shared
+        device.orientation = .portrait
+        defer { app.terminate(); device.orientation = .portrait }
+        app.launch()
+        let back = app.buttons["playground.back"]
+
+        for guitar in [false, true] {
+            device.orientation = .portrait
+            openRoute(in: app, identifier: guitar ? "home.route.freeFretboard" : "home.route.freeKeyboard")
+            let range = app.staticTexts[guitar ? "fretboard.range" : "playground.range"]
+            XCTAssertTrue(range.waitForExistence(timeout: 10))
+            XCTAssertTrue(back.waitForExistence(timeout: 10))
+
+            for orientation: UIDeviceOrientation in [.portrait, .landscapeLeft] {
+                device.orientation = orientation
+                let rotated = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                    orientation == .portrait ? app.frame.height > app.frame.width : app.frame.width > app.frame.height
+                }, object: nil)
+                XCTAssertEqual(XCTWaiter.wait(for: [rotated], timeout: 10), .completed)
+
+                let predicate = guitar
+                    ? NSPredicate(format: "identifier BEGINSWITH %@", "fretboard.position.3.")
+                    : NSPredicate(format: "identifier BEGINSWITH %@ AND label MATCHES %@", "playground.key.", "[A-G] in octave [2-6]")
+                let positions = app.buttons.matching(predicate).allElementsBoundByIndex
+                    .filter { $0.isHittable }.sorted { $0.frame.midX < $1.frame.midX }
+                guard positions.count >= 3, let first = positions.first, let last = positions.last else {
+                    XCTFail("Playable instrument positions unavailable")
+                    return
+                }
+                let middle = positions[positions.count / 2]
+                let y: CGFloat = guitar ? 0.5 : 0.85
+                let start = first.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: y))
+                let mid = middle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: y))
+                let end = last.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: y))
+                start.press(forDuration: 0.10, thenDragTo: end)
+                XCTAssertTrue(range.isHittable, "Leading-key slide must not navigate")
+                mid.press(forDuration: 0.10, thenDragTo: end)
+                XCTAssertTrue(range.isHittable, "Interior rightward slide must not navigate")
+                end.press(forDuration: 0.10, thenDragTo: start)
+                XCTAssertTrue(range.isHittable, "Reverse slide must not navigate")
+                let edgeY = (first.frame.minY + first.frame.height * y - app.frame.minY) / app.frame.height
+                let edge = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: edgeY))
+                edge.press(forDuration: 0.10, thenDragTo: end)
+                XCTAssertTrue(range.isHittable, "Screen-edge drag must not dismiss workspace")
+            }
+            XCTAssertTrue(back.isHittable)
+            back.tap()
+            let closed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in !back.exists }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [closed], timeout: 10), .completed)
+        }
+    }
+
+    @MainActor
     func testPlaygroundLandscapeKeepsControlsTogetherAndPlayableCanvas() {
         let device = XCUIDevice.shared
         let app = XCUIApplication()

@@ -37,3 +37,5 @@
 - [x] Compare cross-route changes against musical-release baseline; specify stronger short-tap energy and scoped preview cleanup regressions.
 - [x] Implement scoped preview cleanup and smoothstep musical release; strengthen RMS and voice ownership regressions.
 - [ ] Verify current-head CI and physical free-instrument decay and cross-route playback acceptance.
+- [x] Specify gesture isolation and add cross-orientation navigation regression test source.
+- [ ] Implement isolated free-instrument presentation; verify current-head CI and physical glissando acceptance.
