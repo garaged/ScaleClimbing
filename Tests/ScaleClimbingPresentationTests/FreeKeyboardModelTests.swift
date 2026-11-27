@@ -55,7 +55,8 @@ import Testing
         var visited = Set<PianoKeyboardModel>()
         var reached = Set<Int>()
         for _ in 0..<6 {
-            #expect(visited.insert(range.model).inserted)
+            let inserted = visited.insert(range.model).inserted
+            #expect(inserted)
             reached.formUnion(range.model.keys.map(\.id))
             guard let next = range.higherOctave else { break }
             range = FreeKeyboardRange(startingOctave: next, surfaceWidth: width)
@@ -63,12 +64,13 @@ import Testing
         }
         #expect(range.model.keys.last?.pitch == Pitch(.b, octave: 6))
         #expect(range.higherOctave == nil)
-        while let lower = range.lowerOctave {
+        for _ in 0..<5 {
+            guard let lower = range.lowerOctave else { break }
             range = FreeKeyboardRange(startingOctave: lower, surfaceWidth: width)
         }
+        #expect(range.lowerOctave == nil)
         #expect(range.model.keys.first?.pitch == Pitch(.c, octave: 2))
-        // At least seven natural keys are kept on supported phone widths >= 336.
-        if width >= 336 { #expect(reached == Set(36...95)) }
+        #expect(reached == Set(36...95))
     }
 }
 

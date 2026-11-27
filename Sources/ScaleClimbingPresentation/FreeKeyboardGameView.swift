@@ -33,16 +33,15 @@ public struct FreeKeyboardGameView: View {
         GeometryReader { proxy in
             let width = Double(proxy.size.width)
             let layout = InstrumentPlaygroundLayout(width: width, height: Double(proxy.size.height))
-            let octaves = FreeKeyboardRange.octaveCount(forWidth: width)
-            let effectiveOctave = FreeKeyboardRange.clampedStartingOctave(startingOctave, visibleOctaves: octaves)
-            let model = FreeKeyboardRange.keyboard(startingOctave: effectiveOctave, viewportWidth: width)
+            let range = FreeKeyboardRange(startingOctave: startingOctave, surfaceWidth: width - 24)
+            let model = range.model
             VStack(spacing: layout.showsHelp ? 8 : 4) {
                 PlaygroundControlStrip(showNoteNames: $showNoteNames, identifier: "playground.noteNames") {
-                    octaveControls(visibleOctaves: octaves, effectiveOctave: effectiveOctave)
+                    octaveControls(range)
                 }
                 GeometryReader { canvas in
                     let height = layout.keyboardHeight(surfaceWidth: Double(canvas.size.width),
-                        availableHeight: Double(canvas.size.height), octaves: octaves)
+                        availableHeight: Double(canvas.size.height), naturalKeyCount: range.naturalKeyCount)
                     #if os(iOS)
                     FreeKeyboardTouchSurface(model: model, showNoteNames: showNoteNames,
                         isActive: scenePhase == .active, onNoteEvent: handleNoteEvent,
@@ -89,32 +88,32 @@ public struct FreeKeyboardGameView: View {
         }
     }
 
-    private func octaveControls(visibleOctaves: Int, effectiveOctave: Int) -> some View {
+    private func octaveControls(_ range: FreeKeyboardRange) -> some View {
         HStack(spacing: 4) {
             Button {
-                startingOctave = max(2, effectiveOctave - 1)
+                if let lower = range.lowerOctave { startingOctave = lower }
             } label: {
                 Image(systemName: "minus.circle")
                     .font(.title3)
                     .frame(minWidth: 44, minHeight: 44)
             }
-            .disabled(effectiveOctave <= 2)
+            .disabled(range.lowerOctave == nil)
             .accessibilityLabel(AppCopy.text("Lower octave"))
             .accessibilityIdentifier("playground.lower")
 
-            Text("C\(effectiveOctave)–B\(effectiveOctave + visibleOctaves - 1)")
+            Text(range.rangeLabel)
                 .font(.subheadline.monospacedDigit().weight(.semibold))
                 .lineLimit(1).minimumScaleFactor(0.65)
                 .accessibilityIdentifier("playground.range")
 
             Button {
-                startingOctave = min(7 - visibleOctaves, effectiveOctave + 1)
+                if let higher = range.higherOctave { startingOctave = higher }
             } label: {
                 Image(systemName: "plus.circle")
                     .font(.title3)
                     .frame(minWidth: 44, minHeight: 44)
             }
-            .disabled(effectiveOctave + visibleOctaves - 1 >= 6)
+            .disabled(range.higherOctave == nil)
             .accessibilityLabel(AppCopy.text("Higher octave"))
             .accessibilityIdentifier("playground.higher")
         }

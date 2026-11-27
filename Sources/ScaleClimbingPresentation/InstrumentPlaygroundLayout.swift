@@ -12,10 +12,10 @@ public struct InstrumentPlaygroundLayout: Equatable, Sendable {
         fillsAvailableHeight = width > height || height <= 420
     }
 
-    public func keyboardHeight(surfaceWidth: Double, availableHeight: Double, octaves: Int) -> Double {
+    public func keyboardHeight(surfaceWidth: Double, availableHeight: Double, naturalKeyCount: Int) -> Double {
         let available = Self.nonnegative(availableHeight)
         if fillsAvailableHeight { return available }
-        let naturalWidth = Self.nonnegative(surfaceWidth) / Double(max(1, min(3, octaves)) * 7)
+        let naturalWidth = Self.nonnegative(surfaceWidth) / Double(max(1, naturalKeyCount))
         return min(available, naturalWidth * 4.6)
     }
 
