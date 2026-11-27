@@ -18,12 +18,15 @@ enum LiveInstrumentVoice: Hashable, Sendable {
 
 struct LiveKeyboardVoiceRegistry {
     let maxVoices: Int
+    let maxActiveVoices: Int
     private var activeByVoice: [LiveInstrumentVoice: Int] = [:]
     private var releasing: Set<Int> = []
 
-    init(maxVoices: Int) {
-        precondition(maxVoices > 0)
+    init(maxVoices: Int, maxActiveVoices: Int? = nil) {
+        let activeLimit = maxActiveVoices ?? maxVoices
+        precondition(maxVoices > 0 && activeLimit > 0 && activeLimit <= maxVoices)
         self.maxVoices = maxVoices
+        self.maxActiveVoices = activeLimit
     }
 
     var activeNoteCount: Int { activeByVoice.count }
@@ -32,7 +35,7 @@ struct LiveKeyboardVoiceRegistry {
     mutating func noteOn(midiNumber: Int) -> Int? { noteOn(voice: .piano(midiNumber)) }
 
     mutating func noteOn(voice: LiveInstrumentVoice) -> Int? {
-        guard activeByVoice[voice] == nil else { return nil }
+        guard activeByVoice[voice] == nil, activeByVoice.count < maxActiveVoices else { return nil }
         let occupied = Set(activeByVoice.values).union(releasing)
         guard let available = (0..<maxVoices).first(where: { !occupied.contains($0) }) else {
             return nil
@@ -186,8 +189,11 @@ private final class LiveRenderSlot: @unchecked Sendable {
 
 /// The exact mixer used by the source callback and offline regression tests.
 final class LiveRenderMixer: @unchecked Sendable {
-    // Fixed -3.74 dB headroom; even ten full-level piano voices cannot exceed
-    // 0.585. No count-dependent normalization or limiter-induced modulation.
+    static let heldVoiceLimit = 10
+    static let renderVoiceLimit = 16
+    // Fixed -3.74 dB mix gain. Sixteen coherent full-level voices are
+    // bounded by 0.936 (piano/reference) or 0.92664 (guitar).
+    // No count-dependent normalization or limiter-induced modulation.
     static let outputGain: Float = 0.65
     private let slots: [LiveRenderSlot]
 
@@ -232,11 +238,12 @@ final class LiveRenderMixer: @unchecked Sendable {
 /// Engine and allocator are confined to the control queue. The AVAudioSourceNode
 /// owns a fixed set of render slots, shared only through atomic command words.
 private final class LiveKeyboardAudioWorker: @unchecked Sendable {
-    private static let voiceLimit = 10
+    private static let voiceLimit = LiveRenderMixer.renderVoiceLimit
     private let queue = DispatchQueue(label: "org.garaged.ScaleClimbing.live-keyboard.audio", qos: .userInitiated)
     private var mixer: LiveRenderMixer?
     private var engine: AVAudioEngine?
-    private var registry = LiveKeyboardVoiceRegistry(maxVoices: LiveKeyboardAudioWorker.voiceLimit)
+    private var registry = LiveKeyboardVoiceRegistry(maxVoices: LiveKeyboardAudioWorker.voiceLimit,
+        maxActiveVoices: LiveRenderMixer.heldVoiceLimit)
     private var generations = Array(repeating: UInt64.zero, count: LiveKeyboardAudioWorker.voiceLimit)
     private var lastMIDIs = Array(repeating: 0, count: LiveKeyboardAudioWorker.voiceLimit)
     private var lastGuitar = Array(repeating: false, count: LiveKeyboardAudioWorker.voiceLimit)
@@ -256,7 +263,7 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
     func noteOn(_ pitch: Pitch, voice: LiveInstrumentVoice, autoRelease: Bool = false) {
         let midi = pitch.midiNumber
         queue.async { [self] in
-            if autoRelease { release(voice: voice) }
+            if autoRelease { release(voice: voice, fast: true) }
             guard ensureEngine() else { return }
             reapReleasedSlots()
             guard let index = registry.noteOn(voice: voice) else { return }
@@ -266,7 +273,7 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
             if autoRelease {
                 queue.asyncAfter(deadline: .now() + .milliseconds(2000)) { [self] in
                     guard generations[index] == generation else { return }
-                    release(voice: voice)
+                    release(voice: voice, fast: true)
                 }
             }
         }
@@ -281,25 +288,30 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
         queue.async { [self] in release(voice: voice) }
     }
 
-    private func release(voice: LiveInstrumentVoice) {
+    private func release(voice: LiveInstrumentVoice, fast: Bool = false) {
         guard let index = registry.noteOff(voice: voice) else { return }
-        _ = publish(index: index, gate: false)
+        _ = publish(index: index, gate: false, fastRelease: fast)
         reapReleasedSlots()
     }
 
     func allNotesOff() {
         queue.async { [self] in
-            for index in registry.releaseAll() { _ = publish(index: index, gate: false) }
+            _ = registry.releaseAll()
+            // Shorten any already-ringing tails as well as held notes.
+            reapReleasedSlots()
+            for index in registry.releasingIndices {
+                _ = publish(index: index, gate: false, fastRelease: true)
+            }
             reapReleasedSlots()
         }
     }
 
     @discardableResult
-    private func publish(index: Int, gate: Bool) -> UInt64 {
+    private func publish(index: Int, gate: Bool, fastRelease: Bool = false) -> UInt64 {
         let generation = (generations[index] + 1) & LiveVoiceCommand.generationMask
         generations[index] = generation == 0 ? 1 : generation
         mixer?.publish(index: index, command: LiveVoiceCommand(generation: generations[index], midi: lastMIDIs[index],
-            guitar: lastGuitar[index], gate: gate, pianoLike: !lastGuitar[index]))
+            guitar: lastGuitar[index], gate: gate, pianoLike: !lastGuitar[index], fastRelease: fastRelease))
         return generations[index]
     }
 

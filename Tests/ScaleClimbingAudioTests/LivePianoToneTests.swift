@@ -65,7 +65,7 @@ private func harmonicAmplitude(_ samples: ArraySlice<Float>, frequency: Double, 
     voice.apply(LiveVoiceCommand(generation: 4, midi: 60, guitar: false, gate: false, pianoLike: true))
     let after = voice.nextSample()
     #expect(abs(before - after) < 0.012)
-    for _ in 0..<LiveRenderVoice.releaseFrames { _ = voice.nextSample() }
+    for _ in 0..<LiveRenderVoice.releaseFrameCount(sampleRate: 44_100, guitar: false, pianoLike: true) { _ = voice.nextSample() }
     #expect(voice.isSilent)
     let silent = voice.nextSample()
     #expect(silent == 0)

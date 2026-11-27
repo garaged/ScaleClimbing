@@ -144,7 +144,7 @@ import Testing
     #expect(peak > 0.01)
     #expect(peak <= 0.1)
     voice.apply(LiveVoiceCommand(generation: 2, midi: 64, guitar: true, gate: false))
-    for _ in 0..<LiveRenderVoice.releaseFrames {
+    for _ in 0..<LiveRenderVoice.releaseFrameCount(sampleRate: 44_100, guitar: true, pianoLike: false) {
         let sample = voice.nextSample()
         #expect(sample.isFinite)
     }
@@ -254,9 +254,11 @@ import Testing
     for (index, midi) in [64, 59, 55, 50, 45, 40].enumerated() {
         mixer.publish(index: index, command: LiveVoiceCommand(generation: 2, midi: midi, guitar: true, gate: false))
     }
+    let releaseFrames = LiveRenderVoice.releaseFrameCount(sampleRate: 48_000, guitar: true, pianoLike: false)
+    output = Array(repeating: Float.zero, count: releaseFrames + 128)
     output.withUnsafeMutableBufferPointer {
         _ = mixer.render(into: $0.baseAddress!, frameCount: $0.count)
     }
-    #expect(output.dropFirst(1440).allSatisfy { $0 == 0 })
+    #expect(output.dropFirst(releaseFrames).allSatisfy { $0 == 0 })
     #expect((0..<6).allSatisfy { mixer.didFinish(index: $0, generation: 2) })
 }

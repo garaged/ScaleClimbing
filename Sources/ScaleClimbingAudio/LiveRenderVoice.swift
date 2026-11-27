@@ -1,33 +1,36 @@
 import Foundation
 
 /// Compact atomic control message. Zero is the initial idle state. The low
-/// ten bits encode pitch, instrument profile and gate; the remainder is the slot epoch.
+/// eleven bits encode pitch, instrument profile, gate and cleanup; the rest is the slot epoch.
 struct LiveVoiceCommand: Equatable, Sendable {
-    static let generationMask = UInt64.max >> 10
+    static let generationMask = UInt64.max >> 11
     let generation: UInt64
     let midi: Int
     let guitar: Bool
     let gate: Bool
     let pianoLike: Bool
+    let fastRelease: Bool
 
-    init(generation: UInt64, midi: Int, guitar: Bool, gate: Bool, pianoLike: Bool = false) {
+    init(generation: UInt64, midi: Int, guitar: Bool, gate: Bool, pianoLike: Bool = false, fastRelease: Bool = false) {
         self.generation = generation & Self.generationMask
         self.midi = min(127, max(0, midi))
         self.guitar = guitar
         self.gate = gate
         self.pianoLike = pianoLike && !guitar
+        self.fastRelease = fastRelease && !gate
     }
 
     init(packed: UInt64) {
-        generation = packed >> 10
+        generation = packed >> 11
         midi = Int(packed & 127)
         guitar = packed & 128 != 0
         gate = packed & 256 != 0
         pianoLike = !guitar && packed & 512 != 0
+        fastRelease = !gate && packed & 1024 != 0
     }
 
     var packed: UInt64 {
-        (generation << 10) | UInt64(midi) | (guitar ? 128 : 0) | (gate ? 256 : 0) | (pianoLike ? 512 : 0)
+        (generation << 11) | UInt64(midi) | (guitar ? 128 : 0) | (gate ? 256 : 0) | (pianoLike ? 512 : 0) | (fastRelease ? 1024 : 0)
     }
 }
 
@@ -110,7 +113,11 @@ struct LivePianoProfile: Sendable {
 struct LiveRenderVoice {
     static let sampleRate = 44_100.0
     static let attackFrames = 441 // 10 ms
-    static let releaseFrames = 1323 // 30 ms
+    static let releaseFrames = 1323 // reference and cleanup, 30 ms
+    static func releaseFrameCount(sampleRate: Double, guitar: Bool, pianoLike: Bool, fastRelease: Bool = false) -> Int {
+        let duration = fastRelease ? 0.030 : (guitar ? 0.320 : (pianoLike ? 0.240 : 0.030))
+        return max(1, Int((sampleRate * duration).rounded()))
+    }
     static let tableSize = 4096
     // Constructed on the control queue before the engine starts. The extra
     // sample allows interpolation across the last table interval.
@@ -120,7 +127,9 @@ struct LiveRenderVoice {
     private let pianoProfiles: [LivePianoProfile]
     private let rate: Double
     private let attackSampleCount: Int
-    private let releaseSampleCount: Int
+    private let shortReleaseSampleCount: Int
+    private let pianoReleaseSampleCount: Int
+    private let guitarReleaseSampleCount: Int
     private let pluckAttackFrames: Int
     private let guitarDecayProfile: LiveNaturalDecayProfile
     private var naturalDecay = LiveNaturalDecayState()
@@ -134,7 +143,9 @@ struct LiveRenderVoice {
     private var step = 0.0
     private var age = 0
     private var releaseRemaining = 0
-    private var releaseStep: Float = 0
+    private var releaseStartGain: Float = 0
+    private var releaseTotal = 1
+    private var quadraticRelease = false
     // Fixed partial state; initialized outside the realtime callback.
     private let d1: Double
     private let d2: Double
@@ -153,7 +164,9 @@ struct LiveRenderVoice {
         }
         pianoProfiles = (0...127).map { LivePianoProfile(midi: $0, sampleRate: rate) }
         attackSampleCount = Int((rate * 0.010).rounded())
-        releaseSampleCount = Int((rate * 0.030).rounded())
+        shortReleaseSampleCount = Self.releaseFrameCount(sampleRate: rate, guitar: false, pianoLike: false)
+        pianoReleaseSampleCount = Self.releaseFrameCount(sampleRate: rate, guitar: false, pianoLike: true)
+        guitarReleaseSampleCount = Self.releaseFrameCount(sampleRate: rate, guitar: true, pianoLike: false)
         pluckAttackFrames = Int((rate * 0.006).rounded())
         guitarDecayProfile = .guitar(sampleRate: rate)
         d1 = 1; d2 = exp(-0.9 / rate); d3 = exp(-1.8 / rate)
@@ -182,7 +195,9 @@ struct LiveRenderVoice {
             age = 0
             gain = 0
             releaseRemaining = 0
-            releaseStep = 0
+            releaseStartGain = 0
+            releaseTotal = 1
+            quadraticRelease = false
             step = phaseSteps[command.midi]
             let frequency = step * rate / Double(Self.tableSize)
             let nyquist = rate / 2
@@ -203,9 +218,16 @@ struct LiveRenderVoice {
                 if guitar { naturalDecay.reset(guitarDecayProfile) }
             }
         } else {
+            let wasHeld = gate
             gate = false
-            releaseRemaining = gain > 0 ? releaseSampleCount : 0
-            releaseStep = gain / Float(releaseSampleCount)
+            let frames = command.fastRelease ? shortReleaseSampleCount :
+                (guitar ? guitarReleaseSampleCount : (pianoLike ? pianoReleaseSampleCount : shortReleaseSampleCount))
+            // Duplicate off/cleanup commands never extend an existing fade.
+            guard gain > 0, wasHeld || releaseRemaining > frames else { return }
+            releaseRemaining = frames
+            releaseTotal = frames
+            releaseStartGain = gain
+            quadraticRelease = !command.fastRelease && (guitar || pianoLike)
         }
     }
 
@@ -260,7 +282,8 @@ struct LiveRenderVoice {
             gain = min(1, gain + 1 / Float(attackSampleCount))
         } else if releaseRemaining > 0 {
             releaseRemaining -= 1
-            gain = releaseRemaining == 0 ? 0 : max(0, gain - releaseStep)
+            let fraction = Float(releaseRemaining) / Float(releaseTotal)
+            gain = releaseStartGain * (quadraticRelease ? fraction * fraction : fraction)
         } else { gain = 0 }
         return sample
     }
