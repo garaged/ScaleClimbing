@@ -78,14 +78,16 @@ private func releaseRMS(_ samples: ArraySlice<Float>) -> Double {
         for _ in 0..<16 {
             for (string, midi) in [60, 64, 67, 72].enumerated() {
                 let id: LiveInstrumentVoice = guitar ? .guitarString(string + 1) : .piano(midi)
-                let index = try #require(registry.noteOn(voice: id))
+                let allocated = registry.noteOn(voice: id)
+                let index = try #require(allocated)
                 pitches[index] = midi
                 publish(index, gate: true)
             }
             render(2880)
             for (string, midi) in [60, 64, 67, 72].enumerated() {
                 let id: LiveInstrumentVoice = guitar ? .guitarString(string + 1) : .piano(midi)
-                let index = try #require(registry.noteOff(voice: id))
+                let released = registry.noteOff(voice: id)
+                let index = try #require(released)
                 publish(index, gate: false)
             }
             render(3120)
