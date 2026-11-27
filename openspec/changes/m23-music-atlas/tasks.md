@@ -25,3 +25,5 @@
 - [x] Record owner audio listening pass and specify partial-octave density regression.
 - [x] Implement density-driven range with partial octaves, natural endpoints, exact labels, bounded navigation and simulator key-width assertions.
 - [ ] Verify fresh CI and physical iPhone density/rotation acceptance; reconfirm previously accepted audio unchanged.
+- [x] Record owner approval for two-stage decay and write held-note/retrigger regression tests.
+- [ ] Implement and validate natural decay profiles on current-head CI and physical devices.
