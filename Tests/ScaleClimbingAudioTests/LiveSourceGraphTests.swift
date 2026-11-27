@@ -8,12 +8,13 @@ import Testing
 @Test func liveSourceGraphPreservesChordAndRelease() throws {
     for rate in [44_100.0, 48_000.0] {
         for pianoLike in [false, true] {
-            try verifyLiveSourceGraph(rate: rate, pianoLike: pianoLike)
+            try verifyLiveSourceGraph(rate: rate, pianoLike: pianoLike, guitar: false)
         }
+        try verifyLiveSourceGraph(rate: rate, pianoLike: false, guitar: true)
     }
 }
 
-private func verifyLiveSourceGraph(rate: Double, pianoLike: Bool) throws {
+private func verifyLiveSourceGraph(rate: Double, pianoLike: Bool, guitar: Bool) throws {
     let format = try #require(AVAudioFormat(standardFormatWithSampleRate: rate, channels: 1))
     let mixer = LiveRenderMixer(voiceLimit: 10, sampleRate: rate)
     let reference = LiveRenderMixer(voiceLimit: 10, sampleRate: rate)
@@ -28,7 +29,7 @@ private func verifyLiveSourceGraph(rate: Double, pianoLike: Bool) throws {
     let buffer = try #require(AVAudioPCMBuffer(pcmFormat: engine.manualRenderingFormat, frameCapacity: 512))
 
     for (index, midi) in [60, 64, 67, 72].enumerated() {
-        let command = LiveVoiceCommand(generation: 1, midi: midi, guitar: false, gate: true, pianoLike: pianoLike)
+        let command = LiveVoiceCommand(generation: 1, midi: midi, guitar: guitar, gate: true, pianoLike: pianoLike)
         mixer.publish(index: index, command: command)
         reference.publish(index: index, command: command)
     }
@@ -75,7 +76,7 @@ private func verifyLiveSourceGraph(rate: Double, pianoLike: Bool) throws {
     #expect(heldError < 0.0001, "Rate: \(rate), fixed graph gain: \(gain), held error: \(heldError)")
 
     for (index, midi) in [60, 64, 67, 72].enumerated() {
-        let command = LiveVoiceCommand(generation: 2, midi: midi, guitar: false, gate: false, pianoLike: pianoLike)
+        let command = LiveVoiceCommand(generation: 2, midi: midi, guitar: guitar, gate: false, pianoLike: pianoLike)
         mixer.publish(index: index, command: command)
         reference.publish(index: index, command: command)
     }

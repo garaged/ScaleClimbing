@@ -31,6 +31,53 @@ struct LiveVoiceCommand: Equatable, Sendable {
     }
 }
 
+/// Shared acoustic energy model. Coefficients are prepared before rendering;
+/// each note owns its own two exponentially decaying energy components.
+struct LiveNaturalDecayProfile: Sendable {
+    let fastWeight: Double
+    let fastMultiplier: Double
+    let tailMultiplier: Double
+
+    init(fastWeight: Double, fastRate: Double, tailRate: Double, sampleRate: Double) {
+        self.fastWeight = fastWeight
+        fastMultiplier = exp(-fastRate / sampleRate)
+        tailMultiplier = exp(-tailRate / sampleRate)
+    }
+
+    static func piano(midi: Int, sampleRate: Double) -> Self {
+        let register = min(2.0, max(0.35, 0.55 + 0.025 * Double(midi - 48))) / 0.55
+        return Self(fastWeight: 0.62, fastRate: 2.4 * register, tailRate: 0.4 * register, sampleRate: sampleRate)
+    }
+
+    static func guitar(sampleRate: Double) -> Self {
+        Self(fastWeight: 0.78, fastRate: 6.5, tailRate: 1.8, sampleRate: sampleRate)
+    }
+}
+
+struct LiveNaturalDecayState {
+    private var fast = 0.0
+    private var tail = 0.0
+    private var fastMultiplier = 1.0
+    private var tailMultiplier = 1.0
+
+    mutating func reset(_ profile: LiveNaturalDecayProfile) {
+        fast = profile.fastWeight
+        tail = 1 - profile.fastWeight
+        fastMultiplier = profile.fastMultiplier
+        tailMultiplier = profile.tailMultiplier
+    }
+
+    @inline(__always)
+    mutating func nextAmplitude() -> Double {
+        let amplitude = fast + tail
+        // At less than -240 dB relative amplitude, flushing to zero avoids
+        // subnormals without a perceptible cutoff; the gate is unaffected.
+        fast = fast > 1e-12 ? fast * fastMultiplier : 0
+        tail = tail > 1e-12 ? tail * tailMultiplier : 0
+        return amplitude
+    }
+}
+
 /// Original, band-limited additive piano profile. These coefficients are
 /// built before render starts. The four harmonic amplitudes sum to one,
 /// preserving the original per-voice peak budget. Higher harmonics decay
@@ -38,6 +85,7 @@ struct LiveVoiceCommand: Equatable, Sendable {
 struct LivePianoProfile: Sendable {
     let a1: Double, a2: Double, a3: Double, a4: Double
     let d1: Double, d2: Double, d3: Double, d4: Double
+    let decay: LiveNaturalDecayProfile
 
     init(midi: Int, sampleRate: Double) {
         let frequency = 440 * pow(2, Double(midi - 69) / 12)
@@ -46,11 +94,13 @@ struct LivePianoProfile: Sendable {
         a2 = 2 * frequency < nyquist ? 0.20 : 0
         a3 = 3 * frequency < nyquist ? 0.09 : 0
         a4 = 4 * frequency < nyquist ? 0.05 : 0
-        let decay = min(2.0, max(0.35, 0.55 + 0.025 * Double(midi - 48)))
-        d1 = exp(-decay / sampleRate)
-        d2 = exp(-(decay + 1.0) / sampleRate)
-        d3 = exp(-(decay + 2.0) / sampleRate)
-        d4 = exp(-(decay + 3.0) / sampleRate)
+        decay = .piano(midi: midi, sampleRate: sampleRate)
+        // The common energy envelope decays the fundamental. These factors
+        // preserve the faster loss of upper harmonics independently.
+        d1 = 1
+        d2 = exp(-1.0 / sampleRate)
+        d3 = exp(-2.0 / sampleRate)
+        d4 = exp(-3.0 / sampleRate)
     }
 }
 
@@ -72,8 +122,8 @@ struct LiveRenderVoice {
     private let attackSampleCount: Int
     private let releaseSampleCount: Int
     private let pluckAttackFrames: Int
-    private let pluckFrames: Int
-    private let pluckTailFrames: Int
+    private let guitarDecayProfile: LiveNaturalDecayProfile
+    private var naturalDecay = LiveNaturalDecayState()
     private(set) var generation: UInt64 = 0
     private(set) var gain: Float = 0
     private var gate = false
@@ -105,10 +155,9 @@ struct LiveRenderVoice {
         attackSampleCount = Int((rate * 0.010).rounded())
         releaseSampleCount = Int((rate * 0.030).rounded())
         pluckAttackFrames = Int((rate * 0.006).rounded())
-        pluckFrames = Int((rate * 2).rounded())
-        pluckTailFrames = Int((rate * 0.025).rounded())
-        d1 = exp(-3.5 / rate); d2 = exp(-4.4 / rate); d3 = exp(-5.3 / rate)
-        d4 = exp(-6.2 / rate); d5 = exp(-7.1 / rate); d6 = exp(-8.0 / rate)
+        guitarDecayProfile = .guitar(sampleRate: rate)
+        d1 = 1; d2 = exp(-0.9 / rate); d3 = exp(-1.8 / rate)
+        d4 = exp(-2.7 / rate); d5 = exp(-3.6 / rate); d6 = exp(-4.5 / rate)
     }
 
     var isSilent: Bool { !gate && gain == 0 }
@@ -146,9 +195,13 @@ struct LiveRenderVoice {
             if pianoLike {
                 let profile = pianoProfiles[command.midi]
                 pianoProfile = profile
+                naturalDecay.reset(profile.decay)
                 p1 = profile.a1; p2 = profile.a2; p3 = profile.a3; p4 = profile.a4
                 p5 = 0; p6 = 0
-            } else { pianoProfile = nil }
+            } else {
+                pianoProfile = nil
+                if guitar { naturalDecay.reset(guitarDecayProfile) }
+            }
         } else {
             gate = false
             releaseRemaining = gain > 0 ? releaseSampleCount : 0
@@ -161,9 +214,9 @@ struct LiveRenderVoice {
         guard !isSilent else { return 0 }
         let wave: Float
         if guitar {
-            if age < pluckFrames {
+            let amplitude = naturalDecay.nextAmplitude()
+            if amplitude > 0 {
                 let attack = min(1, Double(age) / Double(pluckAttackFrames))
-                let tail = min(1, Double(pluckFrames - 1 - age) / Double(pluckTailFrames))
                 let s = sine(at: phase)
                 let quarter = Double(Self.tableSize / 4)
                 let shifted = phase + quarter
@@ -175,10 +228,10 @@ struct LiveRenderVoice {
                 let s4 = 2 * c * s3 - s2
                 let s5 = 2 * c * s4 - s3
                 let s6 = 2 * c * s5 - s4
-                wave = Float(0.045 * attack * tail *
+                wave = Float(0.045 * attack * amplitude *
                     (p1*s + p2*s2 + p3*s3 + p4*s4 + p5*s5 + p6*s6))
                 p1 *= d1; p2 *= d2; p3 *= d3; p4 *= d4; p5 *= d5; p6 *= d6
-                age += 1
+                if age < pluckAttackFrames { age += 1 }
             } else { wave = 0 }
         } else if pianoLike, let profile = pianoProfile {
             let s = sine(at: phase)
@@ -187,7 +240,8 @@ struct LiveRenderVoice {
             let s2 = 2 * c * s
             let s3 = 2 * c * s2 - s
             let s4 = 2 * c * s3 - s2
-            wave = Float(0.09 * (p1*s + p2*s2 + p3*s3 + p4*s4))
+            let amplitude = naturalDecay.nextAmplitude()
+            wave = Float(0.09 * amplitude * (p1*s + p2*s2 + p3*s3 + p4*s4))
             // Flush effectively inaudible partials to zero to bound very
             // long held-note work and avoid subnormal floating-point values.
             p1 = p1 > 1e-12 ? p1 * profile.d1 : 0
