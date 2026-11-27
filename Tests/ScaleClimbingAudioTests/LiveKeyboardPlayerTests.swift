@@ -262,3 +262,18 @@ import Testing
     #expect(output.dropFirst(releaseFrames).allSatisfy { $0 == 0 })
     #expect((0..<6).allSatisfy { mixer.didFinish(index: $0, generation: 2) })
 }
+
+@Test func pianoAuditionHasIndependentIdentityAndPianoTimbre() {
+    #expect(!LiveInstrumentVoice.pianoAudition.isGuitar)
+    #expect(LiveInstrumentVoice.guitarAudition.isGuitar)
+    var registry = LiveKeyboardVoiceRegistry(maxVoices: 4)
+    let held = registry.noteOn(voice: .piano(60))
+    let preview = registry.noteOn(voice: .pianoAudition)
+    let guitar = registry.noteOn(voice: .guitarAudition)
+    #expect(held == 0)
+    #expect(preview == 1)
+    #expect(guitar == 2)
+    let released = registry.noteOff(voice: .pianoAudition)
+    #expect(released == 1)
+    #expect(registry.activeNoteCount == 2)
+}

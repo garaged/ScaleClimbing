@@ -729,6 +729,32 @@ final class EarTrainingUITests: XCTestCase {
     }
 
     @MainActor
+    func testMusicAtlasHeldPianoSelectionAndFretSelection() {
+        let app = XCUIApplication()
+        app.launch()
+        openRoute(in: app, identifier: "home.route.musicAtlas")
+        let focus = app.staticTexts["atlas.focus"]
+        XCTAssertTrue(focus.waitForExistence(timeout: 10))
+        let e = app.buttons["E in octave 4"]
+        if !e.isHittable { app.swipeUp() }
+        XCTAssertTrue(e.waitForExistence(timeout: 10))
+        e.press(forDuration: 0.6)
+        let changed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in focus.label.contains("E4") }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [changed], timeout: 5), .completed)
+        // XCUITest checks selection, not the audible onset. Physical listening
+        // remains required for the press-before-release timing.
+        let lower = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "atlas.position.")).firstMatch
+        for _ in 0..<3 {
+            if lower.isHittable { break }
+            app.swipeUp()
+        }
+        XCTAssertTrue(lower.exists)
+        XCTAssertTrue(lower.isHittable)
+        lower.press(forDuration: 0.6)
+        XCTAssertTrue(focus.exists)
+    }
+
+    @MainActor
     func testPlaygroundLandscapeKeepsControlsTogetherAndPlayableCanvas() {
         let device = XCUIDevice.shared
         let app = XCUIApplication()

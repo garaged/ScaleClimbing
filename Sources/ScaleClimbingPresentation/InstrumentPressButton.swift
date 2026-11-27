@@ -9,6 +9,12 @@ struct InstrumentPressButton<Label: View>: View {
     @Environment(\.isEnabled) private var isEnabled
     @State private var previewState = InstrumentPressPreviewState()
 
+    init(onPreview: (() -> Void)?, onSelect: @escaping () -> Void, @ViewBuilder label: @escaping () -> Label) {
+        self.onPreview = onPreview
+        self.onSelect = onSelect
+        self.label = label
+    }
+
     var body: some View {
         Button(action: activate) { label() }
             .buttonStyle(InstrumentPressStyle(onChange: pressChanged))

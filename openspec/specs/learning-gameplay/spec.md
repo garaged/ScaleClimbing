@@ -248,3 +248,16 @@ Free Keyboard and Free Fretboard SHALL retain the accepted held-note synthesis, 
 - **GIVEN** held notes and audible release tails
 - **WHEN** allNotesOff is requested on navigation or backgrounding
 - **THEN** all voices fade to silence within 30 ms of render-side cleanup and no released voice is reused until acknowledged silent.
+
+### Requirement: consistent audible instrument selection
+Playable note controls in Music Atlas and guided piano/guitar construction or position-selection activities SHALL audition the touched pitch on initial native button press, without waiting for finger lift. Selection/scoring SHALL still occur only on successful native button activation; scrolling or canceling a press SHALL NOT submit an answer. A successful tap SHALL audition at most once; keyboard/accessibility activation without a press SHALL audition and select once. Disabled positions SHALL remain silent and unselectable. Free instruments SHALL keep their existing multi-touch note-on/off behavior. Instrument previews SHALL use the accepted acoustic piano/guitar synthesis, with a bounded one-shot duration; explicit reference, chord, scale, interval, rhythm and timbre listening playback SHALL remain unchanged. Read-only diagrams SHALL remain noninteractive. Navigation and scene deactivation SHALL clean up live preview voices.
+
+#### Scenario: held note in Music Atlas
+- **GIVEN** a playable piano key or fret position
+- **WHEN** the user presses and holds it
+- **THEN** the note is audible before release, and a completed tap selects the position exactly once without replaying the onset.
+
+#### Scenario: canceled practice press
+- **GIVEN** an unlocked practice note control
+- **WHEN** a press is canceled by scrolling
+- **THEN** no answer is committed; a later press can audition normally.

@@ -15,7 +15,8 @@ import Testing
 @Test func canceledInstrumentPressDoesNotSuppressNextActivation() {
     var state = InstrumentPressPreviewState()
     state.began()
-    state.endIfCurrent(state.generation)
+    let token = state.generation
+    state.endIfCurrent(token)
     let needsPreview = state.activated()
     #expect(needsPreview)
 }
