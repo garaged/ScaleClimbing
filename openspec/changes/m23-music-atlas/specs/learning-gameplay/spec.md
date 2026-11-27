@@ -113,3 +113,16 @@ Live piano and guitar SHALL use a bounded two-stage natural amplitude decay (ini
 - **GIVEN** a naturally faded held voice
 - **WHEN** the finger lifts and presses again
 - **THEN** the release is continuous, the old slot is acknowledged only after release, and the new note starts with fresh attack and decay.
+
+### Requirement: expressive post-release instrument resonance
+Free Keyboard and Free Fretboard SHALL retain the accepted held-note synthesis, exact pitch and fixed mix gain while providing a longer smoothly damped tail on finger lift. Piano SHALL reach silence within 240 ms and guitar within 320 ms of render-side release, with a quadratic amplitude envelope starting at the current gate gain and continued natural acoustic decay. Reference tones and forced cleanup SHALL retain a short 30 ms linear release. No note shall restart, increase gain or lose phase on release. Repeated attacks may overlap their previous tails. The renderer SHALL have a bounded 16-slot pool (at most ten actively held voices), with releasing slots reserved until silence acknowledgement; all slots may be used for held or releasing voices subject to the active cap. The fixed 0.65 mix gain and maximum per-voice amplitude budgets SHALL remain unchanged, so even 16 coherent full-level voices remain below digital full scale. Forced cleanup SHALL shorten both held and already-releasing notes without restarting a shorter fade. Guitar audition remains bounded and uses short release. No dynamic normalization, effects, new settings, dependencies or permissions.
+
+#### Scenario: melodic taps at ordinary tempo
+- **GIVEN** a sequence of short taps on piano or guitar
+- **WHEN** the user lifts one finger and plays the next note
+- **THEN** the preceding note remains audible briefly and gradually fades, without delaying the next attack or changing another voice's amplitude.
+
+#### Scenario: navigating away during resonance
+- **GIVEN** held notes and audible release tails
+- **WHEN** allNotesOff is requested on navigation or backgrounding
+- **THEN** all voices fade to silence within 30 ms of render-side cleanup and no released voice is reused until acknowledged silent.

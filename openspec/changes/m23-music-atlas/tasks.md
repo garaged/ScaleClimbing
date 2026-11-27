@@ -28,3 +28,5 @@
 - [x] Record owner approval for two-stage decay and write held-note/retrigger regression tests.
 - [x] Implement shared precomputed two-stage decay profiles, remove fixed held-guitar cutoff, and extend production source graph regression to guitar.
 - [ ] Verify current-head CI and physical natural decay, retriggers, independent chords and layout acceptance.
+- [x] Record owner's accepted held-note sound and specify expressive release and overlap regressions.
+- [ ] Implement instrument-specific release, bounded tail capacity and cleanup; validate CI and physical acceptance.
