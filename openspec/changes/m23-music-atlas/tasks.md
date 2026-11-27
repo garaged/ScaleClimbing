@@ -20,4 +20,5 @@
 - [x] Reproduce owner's exact offline graph error numerically as a fixed -3 dB gain; constrain reference comparison to unity or sqrt(0.5) with unchanged residual tolerance.
 - [ ] Verify revised graph test on CI and owner's Mac.
 - [x] Record owner-approved direction for natural generated piano sound; specify tone, decay and spectral tests.
-- [ ] Implement piano profile and validate current-head CI and listening acceptance.
+- [x] Implement bounded additive piano profile on shared render path and extend offline graph tests.
+- [ ] Verify current-head CI and physical piano tone, chord, retrigger, and existing audio regression acceptance.

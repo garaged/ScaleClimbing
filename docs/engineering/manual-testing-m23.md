@@ -49,3 +49,14 @@ Ordinary interference between simultaneous pitches is not a defect. Persistent a
 ### Offline graph gain diagnostic
 
 Owner's Mac and CI reproduced identical held/release maximum differences (0.064122394 and 0.03760927). At 44.1 kHz the exact reference peaks are approximately 0.21892758 and 0.12840611; multiplying each by (1 - sqrt(0.5)) predicts 0.064122404 and 0.037609278 respectively. This strongly indicates fixed -3 dB graph gain, not a phase discontinuity. The integration test now accepts only unity or sqrt(0.5), selects the better of these two against all held samples, and enforces the same factor for release at the original 0.0001 absolute error bound. No per-buffer normalization, arbitrary gain fitting, delay alignment, or source sound changes. Confirm by re-running the integration test. Hardware vibration remains separately unverified.
+
+## Expressive piano tone acceptance
+
+The owner approved moving toward better sounding instruments. The pre-change graph and all four CI jobs passed at 5a03c3f76c25d39880ed26cfbcd37f4a364b29d5; the reported residual vibration has not been conclusively diagnosed. The new live piano profile uses original additive synthesis: exact fundamental, four bounded harmonic components, frequency-dependent anti-aliasing, gradual register-dependent decay and unchanged 10 ms attack / 30 ms release. The pure reference and guitar remain unchanged.
+
+- On a physical iPhone 17, play single notes in bass, middle and treble registers and hold for two seconds; listen for a warmer recognizable keyboard-like sound, a stable pitch, gentle decay and no artificial tremolo, metallic buzzing or electronic clicks.
+- Play C4/G4, C4/C5, C4/E4/G4 and a four- to six-note chord. Lift and re-add individual notes; other voices must decay independently, with no sudden gain change, stutter or cutoff. Repeat quickly on the same key.
+- Compare at comparable comfortable levels on speaker and headphones, if available; distinguish residual acoustic vibration from normal interval roughness. Report the former separately even if the new timbre is preferred.
+- Verify Free Fretboard, guided pitch/interval/chord exercises and Timbre Lab retain prior behavior. Check cold launch, rotation, scene transitions, iPad, landscape, and no stuck notes.
+- Run `swift test --filter ScaleClimbingAudioTests` to validate spectral profiles, register decay, anti-aliasing, independent six-voice piano mix and actual offline graph for both piano and reference tones.
+- This is a stylized generated piano, not a sampled acoustic grand; physical listening is required before accepting its sound. No new dependency, sample assets, recording permission, settings or persistence changes.
