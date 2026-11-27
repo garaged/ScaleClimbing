@@ -114,3 +114,13 @@ Owner reports free-instrument decay regression after cross-section audio changes
 - Repeat adjacent notes and four-note chords, and confirm no excessive overlap, click, buzzing, missed notes or altered pitch. Leave the free route with notes ringing; cleanup should remain prompt.
 - Repeat Music Atlas press-before-lift and guided reference playback. Confirm audition cleanup still works and no score is accidentally submitted.
 - Run `swift test --filter LiveMusicalReleaseTests` and `swift test --filter ScaleClimbingAudioTests`; current CI and physical playback still require verification.
+
+## Free-instrument gesture isolation
+
+Owner reports left-to-right slides on physical keyboard trigger interactive back navigation even from the middle of the instrument, in both orientations. UIKit's newer interactive content pop recognizer can start throughout navigation content, in addition to the older edge recognizer. Instead of mutating global UIKit recognizers, the iOS home cards now open both free instruments in a full-screen cover containing a root-only navigation stack with a localized, accessible Back button. Interactive dismissal is disabled. No musical gesture, rendering, decay, touch mapping or scoring changes; non-iOS navigation and other iOS practice navigation are unchanged.
+
+- On the physical iPhone, slide across the lower portion of white keys from first to last, and from the middle to the right, at slow and normal glissando speed. Reverse direction; slide along black keys. No previous-screen movement, interruption, or accidental exit.
+- Repeat in portrait and both landscape directions, including near the leading edge. Repeat horizontal/diagonal slides on Free Fretboard. System-level gestures are not overridden.
+- Play single notes, multi-touch chords, rapid taps and held-note releases; verify unchanged sound and no stuck notes after slides. Tap Back while notes are ringing; home returns and audio fades promptly. Reopen each workspace and verify range/labels/persistence and layout.
+- Confirm VoiceOver can activate Back and note controls, Spanish shows Atrás, and iPad presentation works. Enter an ordinary guided practice, use its native back navigation and confirm it remains unchanged.
+- Simulator UI regression test `testFreeInstrumentSlidesDoNotNavigateBack` checks first/interior/edge/reverse drags for both instruments in portrait and landscape and explicit Back. This establishes navigation survival, not physical audio/glissando timing. Current CI and device acceptance required.

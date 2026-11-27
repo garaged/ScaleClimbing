@@ -38,4 +38,5 @@
 - [x] Implement scoped preview cleanup and smoothstep musical release; strengthen RMS and voice ownership regressions.
 - [ ] Verify current-head CI and physical free-instrument decay and cross-route playback acceptance.
 - [x] Specify gesture isolation and add cross-orientation navigation regression test source.
-- [ ] Implement isolated free-instrument presentation; verify current-head CI and physical glissando acceptance.
+- [x] Present iOS free instruments as isolated full-screen root workspaces with localized explicit Back and unchanged touch/audio paths.
+- [ ] Verify current-head CI and physical glissando, navigation and audio cleanup acceptance.

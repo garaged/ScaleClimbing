@@ -264,3 +264,16 @@ Playable note controls in Music Atlas and guided piano/guitar construction or po
 
 ### Requirement: isolate audition cleanup and retain musical tail energy
 Explicit generated reference playback and practice-route lifecycle cleanup SHALL stop only instrument audition voices, including their already-releasing tails, without changing any free-play voice or tail. Free instrument navigation, range changes and scene deactivation SHALL continue to stop all live notes. Ordinary acoustic finger lift SHALL retain the 240 ms piano and 320 ms guitar duration and continued held-note natural decay, using a smoothstep release instead of a rapidly attenuating quadratic release. A middle C note held for 60 ms SHALL retain at least 48% of its first 20 ms post-release RMS amplitude during the 80–100 ms post-release window at 44.1 and 48 kHz. No gain or phase jump, clipping, new dependencies or change to held-note timbre.
+
+### Requirement: free-instrument gesture isolation
+On iOS, Free Keyboard and Free Fretboard SHALL present a full-screen instrument workspace outside the home navigation stack's interactive pop gestures. Horizontal or diagonal playing gestures originating anywhere on the instrument, including the leading edge, SHALL NOT trigger back navigation in either orientation. The workspace SHALL expose a visible, localized, accessible Back control that returns to the previous home screen and stops all instrument notes. System-level gestures and normal practice-route navigation SHALL remain unchanged; no private gesture recognizers, global UIKit mutation, or competing drag recognizers. Instrument touch mapping, audio synthesis and note release behavior SHALL remain unchanged.
+
+#### Scenario: glissando across free instruments
+- **GIVEN** the free keyboard or fretboard in portrait or landscape
+- **WHEN** a finger slides from the first playable key or fret to the right, or from an interior position in either direction
+- **THEN** the workspace remains visible and the instrument retains control of the touch until release.
+
+#### Scenario: intentional exit
+- **GIVEN** a free-instrument workspace
+- **WHEN** the learner activates Back
+- **THEN** the workspace closes and audio cleanup runs, with normal navigation available elsewhere.
