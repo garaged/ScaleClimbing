@@ -53,10 +53,19 @@ import Testing
         #expect(held.count == heldReference.count)
         #expect(held.allSatisfy { $0.isFinite && abs($0) <= 0.24 })
         #expect(held.contains { abs($0) > 0.05 })
-        // Same mono format at both ends, so no resampling or gain change is
-        // expected. Check all held samples, not just peaks or note onsets.
-        let heldError = zip(held, heldReference).reduce(Float.zero) { max($0, abs($1.0 - $1.1)) }
-        #expect(heldError < 0.0001)
+        // AVAudioEngine can apply its constant-power center gain to a mono
+        // signal (for example 44.1 kHz on a 48 kHz host). Accept only unity
+        // or the known -3 dB factor, never an arbitrary fitted gain. Use the
+        // same factor for every held and released sample.
+        let permittedGains: [Float] = [1, Float(sqrt(0.5))]
+        func maximumError(_ actual: [Float], _ expected: [Float], gain: Float) -> Float {
+            zip(actual, expected).reduce(Float.zero) { max($0, abs($1.0 - gain * $1.1)) }
+        }
+        let gain = try #require(permittedGains.min {
+            maximumError(held, heldReference, gain: $0) < maximumError(held, heldReference, gain: $1)
+        })
+        let heldError = maximumError(held, heldReference, gain: gain)
+        #expect(heldError < 0.0001, "Rate: \(rate), fixed graph gain: \(gain), held error: \(heldError)")
 
         for (index, midi) in [60, 64, 67, 72].enumerated() {
             let command = LiveVoiceCommand(generation: 2, midi: midi, guitar: false, gate: false)
@@ -65,8 +74,9 @@ import Testing
         }
         let (released, releaseReference) = try renderBlocks(count: 12)
         #expect(released.count > 2000)
-        let releaseError = zip(released, releaseReference).reduce(Float.zero) { max($0, abs($1.0 - $1.1)) }
-        #expect(releaseError < 0.0001)
+        #expect(released.count == releaseReference.count)
+        let releaseError = maximumError(released, releaseReference, gain: gain)
+        #expect(releaseError < 0.0001, "Rate: \(rate), fixed graph gain: \(gain), release error: \(releaseError)")
         #expect(released.dropFirst(Int(rate * 0.030)).allSatisfy { abs($0) < 0.000001 })
     }
 }

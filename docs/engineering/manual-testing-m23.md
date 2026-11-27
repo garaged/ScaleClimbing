@@ -45,3 +45,7 @@ Use the same build and volume for each comparison:
 3. Compare C major reference playback in Chord Forge with a held C4/E4/G4 in Free Keyboard, and Free Fretboard's three notes. Keep volume comparable. Report which paths exhibit the effect.
 
 Ordinary interference between simultaneous pitches is not a defect. Persistent artifacts with an octave, across headphone/speaker routes, or only in live playback require further investigation. The offline AVAudioEngine graph test uses the same source adapter and mono formats as production, but cannot prove real-time device scheduling or physical speaker behavior.
+
+### Offline graph gain diagnostic
+
+Owner's Mac and CI reproduced identical held/release maximum differences (0.064122394 and 0.03760927). At 44.1 kHz the exact reference peaks are approximately 0.21892758 and 0.12840611; multiplying each by (1 - sqrt(0.5)) predicts 0.064122404 and 0.037609278 respectively. This strongly indicates fixed -3 dB graph gain, not a phase discontinuity. The integration test now accepts only unity or sqrt(0.5), selects the better of these two against all held samples, and enforces the same factor for release at the original 0.0001 absolute error bound. No per-buffer normalization, arbitrary gain fitting, delay alignment, or source sound changes. Confirm by re-running the integration test. Hardware vibration remains separately unverified.

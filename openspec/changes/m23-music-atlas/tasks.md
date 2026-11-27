@@ -17,3 +17,5 @@
 - [x] Record residual polyphonic vibration and passing 185-test package validation at 4ec2d1b.
 - [x] Add production source-node offline graph regression and route/tone diagnostic procedure, without changing tone behavior.
 - [ ] Verify graph test CI and collect physical diagnostic results before further sound-design changes.
+- [x] Reproduce owner's exact offline graph error numerically as a fixed -3 dB gain; constrain reference comparison to unity or sqrt(0.5) with unchanged residual tolerance.
+- [ ] Verify revised graph test on CI and owner's Mac.
