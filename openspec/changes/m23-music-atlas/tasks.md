@@ -22,3 +22,5 @@
 - [x] Record owner-approved direction for natural generated piano sound; specify tone, decay and spectral tests.
 - [x] Implement bounded additive piano profile on shared render path and extend offline graph tests.
 - [ ] Verify current-head CI and physical piano tone, chord, retrigger, and existing audio regression acceptance.
+- [x] Record owner audio listening pass and specify partial-octave density regression.
+- [ ] Implement density-driven range, verify CI and physical layout acceptance.

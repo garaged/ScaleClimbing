@@ -87,3 +87,16 @@ Free Keyboard SHALL default to an original, deterministic piano-like additive to
 - **GIVEN** equal-length bass and treble notes
 - **WHEN** they are rendered at 44.1 or 48 kHz
 - **THEN** the fundamental remains dominant, integer harmonics are present, and the upper register decays faster while remaining audible during typical playing.
+
+### Requirement: continuous-width free keyboard range
+Free Keyboard SHALL derive its playable range from the available canvas width, targeting white keys of approximately 48 points instead of quantizing to complete octaves. Partial octaves SHALL be permitted; the first and last visible pitches SHALL be natural keys, with all chromatic pitches between them represented. White keys SHALL not suddenly double in width when a device crosses a legacy octave breakpoint. The visible range label SHALL show the actual first and last pitches. Register controls SHALL move by octave until the upper boundary, where the window shifts to end at B6 without reducing the number of visible keys. Resize SHALL preserve the stored requested octave unless the user explicitly navigates. Shared touch geometry, smooth audio, note names, VoiceOver, and single-row landscape controls SHALL remain unchanged.
+
+#### Scenario: reduced physical landscape width
+- **GIVEN** an available instrument width of 556 points (580 minus 24 points horizontal padding)
+- **WHEN** Free Keyboard is displayed
+- **THEN** 11 natural keys and the intervening accidentals are available, starting at C4 and ending at F5 for requested octave 4; white keys are about 50.5 points wide.
+
+#### Scenario: width crosses the old 620-point breakpoint
+- **GIVEN** available instrument widths of 595 and 596 points
+- **WHEN** the keyboard resizes
+- **THEN** the visible natural-key count remains 12 and does not jump from seven to fourteen.
