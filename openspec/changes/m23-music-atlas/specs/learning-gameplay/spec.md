@@ -76,7 +76,7 @@ Live instrument mixing SHALL use constant output headroom independent of the act
 - **THEN** its own envelope fades to zero, while the amplitude of the other two remains unchanged.
 
 ### Requirement: expressive generated piano playback
-Free Keyboard SHALL default to an original, deterministic piano-like additive tone, with an exact 12-TET fundamental, bounded integer harmonics below Nyquist, and register-dependent natural decay (upper registers decay more quickly). The live source SHALL preserve its sample-continuous attack/release, fixed mix headroom, independent held voices, bounded realtime work and no dependencies, audio assets or permissions. Pure sine reference tones for guided learning and diagnostic tests SHALL remain available. Guitar synthesis and pedagogical reference playback SHALL remain unchanged. The generated piano is a stylized instrument, not a sampled or acoustically exact piano.
+Free Keyboard SHALL default to an original, deterministic piano-like additive tone, with an exact 12-TET fundamental, bounded integer harmonics below Nyquist, and register-dependent natural decay (upper registers decay more quickly). The live source SHALL preserve its sample-continuous attack/release, fixed mix headroom, independent held voices, bounded realtime work and no dependencies, audio assets or permissions. Pure sine reference tones for guided learning and diagnostic tests SHALL remain available. Pedagogical reference playback SHALL remain unchanged. Guitar retains its plucked-string timbre, with natural decay as specified below. The generated piano is a stylized instrument, not a sampled or acoustically exact piano.
 
 #### Scenario: piano chord held and released
 - **GIVEN** three or more live piano notes

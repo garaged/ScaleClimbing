@@ -69,3 +69,15 @@ Owner reports that the piano sound issue appears completely resolved, but the ph
 - Confirm the actual visible first and last notes match the displayed range. Tap the last white key and its neighboring black key; no clipped or unreachable accidental should appear at either end.
 - Navigate up/down to C2 and B6. At the upper boundary the last pitch is B6 and key count remains stable. Rotate between portrait and landscape without navigating: return to the requested portrait octave.
 - Confirm one-row controls, comfortable touch targets, correct note-name switch, VoiceOver and iPad. Repeat rapid taps/chords and confirm the previously accepted piano sound remains clean. Audio code is intentionally unchanged in the density correction.
+
+## Natural decay refinement acceptance
+
+The owner approved natural two-stage decay for both acoustic instruments. All four CI gates passed on the preceding keyboard density head d5688c5902892948e874ea56dc8220a5f6a1fd98 (run 46031565813); the new head needs its own validation. No tuning, mixer gain, UI layout, voice allocation, guided exercise playback, dependencies or permissions changed. The guitar audition remains a bounded two-second event, while a physically held Free Fretboard note is no longer forcibly cut off at two seconds.
+
+- Hold a middle-register piano key for 4–6 seconds. It should begin clearly, lose initial energy noticeably, then ring more quietly and fade without repeating or stepping in volume.
+- Compare low and high piano notes at comparable volume. Higher notes should decay more quickly without changing tuning. Release one key early or late; it should damp smoothly.
+- Hold a guitar position for 4 seconds; expect a clear pluck, quicker initial decay than piano, and a quiet tail. No audible abrupt cutoff at the old two-second boundary. A released/repressed string must sound freshly plucked.
+- Hold a triad on piano and several strings on guitar; lift and re-add one note without interrupting or changing the decay of other voices. Repeat rapid taps, slides, black keys, and range changes. No recurrent electronic click, buzzing or stuck audio.
+- Verify guided reference pitch/chord/timbre playback remains unchanged. Recheck physical iPhone landscape key density and portrait rotation.
+- Automated: `swift test --filter LiveNaturalDecayTests`, `swift test --filter ScaleClimbingAudioTests`, and the full CI. The tests exercise actual live voice samples, RMS decay windows, constant reference sustain, late release/slot acknowledgement, fresh onset on retrigger, independent chord voices, and the AVAudioEngine offline graph at 44.1/48 kHz for reference, piano and guitar.
+- Coefficients are a deliberately stylized starting point: piano 62% fast / 38% resonant tail (register-scaled 2.4 and 0.4 per second); guitar 78% fast / 22% tail (6.5 and 1.8 per second). They are amplitude decay rates, not measured acoustic instrument constants. Listening acceptance is authoritative for sound preference.

@@ -198,7 +198,7 @@ Live instrument mixing SHALL use constant output headroom independent of the act
 - **THEN** its own envelope fades to zero, while the amplitude of the other two remains unchanged.
 
 ### Requirement: expressive generated piano playback
-Free Keyboard SHALL default to an original, deterministic piano-like additive tone, with an exact 12-TET fundamental, bounded integer harmonics below Nyquist, and register-dependent natural decay (upper registers decay more quickly). The live source SHALL preserve its sample-continuous attack/release, fixed mix headroom, independent held voices, bounded realtime work and no dependencies, audio assets or permissions. Pure sine reference tones for guided learning and diagnostic tests SHALL remain available. Guitar synthesis and pedagogical reference playback SHALL remain unchanged. The generated piano is a stylized instrument, not a sampled or acoustically exact piano.
+Free Keyboard SHALL default to an original, deterministic piano-like additive tone, with an exact 12-TET fundamental, bounded integer harmonics below Nyquist, and register-dependent natural decay (upper registers decay more quickly). The live source SHALL preserve its sample-continuous attack/release, fixed mix headroom, independent held voices, bounded realtime work and no dependencies, audio assets or permissions. Pure sine reference tones for guided learning and diagnostic tests SHALL remain available. Pedagogical reference playback SHALL remain unchanged. Guitar retains its plucked-string timbre, with natural decay as specified below. The generated piano is a stylized instrument, not a sampled or acoustically exact piano.
 
 #### Scenario: piano chord held and released
 - **GIVEN** three or more live piano notes
@@ -222,3 +222,16 @@ Free Keyboard SHALL derive its playable range from the available canvas width, t
 - **GIVEN** available instrument widths of 595 and 596 points
 - **WHEN** the keyboard resizes
 - **THEN** the visible natural-key count remains 12 and does not jump from seven to fourteen.
+
+### Requirement: instrument-specific two-stage natural decay
+Live piano and guitar SHALL use a bounded two-stage natural amplitude decay (initial energy loss followed by a quieter resonant tail) independently of touch duration. The piano tail SHALL vary with register; guitar SHALL decay faster than mid-register piano and SHALL NOT impose a fixed two-second cutoff on a held string. Releasing a held note SHALL damp its current amplitude using the existing 30 ms sample-continuous release, even during attack or late decay. Repeated notes SHALL start fresh envelopes and overlapping notes SHALL decay independently. Analytical sine reference tones and guided exercise playback SHALL remain unchanged. The fixed gain, pitch accuracy, harmonic budgets, atomic voice commands, and ten-voice limit SHALL be preserved. Precompute coefficients before rendering; no new allocations, blocking or transcendental functions in the sample loop. A held voice that has naturally become inaudible remains reserved until its own release; do not recycle it into another touch.
+
+#### Scenario: long-held piano and guitar
+- **GIVEN** a held middle-register piano note and a held guitar note
+- **WHEN** each rings for several seconds
+- **THEN** both lose initial energy quickly and decay more slowly thereafter, guitar becomes quieter sooner, and neither loops or retriggers merely because it is held.
+
+#### Scenario: late release and retrigger
+- **GIVEN** a naturally faded held voice
+- **WHEN** the finger lifts and presses again
+- **THEN** the release is continuous, the old slot is acknowledged only after release, and the new note starts with fresh attack and decay.
