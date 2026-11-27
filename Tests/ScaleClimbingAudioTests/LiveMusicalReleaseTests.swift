@@ -22,7 +22,8 @@ private func releaseRMS(_ samples: ArraySlice<Float>) -> Double {
             let end = releaseRMS(tail[(frames - 128)..<frames])
             #expect(abs(previous - tail[0]) < 0.012)
             #expect(early > 0.01)
-            #expect(musical > early * 0.10)
+            // Retain useful audible energy across a normal inter-note gap.
+            #expect(musical > early * 0.48)
             #expect(musical < early)
             #expect(end < early * 0.01)
             #expect(tail.suffix(64).allSatisfy { $0 == 0 })
@@ -117,3 +118,31 @@ private func releaseRMS(_ samples: ArraySlice<Float>) -> Double {
     #expect(samples.allSatisfy { $0.isFinite && abs($0) < 0.94 })
     #expect(samples.contains { abs($0) > 0.85 })
 }
+
+
+@Test func previewCleanupDoesNotIncludeHeldOrReleasedFreeInstrumentVoices() throws {
+    var registry = LiveKeyboardVoiceRegistry(maxVoices: 8)
+    let heldResult = registry.noteOn(voice: .piano(60))
+    let held = try #require(heldResult)
+    let freeTailResult = registry.noteOn(voice: .guitarString(1))
+    let freeTail = try #require(freeTailResult)
+    let pianoPreviewResult = registry.noteOn(voice: .pianoAudition)
+    let pianoPreview = try #require(pianoPreviewResult)
+    let guitarPreviewResult = registry.noteOn(voice: .guitarAudition)
+    let guitarPreview = try #require(guitarPreviewResult)
+    let releasedFree = registry.noteOff(voice: .guitarString(1))
+    let releasedPreview = registry.noteOff(voice: .pianoAudition)
+    #expect(releasedFree == freeTail)
+    #expect(releasedPreview == pianoPreview)
+    let cleanup = registry.releaseAuditions()
+    #expect(Set(cleanup) == Set([pianoPreview, guitarPreview]))
+    #expect(registry.activeNoteCount == 1)
+    #expect(registry.releasingIndices.contains(freeTail))
+    let releasedHeld = registry.noteOff(voice: .piano(60))
+    #expect(releasedHeld == held)
+    registry.finishRelease(voice: pianoPreview)
+    registry.finishRelease(voice: guitarPreview)
+    let remaining = registry.releaseAuditions()
+    #expect(remaining.isEmpty)
+}
+

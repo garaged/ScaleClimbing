@@ -34,3 +34,5 @@
 - [x] Specify touch-down preview vs committed selection, and audit instrument routes.
 - [x] Wire shared press preview and native selection activation across Music Atlas, piano practice and fretboard practice; add natural piano audition and cleanup.
 - [ ] Verify current-head CI and physical press timing, cancellation, accessibility and listening acceptance across routes.
+- [x] Compare cross-route changes against musical-release baseline; specify stronger short-tap energy and scoped preview cleanup regressions.
+- [ ] Implement scoped cleanup and gentler musical release; verify CI and device listening.
