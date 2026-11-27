@@ -29,4 +29,5 @@
 - [x] Implement shared precomputed two-stage decay profiles, remove fixed held-guitar cutoff, and extend production source graph regression to guitar.
 - [ ] Verify current-head CI and physical natural decay, retriggers, independent chords and layout acceptance.
 - [x] Record owner's accepted held-note sound and specify expressive release and overlap regressions.
-- [ ] Implement instrument-specific release, bounded tail capacity and cleanup; validate CI and physical acceptance.
+- [x] Implement instrument-specific release curves, 16-slot pool with ten-held-note cap, and quick cleanup of existing tails; update acoustic and graph regressions.
+- [ ] Verify current-head CI and physical musical phrasing, retriggers, cleanup and previous layout acceptance.
