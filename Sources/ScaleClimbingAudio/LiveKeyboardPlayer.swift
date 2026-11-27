@@ -11,6 +11,8 @@ enum LiveInstrumentVoice: Hashable, Sendable {
     case guitarString(Int)
     case guitarAudition
 
+    var isAudition: Bool { self == .pianoAudition || self == .guitarAudition }
+
     var isGuitar: Bool {
         switch self {
         case .piano, .pianoAudition: return false
@@ -24,6 +26,7 @@ struct LiveKeyboardVoiceRegistry {
     let maxActiveVoices: Int
     private var activeByVoice: [LiveInstrumentVoice: Int] = [:]
     private var releasing: Set<Int> = []
+    private var auditionSlots: Set<Int> = []
 
     init(maxVoices: Int, maxActiveVoices: Int? = nil) {
         let activeLimit = maxActiveVoices ?? maxVoices
@@ -44,6 +47,7 @@ struct LiveKeyboardVoiceRegistry {
             return nil
         }
         activeByVoice[voice] = available
+        if voice.isAudition { auditionSlots.insert(available) }
         return available
     }
 
@@ -56,7 +60,14 @@ struct LiveKeyboardVoiceRegistry {
     }
 
     mutating func finishRelease(voice: Int) {
-        releasing.remove(voice)
+        if releasing.remove(voice) != nil { auditionSlots.remove(voice) }
+    }
+
+    /// Include already-releasing previews, but never touch a free-play slot.
+    mutating func releaseAuditions() -> [Int] {
+        _ = noteOff(voice: .pianoAudition)
+        _ = noteOff(voice: .guitarAudition)
+        return auditionSlots.sorted()
     }
 
     mutating func releaseAll() -> [Int] {
@@ -134,6 +145,10 @@ public final class LiveKeyboardPlayer {
 
     public func allNotesOff() {
         worker.allNotesOff()
+    }
+
+    public func stopAuditions() {
+        worker.stopAuditions()
     }
 
     public func prepareGuitar(_ pitches: [Pitch]) { worker.prepare(pitches, guitar: true) }
@@ -300,6 +315,16 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
         guard let index = registry.noteOff(voice: voice) else { return }
         _ = publish(index: index, gate: false, fastRelease: fast)
         reapReleasedSlots()
+    }
+
+    func stopAuditions() {
+        queue.async { [self] in
+            reapReleasedSlots()
+            for index in registry.releaseAuditions() {
+                _ = publish(index: index, gate: false, fastRelease: true)
+            }
+            reapReleasedSlots()
+        }
     }
 
     func allNotesOff() {

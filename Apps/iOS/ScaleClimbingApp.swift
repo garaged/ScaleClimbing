@@ -27,7 +27,8 @@ struct ScaleClimbingApp: App {
                 onGuitarNoteOff: { liveKeyboard.guitarNoteOff(string: $0) },
                 onGuitarPrepare: { liveKeyboard.prepareGuitar($0) },
                 onGuitarAudition: { liveKeyboard.auditionGuitar($0) },
-                onPianoAudition: { liveKeyboard.auditionPiano($0) }
+                onPianoAudition: { liveKeyboard.auditionPiano($0) },
+                onStopAuditions: { liveKeyboard.stopAuditions() }
             )
         }
     }

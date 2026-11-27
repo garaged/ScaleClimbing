@@ -21,6 +21,7 @@ public struct ScaleClimbingRootView: View {
     private let onGuitarPrepare: ([Pitch]) -> Void
     private let onGuitarAudition: (Pitch) -> Void
     private let onPianoAudition: (Pitch) -> Void
+    private let onStopAuditions: () -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
@@ -40,17 +41,20 @@ public struct ScaleClimbingRootView: View {
         onGuitarNoteOff: @escaping (Int) -> Void = { _ in },
         onGuitarPrepare: @escaping ([Pitch]) -> Void = { _ in },
         onGuitarAudition: @escaping (Pitch) -> Void = { _ in },
-        onPianoAudition: ((Pitch) -> Void)? = nil
+        onPianoAudition: ((Pitch) -> Void)? = nil,
+        onStopAuditions: (() -> Void)? = nil
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
-        self.onPlayChord = { value in onLiveAllNotesOff(); onPlayChord(value) }
-        self.onPlayPitch = { value in onLiveAllNotesOff(); onPlayPitch(value) }
-        self.onPlayInterval = { value in onLiveAllNotesOff(); onPlayInterval(value) }
-        self.onPlayVoicing = { value in onLiveAllNotesOff(); onPlayVoicing(value) }
-        self.onPlayScale = { value in onLiveAllNotesOff(); onPlayScale(value) }
-        self.onPlayProgression = { value in onLiveAllNotesOff(); onPlayProgression(value) }
-        self.onPlayRhythm = { value in onLiveAllNotesOff(); onPlayRhythm(value) }
-        self.onPlayTimbre = { value in onLiveAllNotesOff(); onPlayTimbre(value) }
+        let stopAuditions = onStopAuditions ?? onLiveAllNotesOff
+        self.onStopAuditions = stopAuditions
+        self.onPlayChord = { value in stopAuditions(); onPlayChord(value) }
+        self.onPlayPitch = { value in stopAuditions(); onPlayPitch(value) }
+        self.onPlayInterval = { value in stopAuditions(); onPlayInterval(value) }
+        self.onPlayVoicing = { value in stopAuditions(); onPlayVoicing(value) }
+        self.onPlayScale = { value in stopAuditions(); onPlayScale(value) }
+        self.onPlayProgression = { value in stopAuditions(); onPlayProgression(value) }
+        self.onPlayRhythm = { value in stopAuditions(); onPlayRhythm(value) }
+        self.onPlayTimbre = { value in stopAuditions(); onPlayTimbre(value) }
         self.onLiveNoteOn = onLiveNoteOn
         self.onLiveNoteOff = onLiveNoteOff
         self.onLiveAllNotesOff = onLiveAllNotesOff
@@ -72,7 +76,7 @@ public struct ScaleClimbingRootView: View {
                                 onLivePrepare([Pitch(.c, octave: 4)])
                             }
                         }
-                        .onDisappear { onLiveAllNotesOff() }
+                        .onDisappear { onStopAuditions() }
                 }
                 .toolbar {
                     ToolbarItem(placement: .automatic) {
@@ -93,7 +97,7 @@ public struct ScaleClimbingRootView: View {
                     }
                 }
         }
-        .onChange(of: scenePhase) { _, phase in if phase != .active { onLiveAllNotesOff() } }
+        .onChange(of: scenePhase) { _, phase in if phase != .active { onStopAuditions() } }
     }
 
     @ViewBuilder
@@ -111,14 +115,14 @@ public struct ScaleClimbingRootView: View {
             FreeFretboardGameView(onNoteOn: onGuitarNoteOn, onNoteOff: onGuitarNoteOff,
                 onAllNotesOff: onLiveAllNotesOff, onPrepare: onGuitarPrepare, onAudition: onGuitarAudition)
         case .musicAtlas:
-            MusicAtlasGameView(onPiano: onPianoAudition, onGuitar: onGuitarAudition, onSequence: onPlayScale, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
+            MusicAtlasGameView(onPiano: onPianoAudition, onGuitar: onGuitarAudition, onSequence: onPlayScale, onChord: onPlayVoicing, onStop: onStopAuditions)
         case .scaleNetwork:
-            ScaleNetworkGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
+            ScaleNetworkGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onStopAuditions)
         case .guitarTriads:
-            GuitarTriadsGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
+            GuitarTriadsGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onStopAuditions)
         case .fretboardFoundations:
             FretboardFoundationsGameView(onGuitarAudition: onGuitarAudition, onPianoAudition: onPianoAudition,
-                onPianoReference: onPlayPitch, onStopAudio: onLiveAllNotesOff)
+                onPianoReference: onPlayPitch, onStopAudio: onStopAuditions)
         case .noteHunter:
             NoteHunterGameView(onPlayPitch: onPianoAudition)
         case .chordForge:

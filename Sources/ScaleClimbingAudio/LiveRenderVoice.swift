@@ -145,7 +145,7 @@ struct LiveRenderVoice {
     private var releaseRemaining = 0
     private var releaseStartGain: Float = 0
     private var releaseTotal = 1
-    private var quadraticRelease = false
+    private var smoothRelease = false
     // Fixed partial state; initialized outside the realtime callback.
     private let d1: Double
     private let d2: Double
@@ -197,7 +197,7 @@ struct LiveRenderVoice {
             releaseRemaining = 0
             releaseStartGain = 0
             releaseTotal = 1
-            quadraticRelease = false
+            smoothRelease = false
             step = phaseSteps[command.midi]
             let frequency = step * rate / Double(Self.tableSize)
             let nyquist = rate / 2
@@ -227,7 +227,7 @@ struct LiveRenderVoice {
             releaseRemaining = frames
             releaseTotal = frames
             releaseStartGain = gain
-            quadraticRelease = !command.fastRelease && (guitar || pianoLike)
+            smoothRelease = !command.fastRelease && (guitar || pianoLike)
         }
     }
 
@@ -283,7 +283,10 @@ struct LiveRenderVoice {
         } else if releaseRemaining > 0 {
             releaseRemaining -= 1
             let fraction = Float(releaseRemaining) / Float(releaseTotal)
-            gain = releaseStartGain * (quadraticRelease ? fraction * fraction : fraction)
+            // Smoothstep has zero slope at both endpoints. Unlike the old
+            // quadratic fade it preserves more of the early musical tail.
+            let envelope = smoothRelease ? fraction * fraction * (3 - 2 * fraction) : fraction
+            gain = releaseStartGain * envelope
         } else { gain = 0 }
         return sample
     }
