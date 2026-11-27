@@ -60,3 +60,12 @@ The owner approved moving toward better sounding instruments. The pre-change gra
 - Verify Free Fretboard, guided pitch/interval/chord exercises and Timbre Lab retain prior behavior. Check cold launch, rotation, scene transitions, iPad, landscape, and no stuck notes.
 - Run `swift test --filter ScaleClimbingAudioTests` to validate spectral profiles, register decay, anti-aliasing, independent six-voice piano mix and actual offline graph for both piano and reference tones.
 - This is a stylized generated piano, not a sampled acoustic grand; physical listening is required before accepting its sound. No new dependency, sample assets, recording permission, settings or persistence changes.
+
+## Physical keyboard density follow-up
+
+Owner reports that the piano sound issue appears completely resolved, but the physical iPhone landscape keyboard displayed one stretched octave whereas the simulator displayed two. Replace the 620/980-point whole-octave thresholds with a density target of 48 points per white key, retaining at least one octave on positive-width narrow screens. The canvas uses the actual padded width; the window can end partway through an octave and shifts to B6 at the upper boundary without changing its key count.
+
+- Compare physical iPhone landscape left/right and simulator at matching zoom settings. White keys should remain reasonably consistent in width even if the visible note count differs. For example, a 556-point canvas should display 11 white keys (C4–F5 by default); an 820-point canvas should display 17 (C4–E6). These are modeled canvas widths, not measured iPhone dimensions.
+- Confirm the actual visible first and last notes match the displayed range. Tap the last white key and its neighboring black key; no clipped or unreachable accidental should appear at either end.
+- Navigate up/down to C2 and B6. At the upper boundary the last pitch is B6 and key count remains stable. Rotate between portrait and landscape without navigating: return to the requested portrait octave.
+- Confirm one-row controls, comfortable touch targets, correct note-name switch, VoiceOver and iPad. Repeat rapid taps/chords and confirm the previously accepted piano sound remains clean. Audio code is intentionally unchanged in the density correction.

@@ -35,13 +35,13 @@ Atlas SHALL not change current exercises, stored progress, instrument preference
 The Free Keyboard and Free Fretboard SHALL reserve a single horizontal control strip for navigation and note-name visibility in constrained landscape layouts, including when horizontal safe areas or larger display settings reduce usable width. Long localized or accessibility text SHALL fall back to a compact accessible label, not a second control row. The touch canvas SHALL use the actual remaining layout height after controls and safe areas, not a fixed estimate of control height. In roomy portrait layouts, the keyboard SHALL retain natural key proportions and the fretboard SHALL remain centered. The range SHALL stay within valid octave/fret bounds when the window changes. Existing note-name preferences, accessibility and independent touch/audio behavior SHALL remain intact.
 
 #### Scenario: physical iPhone landscape with reduced usable width
-- **GIVEN** a landscape viewport of 580 by 260 points after safe areas, with a one-octave keyboard
+- **GIVEN** a landscape viewport of 580 by 260 points after safe areas, with a partial-octave keyboard
 - **WHEN** the instrument is displayed
 - **THEN** the controls remain one row, supplementary help does not consume a separate row, and the canvas fills the remaining height.
 
 #### Scenario: resize at the high register
 - **GIVEN** the starting octave preference is 6 on a portrait phone
-- **WHEN** the viewport expands to two or three octaves
+- **WHEN** the viewport expands to include additional natural keys
 - **THEN** the effective range ends at B6 or below, without overwriting the preference merely due to layout.
 
 #### Scenario: localized controls and accessible sizing

@@ -23,4 +23,5 @@
 - [x] Implement bounded additive piano profile on shared render path and extend offline graph tests.
 - [ ] Verify current-head CI and physical piano tone, chord, retrigger, and existing audio regression acceptance.
 - [x] Record owner audio listening pass and specify partial-octave density regression.
-- [ ] Implement density-driven range, verify CI and physical layout acceptance.
+- [x] Implement density-driven range with partial octaves, natural endpoints, exact labels, bounded navigation and simulator key-width assertions.
+- [ ] Verify fresh CI and physical iPhone density/rotation acceptance; reconfirm previously accepted audio unchanged.
