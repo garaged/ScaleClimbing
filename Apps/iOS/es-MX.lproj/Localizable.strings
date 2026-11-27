@@ -241,3 +241,6 @@
 "Interval" = "Intervalo";
 "Chord" = "Acorde";
 "Major key" = "Tonalidad mayor";
+
+/* M23 isolated instrument workspace */
+"Back" = "Atrás";

@@ -3,6 +3,7 @@ import SwiftUI
 
 public struct ScaleClimbingRootView: View {
     @StateObject private var viewModel: HomeViewModel
+    @State private var presentedInstrument: AppRoute?
     @Environment(\.scenePhase) private var scenePhase
     private let onPlayChord: ([PitchClass]) -> Void
     private let onPlayPitch: (Pitch) -> Void
@@ -68,7 +69,7 @@ public struct ScaleClimbingRootView: View {
 
     public var body: some View {
         NavigationStack {
-            HomeView(viewModel: viewModel)
+            HomeView(viewModel: viewModel, onOpenInstrument: { presentedInstrument = $0 })
                 .navigationDestination(for: AppRoute.self) { route in
                     destination(for: route)
                         .onAppear {
@@ -97,6 +98,30 @@ public struct ScaleClimbingRootView: View {
                     }
                 }
         }
+        #if os(iOS)
+        // A root-only, full-screen workspace has no navigation controller
+        // history to pop. Both edge and content-area swipe-back gestures
+        // are therefore outside the instrument's touch path.
+        .fullScreenCover(item: $presentedInstrument) { route in
+            NavigationStack {
+                destination(for: route)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button {
+                                onLiveAllNotesOff()
+                                presentedInstrument = nil
+                            } label: {
+                                Label(AppCopy.text("Back"), systemImage: "chevron.backward")
+                                    .labelStyle(.iconOnly)
+                            }
+                            .accessibilityLabel(AppCopy.text("Back"))
+                            .accessibilityIdentifier("playground.back")
+                        }
+                    }
+            }
+            .interactiveDismissDisabled(true)
+        }
+        #endif
         .onChange(of: scenePhase) { _, phase in if phase != .active { onStopAuditions() } }
     }
 
@@ -156,9 +181,19 @@ public struct ScaleClimbingRootView: View {
 
 private struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
+    let onOpenInstrument: (AppRoute) -> Void
     @Environment(\.colorScheme) private var colorScheme
 
     private let columns = [GridItem(.adaptive(minimum: 155), spacing: 12)]
+
+    @ViewBuilder
+    private func instrumentLink<Label: View>(_ route: AppRoute, @ViewBuilder label: () -> Label) -> some View {
+        #if os(iOS)
+        Button { onOpenInstrument(route) } label: { label() }
+        #else
+        NavigationLink(value: route, label: label)
+        #endif
+    }
 
     var body: some View {
         ScrollView {
@@ -178,7 +213,7 @@ private struct HomeView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("home.route.\(viewModel.featuredRoute.rawValue)")
 
-                NavigationLink(value: AppRoute.freeKeyboard) {
+                instrumentLink(.freeKeyboard) {
                     HStack(spacing: 14) {
                         Image(systemName: "pianokeys")
                             .font(.title2.weight(.medium))
@@ -206,7 +241,7 @@ private struct HomeView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("home.route.freeKeyboard")
 
-                NavigationLink(value: AppRoute.freeFretboard) {
+                instrumentLink(.freeFretboard) {
                     HStack(spacing: 14) {
                         Image(systemName: "guitars")
                             .font(.title2.weight(.medium))
