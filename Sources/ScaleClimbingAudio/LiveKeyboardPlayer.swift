@@ -299,7 +299,7 @@ private final class LiveKeyboardAudioWorker: @unchecked Sendable {
         let generation = (generations[index] + 1) & LiveVoiceCommand.generationMask
         generations[index] = generation == 0 ? 1 : generation
         mixer?.publish(index: index, command: LiveVoiceCommand(generation: generations[index], midi: lastMIDIs[index],
-            guitar: lastGuitar[index], gate: gate))
+            guitar: lastGuitar[index], gate: gate, pianoLike: !lastGuitar[index]))
         return generations[index]
     }
 

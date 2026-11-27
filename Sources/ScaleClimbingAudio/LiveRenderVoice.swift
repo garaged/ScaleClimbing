@@ -1,30 +1,56 @@
 import Foundation
 
 /// Compact atomic control message. Zero is the initial idle state. The low
-/// nine bits encode pitch, guitar and gate; the remainder is the slot epoch.
+/// ten bits encode pitch, instrument profile and gate; the remainder is the slot epoch.
 struct LiveVoiceCommand: Equatable, Sendable {
-    static let generationMask = UInt64.max >> 9
+    static let generationMask = UInt64.max >> 10
     let generation: UInt64
     let midi: Int
     let guitar: Bool
     let gate: Bool
+    let pianoLike: Bool
 
-    init(generation: UInt64, midi: Int, guitar: Bool, gate: Bool) {
+    init(generation: UInt64, midi: Int, guitar: Bool, gate: Bool, pianoLike: Bool = false) {
         self.generation = generation & Self.generationMask
         self.midi = min(127, max(0, midi))
         self.guitar = guitar
         self.gate = gate
+        self.pianoLike = pianoLike && !guitar
     }
 
     init(packed: UInt64) {
-        generation = packed >> 9
+        generation = packed >> 10
         midi = Int(packed & 127)
         guitar = packed & 128 != 0
         gate = packed & 256 != 0
+        pianoLike = !guitar && packed & 512 != 0
     }
 
     var packed: UInt64 {
-        (generation << 9) | UInt64(midi) | (guitar ? 128 : 0) | (gate ? 256 : 0)
+        (generation << 10) | UInt64(midi) | (guitar ? 128 : 0) | (gate ? 256 : 0) | (pianoLike ? 512 : 0)
+    }
+}
+
+/// Original, band-limited additive piano profile. These coefficients are
+/// built before render starts. The four harmonic amplitudes sum to one,
+/// preserving the original per-voice peak budget. Higher harmonics decay
+/// faster; register controls the decay of the fundamental as well.
+struct LivePianoProfile: Sendable {
+    let a1: Double, a2: Double, a3: Double, a4: Double
+    let d1: Double, d2: Double, d3: Double, d4: Double
+
+    init(midi: Int, sampleRate: Double) {
+        let frequency = 440 * pow(2, Double(midi - 69) / 12)
+        let nyquist = sampleRate / 2
+        a1 = frequency < nyquist ? 0.66 : 0
+        a2 = 2 * frequency < nyquist ? 0.20 : 0
+        a3 = 3 * frequency < nyquist ? 0.09 : 0
+        a4 = 4 * frequency < nyquist ? 0.05 : 0
+        let decay = min(2.0, max(0.35, 0.55 + 0.025 * Double(midi - 48)))
+        d1 = exp(-decay / sampleRate)
+        d2 = exp(-(decay + 1.0) / sampleRate)
+        d3 = exp(-(decay + 2.0) / sampleRate)
+        d4 = exp(-(decay + 3.0) / sampleRate)
     }
 }
 
@@ -41,6 +67,7 @@ struct LiveRenderVoice {
     static let sineTable = (0...tableSize).map { sin(2 * Double.pi * Double($0) / Double(tableSize)) }
     private let table: [Double]
     private let phaseSteps: [Double]
+    private let pianoProfiles: [LivePianoProfile]
     private let rate: Double
     private let attackSampleCount: Int
     private let releaseSampleCount: Int
@@ -51,6 +78,8 @@ struct LiveRenderVoice {
     private(set) var gain: Float = 0
     private var gate = false
     private var guitar = false
+    private var pianoLike = false
+    private var pianoProfile: LivePianoProfile?
     private var phase = 0.0
     private var step = 0.0
     private var age = 0
@@ -72,6 +101,7 @@ struct LiveRenderVoice {
         phaseSteps = (0...127).map { midi in
             440 * pow(2, Double(midi - 69) / 12) * Double(Self.tableSize) / rate
         }
+        pianoProfiles = (0...127).map { LivePianoProfile(midi: $0, sampleRate: rate) }
         attackSampleCount = Int((rate * 0.010).rounded())
         releaseSampleCount = Int((rate * 0.030).rounded())
         pluckAttackFrames = Int((rate * 0.006).rounded())
@@ -98,6 +128,7 @@ struct LiveRenderVoice {
             // A gate superseded by off before the first callback remains silent.
             gate = true
             guitar = command.guitar
+            pianoLike = command.pianoLike
             phase = 0
             age = 0
             gain = 0
@@ -112,6 +143,12 @@ struct LiveRenderVoice {
             p4 = 4 * frequency < nyquist ? 0.15 : 0
             p5 = 5 * frequency < nyquist ? 0.09 : 0
             p6 = 6 * frequency < nyquist ? 0.05 : 0
+            if pianoLike {
+                let profile = pianoProfiles[command.midi]
+                pianoProfile = profile
+                p1 = profile.a1; p2 = profile.a2; p3 = profile.a3; p4 = profile.a4
+                p5 = 0; p6 = 0
+            } else { pianoProfile = nil }
         } else {
             gate = false
             releaseRemaining = gain > 0 ? releaseSampleCount : 0
@@ -143,6 +180,20 @@ struct LiveRenderVoice {
                 p1 *= d1; p2 *= d2; p3 *= d3; p4 *= d4; p5 *= d5; p6 *= d6
                 age += 1
             } else { wave = 0 }
+        } else if pianoLike, let profile = pianoProfile {
+            let s = sine(at: phase)
+            let shifted = phase + Double(Self.tableSize / 4)
+            let c = sine(at: shifted >= Double(Self.tableSize) ? shifted - Double(Self.tableSize) : shifted)
+            let s2 = 2 * c * s
+            let s3 = 2 * c * s2 - s
+            let s4 = 2 * c * s3 - s2
+            wave = Float(0.09 * (p1*s + p2*s2 + p3*s3 + p4*s4))
+            // Flush effectively inaudible partials to zero to bound very
+            // long held-note work and avoid subnormal floating-point values.
+            p1 = p1 > 1e-12 ? p1 * profile.d1 : 0
+            p2 = p2 > 1e-12 ? p2 * profile.d2 : 0
+            p3 = p3 > 1e-12 ? p3 * profile.d3 : 0
+            p4 = p4 > 1e-12 ? p4 * profile.d4 : 0
         } else {
             wave = Float(0.09 * sine(at: phase))
         }

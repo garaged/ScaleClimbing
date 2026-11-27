@@ -99,8 +99,8 @@ private func harmonicAmplitude(_ samples: ArraySlice<Float>, frequency: Double, 
 }
 
 @Test func pianoUpperPartialsStayBelowNyquist() {
-    // At 8 kHz MIDI 96 has a fundamental near 1046 Hz; at MIDI 108
-    // only the fundamental is below Nyquist. Compare to a sine reference.
+    // At 8 kHz MIDI 108 has a fundamental near 2093 Hz; only the
+    // fundamental is below Nyquist. Check that the second does not alias.
     let rate = 8_000.0
     let samples = pianoSamples(midi: 108, rate: rate, duration: 0.3)
     let region = samples[400..<2000]
