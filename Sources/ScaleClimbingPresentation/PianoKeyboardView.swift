@@ -12,11 +12,13 @@ public struct PianoKeyboardView: View {
     public let highlightedPitches: Set<Pitch>
     public let focusedPitches: Set<Pitch>
     public let onKeyTap: (PianoKeyModel) -> Void
+    public let onKeyPreview: ((PianoKeyModel) -> Void)?
 
     public init(
         model: PianoKeyboardModel,
         highlightedPitchClass: PitchClass? = nil,
         purpose: PianoKeyboardPurpose = .construction,
+        onKeyPreview: ((PianoKeyModel) -> Void)? = nil,
         onKeyTap: @escaping (PianoKeyModel) -> Void
     ) {
         self.model = model
@@ -25,12 +27,14 @@ public struct PianoKeyboardView: View {
         self.highlightedPitches = []
         self.focusedPitches = []
         self.onKeyTap = onKeyTap
+        self.onKeyPreview = onKeyPreview
     }
 
     public init(
         model: PianoKeyboardModel,
         highlightedPitchClasses: Set<PitchClass>,
         purpose: PianoKeyboardPurpose = .construction,
+        onKeyPreview: ((PianoKeyModel) -> Void)? = nil,
         onKeyTap: @escaping (PianoKeyModel) -> Void
     ) {
         self.model = model
@@ -39,6 +43,7 @@ public struct PianoKeyboardView: View {
         self.highlightedPitches = []
         self.focusedPitches = []
         self.onKeyTap = onKeyTap
+        self.onKeyPreview = onKeyPreview
     }
 
     public init(
@@ -46,6 +51,7 @@ public struct PianoKeyboardView: View {
         highlightedPitches: Set<Pitch>,
         focusedPitches: Set<Pitch> = [],
         purpose: PianoKeyboardPurpose = .construction,
+        onKeyPreview: ((PianoKeyModel) -> Void)? = nil,
         onKeyTap: @escaping (PianoKeyModel) -> Void
     ) {
         self.model = model
@@ -54,6 +60,7 @@ public struct PianoKeyboardView: View {
         self.highlightedPitches = highlightedPitches
         self.focusedPitches = focusedPitches
         self.onKeyTap = onKeyTap
+        self.onKeyPreview = onKeyPreview
     }
 
     private var layout: PianoKeyboardLayout { PianoKeyboardLayout(model: model) }
@@ -103,6 +110,7 @@ public struct PianoKeyboardView: View {
                 || highlightedPitches.contains(key.pitch),
             showsNoteName: showsNoteNames,
             isFocused: focusedPitches.contains(key.pitch),
+            onPreview: onKeyPreview.map { preview in { preview(key) } },
             onTap: { onKeyTap(key) }
         )
     }
@@ -118,12 +126,14 @@ public struct PianoKeyButton: View {
     public let showsNoteName: Bool
     public let isFocused: Bool
     public let onTap: () -> Void
+    public let onPreview: (() -> Void)?
 
     public init(
         key: PianoKeyModel,
         isHighlighted: Bool = false,
         showsNoteName: Bool = true,
         isFocused: Bool = false,
+        onPreview: (() -> Void)? = nil,
         onTap: @escaping () -> Void
     ) {
         self.key = key
@@ -131,10 +141,11 @@ public struct PianoKeyButton: View {
         self.showsNoteName = showsNoteName
         self.isFocused = isFocused
         self.onTap = onTap
+        self.onPreview = onPreview
     }
 
     public var body: some View {
-        Button(action: onTap) {
+        InstrumentPressButton(onPreview: onPreview, onSelect: onTap) {
             keyFace
                 .frame(
                     width: key.isNatural ? Self.naturalWidth : Self.accidentalHitWidth,
@@ -143,7 +154,6 @@ public struct PianoKeyButton: View {
                 )
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
         .accessibilityLabel(key.accessibilityLabel)
         .accessibilityHint(AppCopy.text("Tap to choose a key"))
         .accessibilityAddTraits(isHighlighted || isFocused ? [.isSelected] : [])

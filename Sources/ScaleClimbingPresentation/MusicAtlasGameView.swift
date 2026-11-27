@@ -123,9 +123,9 @@ public struct MusicAtlasGameView: View {
             let members = Set(atlas.tones)
             let highlights = Set(keyboard.keys.filter { members.contains($0.pitchClass) }.map(\.pitch))
             let matches = Set(atlas.matches(on: MusicAtlas.piano, equivalence: equivalence).compactMap(MusicAtlas.piano.pitch(at:)))
-            PianoKeyboardView(model: keyboard, highlightedPitches: highlights, focusedPitches: matches) { key in
+            PianoKeyboardView(model: keyboard, highlightedPitches: highlights, focusedPitches: matches,
+                onKeyPreview: { onPiano($0.pitch) }) { key in
                 guard atlas.select(.pianoKey(midi: key.pitch.midiNumber), on: MusicAtlas.piano) else { return }
-                onStop(); onPiano(key.pitch)
                 if let first = atlas.matches(on: guitar, equivalence: .exactPitch).first, case .fret(_, let fret) = first {
                     start = max(0, fret - 1)
                 }
@@ -150,10 +150,10 @@ public struct MusicAtlasGameView: View {
                 return (position, degree)
             })
             FretboardSelectionView(window: window, showNames: false, identifierPrefix: "atlas",
-                overlayLabels: labels, shapePositions: Set(atlas.matches(on: guitar, equivalence: equivalence))) { position in
+                overlayLabels: labels, shapePositions: Set(atlas.matches(on: guitar, equivalence: equivalence)),
+                onPreview: { position in if let pitch = guitar.pitch(at: position) { onGuitar(pitch) } }) { position in
                 guard atlas.select(position, on: guitar) else { return }
                 octave = min(6, max(2, atlas.focus.octave))
-                onGuitar(atlas.focus)
             }
         }
     }
