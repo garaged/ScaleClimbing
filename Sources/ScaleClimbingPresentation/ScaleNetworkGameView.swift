@@ -82,7 +82,8 @@ public struct ScaleNetworkGameView: View {
                     FretboardSelectionView(window: window, showNames: false,
                         selected: bridge?.selected ?? selected, result: bridge?.result,
                         locked: bridge?.result == true, identifierPrefix: "scaleNetwork",
-                        overlayLabels: markers, shapePositions: bridge == nil ? Set(shape.positions) : [], onSelect: choose)
+                        overlayLabels: markers, shapePositions: bridge == nil ? Set(shape.positions) : [],
+                         onPreview: { position in if let pitch = guitar.pitch(at: position) { onNote(pitch) } }, onSelect: choose)
                     if bridge == nil {
                         Text(AppCopy.text("R marks the overlay tonic; outlined notes are the major chord shape.")).font(.caption).foregroundStyle(.secondary)
                     }
@@ -126,12 +127,11 @@ public struct ScaleNetworkGameView: View {
         start = max(shape.region.lowerBound, nextShape.region.lowerBound)
     }
     private func choose(_ position: InstrumentPosition) {
-        guard let pitch = guitar.pitch(at: position) else { return }
+        guard guitar.pitch(at: position) != nil else { return }
         if var session = bridge {
             guard session.submit(position) != nil else { return }
             bridge = session
         } else { selected = position }
-        onNote(pitch)
     }
     private var feedback: String {
         if let bridge {

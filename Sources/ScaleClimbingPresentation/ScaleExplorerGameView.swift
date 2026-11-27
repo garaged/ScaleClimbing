@@ -4,13 +4,16 @@ import SwiftUI
 public struct ScaleExplorerGameView: View {
     @StateObject private var viewModel: ScaleExplorerViewModel
     private let onPlayScale: ([Pitch]) -> Void
+    private let onPlayPitch: (Pitch) -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> ScaleExplorerViewModel = ScaleExplorerViewModel(),
-        onPlayScale: @escaping ([Pitch]) -> Void = { _ in }
+        onPlayScale: @escaping ([Pitch]) -> Void = { _ in },
+        onPlayPitch: @escaping (Pitch) -> Void = { _ in }
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
         self.onPlayScale = onPlayScale
+        self.onPlayPitch = onPlayPitch
     }
 
     public var body: some View {
@@ -105,6 +108,7 @@ public struct ScaleExplorerGameView: View {
                     PianoKeyboardView(
                         model: viewModel.keyboard,
                         highlightedPitchClasses: viewModel.selectedPitchClasses,
+                        onKeyPreview: { onPlayPitch($0.pitch) },
                         onKeyTap: { key in viewModel.toggle(key.pitchClass) }
                     )
                     Text(AppCopy.learnerText(viewModel.selectionText))

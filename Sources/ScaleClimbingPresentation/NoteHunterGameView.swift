@@ -45,10 +45,8 @@ public struct NoteHunterGameView: View {
             model: viewModel.keyboard,
             highlightedPitchClass: viewModel.selectedPitchClass,
             purpose: .noteIdentification,
-            onKeyTap: { key in
-                onPlayPitch(key.pitch)
-                viewModel.submit(key)
-            }
+            onKeyPreview: { onPlayPitch($0.pitch) },
+            onKeyTap: { viewModel.submit($0) }
         )
     }
 
