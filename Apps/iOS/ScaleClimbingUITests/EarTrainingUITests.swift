@@ -731,10 +731,25 @@ final class EarTrainingUITests: XCTestCase {
     @MainActor
     func testPlaygroundLandscapeKeepsControlsTogetherAndPlayableCanvas() {
         let device = XCUIDevice.shared
-        device.orientation = .portrait
-        defer { device.orientation = .portrait }
-
         let app = XCUIApplication()
+        device.orientation = .portrait
+        defer {
+            app.terminate()
+            device.orientation = .portrait
+        }
+
+        func expectToggleChange(_ toggle: XCUIElement) {
+            let previous = toggle.value as? String
+            // SwiftUI may expose the full labeled row as the switch element;
+            // tapping its center is not necessarily tapping the actual control.
+            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+            let changed = XCTNSPredicateExpectation(
+                predicate: NSPredicate { _, _ in (toggle.value as? String) != previous },
+                object: nil
+            )
+            XCTAssertEqual(XCTWaiter.wait(for: [changed], timeout: 5), .completed)
+        }
+
         app.launch()
         openRoute(in: app, identifier: "home.route.freeKeyboard")
         let pianoRange = app.staticTexts["playground.range"]
@@ -759,10 +774,8 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertGreaterThan(whiteKey.frame.height, app.frame.height * 0.40)
         XCTAssertGreaterThanOrEqual(whiteKey.frame.minY, pianoHigher.frame.maxY - 2)
         XCTAssertFalse(app.staticTexts["playground.help"].exists)
-        let pianoState = pianoToggle.value as? String
-        pianoToggle.tap()
-        XCTAssertNotEqual(pianoToggle.value as? String, pianoState)
-        pianoToggle.tap()
+        expectToggleChange(pianoToggle)
+        expectToggleChange(pianoToggle)
 
         app.terminate()
         device.orientation = .portrait
@@ -789,10 +802,8 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertGreaterThan(lastString.frame.maxY - firstString.frame.minY, app.frame.height * 0.35)
         XCTAssertGreaterThanOrEqual(firstString.frame.minY, fretHigher.frame.maxY - 2)
         XCTAssertFalse(app.staticTexts["fretboard.help"].exists)
-        let fretState = fretToggle.value as? String
-        fretToggle.tap()
-        XCTAssertNotEqual(fretToggle.value as? String, fretState)
-        fretToggle.tap()
+        expectToggleChange(fretToggle)
+        expectToggleChange(fretToggle)
         firstString.tap()
     }
 
