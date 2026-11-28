@@ -7,7 +7,7 @@ This document separates repository validation from Apple-account actions. No cer
 | Item | Repository state |
 |---|---|
 | Bundle identifier | `org.garaged.ScaleClimbing` |
-| Current version/build | `0.3.0 (1)` — pre-release values; choose the first store version before upload |
+| Current version/build | `0.4.0 (2)` — M0–M23 release candidate; confirm build availability in App Store Connect before upload |
 | Signing | Automatic; project currently references the prior development team |
 | Capabilities / entitlements | None; no entitlements file |
 | Permissions | None; generated local audio only |
@@ -22,7 +22,7 @@ This document separates repository validation from Apple-account actions. No cer
 2. In **Xcode > Settings > Accounts**, add the Apple ID that belongs to the organization’s Apple Developer team.
 3. Select the **ScaleClimbing** app target, open **Signing & Capabilities**, choose that team, retain **Automatically manage signing**, and confirm the bundle identifier is the registered identifier you intend to ship.
 4. Do not add a capability merely to remove a warning. This offline app needs none today.
-5. Set the chosen store `MARKETING_VERSION`; increment `CURRENT_PROJECT_VERSION` for every uploaded build, including TestFlight retries.
+5. Confirm the intended store `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in both Debug and Release. The repository candidate is 0.4.0 (2); if already used in App Store Connect, increment the build number before archiving. Increment the build number for every uploaded build, including TestFlight retries.
 6. Select the shared **ScaleClimbing** scheme, an iPhone device destination, and **Product > Archive**. Resolve only account/provisioning issues in Xcode; do not commit generated profiles.
 7. Validate the archive in Organizer, then upload it to TestFlight only when the App Store Connect record and privacy fields are ready.
 
