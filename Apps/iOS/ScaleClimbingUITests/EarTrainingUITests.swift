@@ -711,4 +711,185 @@ final class EarTrainingUITests: XCTestCase {
         XCTAssertTrue(prompt.exists)
     }
 
+    @MainActor
+    func testMusicAtlasShowsExactMatchesAndPitchClassMode() {
+        let app = XCUIApplication()
+        app.launch()
+        openRoute(in: app, identifier: "home.route.musicAtlas")
+        let focus = app.staticTexts["atlas.focus"]
+        XCTAssertTrue(focus.waitForExistence(timeout: 10))
+        XCTAssertTrue(focus.label.contains("C4"))
+        let count = app.staticTexts["atlas.matchCount"]
+        XCTAssertTrue(count.label.contains("5"))
+        let pitchClass = app.buttons["Pitch class"]
+        if !pitchClass.isHittable { app.swipeUp() }
+        XCTAssertTrue(pitchClass.exists)
+        pitchClass.tap()
+        XCTAssertNotEqual(count.label, "Guitar matches: 5")
+    }
+
+    @MainActor
+    func testMusicAtlasHeldPianoSelectionAndFretSelection() {
+        let app = XCUIApplication()
+        app.launch()
+        openRoute(in: app, identifier: "home.route.musicAtlas")
+        let focus = app.staticTexts["atlas.focus"]
+        XCTAssertTrue(focus.waitForExistence(timeout: 10))
+        let e = app.buttons["E in octave 4"]
+        if !e.isHittable { app.swipeUp() }
+        XCTAssertTrue(e.waitForExistence(timeout: 10))
+        e.press(forDuration: 0.6)
+        let changed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in focus.label.contains("E4") }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [changed], timeout: 5), .completed)
+        // XCUITest checks selection, not the audible onset. Physical listening
+        // remains required for the press-before-release timing.
+        let lower = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "atlas.position.")).firstMatch
+        for _ in 0..<3 {
+            if lower.isHittable { break }
+            app.swipeUp()
+        }
+        XCTAssertTrue(lower.exists)
+        XCTAssertTrue(lower.isHittable)
+        lower.press(forDuration: 0.6)
+        XCTAssertTrue(focus.exists)
+    }
+
+    @MainActor
+    func testFreeInstrumentSlidesDoNotNavigateBack() {
+        let app = XCUIApplication()
+        let device = XCUIDevice.shared
+        device.orientation = .portrait
+        defer { app.terminate(); device.orientation = .portrait }
+        app.launch()
+        let back = app.buttons["playground.back"]
+
+        for guitar in [false, true] {
+            device.orientation = .portrait
+            openRoute(in: app, identifier: guitar ? "home.route.freeFretboard" : "home.route.freeKeyboard")
+            let range = app.staticTexts[guitar ? "fretboard.range" : "playground.range"]
+            XCTAssertTrue(range.waitForExistence(timeout: 10))
+            XCTAssertTrue(back.waitForExistence(timeout: 10))
+
+            for orientation: UIDeviceOrientation in [.portrait, .landscapeLeft] {
+                device.orientation = orientation
+                let rotated = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                    orientation == .portrait ? app.frame.height > app.frame.width : app.frame.width > app.frame.height
+                }, object: nil)
+                XCTAssertEqual(XCTWaiter.wait(for: [rotated], timeout: 10), .completed)
+
+                let predicate = guitar
+                    ? NSPredicate(format: "identifier BEGINSWITH %@", "fretboard.position.3.")
+                    : NSPredicate(format: "identifier BEGINSWITH %@ AND label MATCHES %@", "playground.key.", "[A-G] in octave [2-6]")
+                let positions = app.buttons.matching(predicate).allElementsBoundByIndex
+                    .filter { $0.isHittable }.sorted { $0.frame.midX < $1.frame.midX }
+                guard positions.count >= 3, let first = positions.first, let last = positions.last else {
+                    XCTFail("Playable instrument positions unavailable")
+                    return
+                }
+                let middle = positions[positions.count / 2]
+                let y: CGFloat = guitar ? 0.5 : 0.85
+                let start = first.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: y))
+                let mid = middle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: y))
+                let end = last.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: y))
+                start.press(forDuration: 0.10, thenDragTo: end)
+                XCTAssertTrue(range.isHittable, "Leading-key slide must not navigate")
+                mid.press(forDuration: 0.10, thenDragTo: end)
+                XCTAssertTrue(range.isHittable, "Interior rightward slide must not navigate")
+                end.press(forDuration: 0.10, thenDragTo: start)
+                XCTAssertTrue(range.isHittable, "Reverse slide must not navigate")
+                let edgeY = (first.frame.minY + first.frame.height * y - app.frame.minY) / app.frame.height
+                let edge = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: edgeY))
+                edge.press(forDuration: 0.10, thenDragTo: end)
+                XCTAssertTrue(range.isHittable, "Screen-edge drag must not dismiss workspace")
+            }
+            XCTAssertTrue(back.isHittable)
+            back.tap()
+            let closed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in !back.exists }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [closed], timeout: 10), .completed)
+        }
+    }
+
+    @MainActor
+    func testPlaygroundLandscapeKeepsControlsTogetherAndPlayableCanvas() {
+        let device = XCUIDevice.shared
+        let app = XCUIApplication()
+        device.orientation = .portrait
+        defer {
+            app.terminate()
+            device.orientation = .portrait
+        }
+
+        func expectToggleChange(_ toggle: XCUIElement) {
+            let previous = toggle.value as? String
+            // SwiftUI may expose the full labeled row as the switch element;
+            // tapping its center is not necessarily tapping the actual control.
+            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+            let changed = XCTNSPredicateExpectation(
+                predicate: NSPredicate { _, _ in (toggle.value as? String) != previous },
+                object: nil
+            )
+            XCTAssertEqual(XCTWaiter.wait(for: [changed], timeout: 5), .completed)
+        }
+
+        app.launch()
+        openRoute(in: app, identifier: "home.route.freeKeyboard")
+        let pianoRange = app.staticTexts["playground.range"]
+        XCTAssertTrue(pianoRange.waitForExistence(timeout: 10))
+        device.orientation = .landscapeLeft
+        let landscape = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _, _ in app.frame.width > app.frame.height },
+            object: nil
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [landscape], timeout: 10), .completed)
+        let pianoToggle = app.switches["playground.noteNames"]
+        let pianoLower = app.buttons["playground.lower"]
+        let pianoHigher = app.buttons["playground.higher"]
+        XCTAssertTrue(pianoToggle.waitForExistence(timeout: 10))
+        XCTAssertTrue(pianoToggle.isHittable)
+        XCTAssertTrue(pianoLower.exists)
+        XCTAssertTrue(pianoHigher.exists)
+        XCTAssertLessThan(abs(pianoToggle.frame.midY - pianoRange.frame.midY), 25)
+        XCTAssertLessThan(abs(pianoToggle.frame.midY - pianoHigher.frame.midY), 25)
+        let whiteKey = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@", "playground.key.", "C in octave")).firstMatch
+        XCTAssertTrue(whiteKey.waitForExistence(timeout: 10))
+        XCTAssertGreaterThan(whiteKey.frame.height, app.frame.height * 0.40)
+        XCTAssertGreaterThanOrEqual(whiteKey.frame.minY, pianoHigher.frame.maxY - 2)
+        let naturalKeys = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label MATCHES %@", "playground.key.", "[A-G] in octave [2-6]"))
+        XCTAssertGreaterThanOrEqual(naturalKeys.count, 10)
+        XCTAssertGreaterThanOrEqual(whiteKey.frame.width, 40)
+        XCTAssertLessThanOrEqual(whiteKey.frame.width, 60)
+        XCTAssertFalse(app.staticTexts["playground.help"].exists)
+        expectToggleChange(pianoToggle)
+        expectToggleChange(pianoToggle)
+
+        app.terminate()
+        device.orientation = .portrait
+        app.launch()
+        openRoute(in: app, identifier: "home.route.freeFretboard")
+        let fretRange = app.staticTexts["fretboard.range"]
+        XCTAssertTrue(fretRange.waitForExistence(timeout: 10))
+        device.orientation = .landscapeLeft
+        let guitarLandscape = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _, _ in app.frame.width > app.frame.height },
+            object: nil
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [guitarLandscape], timeout: 10), .completed)
+        let fretToggle = app.switches["fretboard.noteNames"]
+        let fretHigher = app.buttons["fretboard.higher"]
+        XCTAssertTrue(fretToggle.waitForExistence(timeout: 10))
+        XCTAssertTrue(fretToggle.isHittable)
+        XCTAssertLessThan(abs(fretToggle.frame.midY - fretRange.frame.midY), 25)
+        XCTAssertLessThan(abs(fretToggle.frame.midY - fretHigher.frame.midY), 25)
+        let firstString = app.buttons["fretboard.position.1.0"]
+        let lastString = app.buttons["fretboard.position.6.0"]
+        XCTAssertTrue(firstString.waitForExistence(timeout: 10))
+        XCTAssertTrue(lastString.exists)
+        XCTAssertGreaterThan(lastString.frame.maxY - firstString.frame.minY, app.frame.height * 0.35)
+        XCTAssertGreaterThanOrEqual(firstString.frame.minY, fretHigher.frame.maxY - 2)
+        XCTAssertFalse(app.staticTexts["fretboard.help"].exists)
+        expectToggleChange(fretToggle)
+        expectToggleChange(fretToggle)
+        firstString.tap()
+    }
+
 }

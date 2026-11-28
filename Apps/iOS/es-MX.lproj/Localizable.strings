@@ -203,3 +203,44 @@
 "Not yet. Choose a tone in both regions." = "Aún no. Elige una nota en ambas regiones.";
 "Find one position that belongs to both regions." = "Encuentra una posición que pertenezca a ambas regiones.";
 "Explore the chord shape and surrounding scale tones." = "Explora la forma del acorde y las notas de la escala que la rodean.";
+
+/* M23 music atlas */
+"Music Atlas" = "Atlas musical";
+"Discover musical relationships across piano and guitar." = "Descubre relaciones musicales entre el piano y la guitarra.";
+"One musical idea, two instruments" = "Una idea musical, dos instrumentos";
+"Musical structure" = "Estructura musical";
+"Directed interval" = "Intervalo con dirección";
+"%+d semitones" = "%+d semitonos";
+"Chord quality" = "Tipo de acorde";
+"Direction" = "Dirección";
+"Ascending" = "Ascendente";
+"Descending" = "Descendente";
+"Hear structure" = "Escuchar estructura";
+"Focus pitch: %@" = "Altura seleccionada: %@";
+"Matching positions" = "Posiciones equivalentes";
+"Matching position" = "Posición equivalente";
+"Pitch class" = "Clase de altura";
+"Guitar matches: %d" = "Coincidencias en guitarra: %d";
+"Tap either instrument to follow the same sounding note. Outlines mark matches; colored markers show structure tones." = "Toca cualquiera de los instrumentos para seguir la misma nota. Los contornos marcan coincidencias; los marcadores de color muestran notas de la estructura.";
+"Piano" = "Piano";
+"Guitar" = "Guitarra";
+"Octave %d" = "Octava %d";
+"Explore relationships" = "Explorar relaciones";
+"Key signature: %@" = "Armadura: %@";
+"None" = "Ninguna";
+"Compare chords" = "Comparar acordes";
+"Comparison root" = "Fundamental de comparación";
+"Comparison quality" = "Tipo de acorde de comparación";
+"Shared tones: %@" = "Notas comunes: %@";
+"First chord only: %@" = "Solo primer acorde: %@";
+"Second chord only: %@" = "Solo segundo acorde: %@";
+"Hear comparison chord" = "Escuchar acorde de comparación";
+"Structure tones are pitch classes. Matching an exact pitch also requires the same octave." = "Las notas de la estructura son clases de altura. La altura exacta exige también la misma octava.";
+"Focus distance from root in octave 4: %+d semitones." = "Distancia desde la fundamental en la octava 4: %+d semitonos.";
+"Note" = "Nota";
+"Interval" = "Intervalo";
+"Chord" = "Acorde";
+"Major key" = "Tonalidad mayor";
+
+/* M23 isolated instrument workspace */
+"Back" = "Atrás";

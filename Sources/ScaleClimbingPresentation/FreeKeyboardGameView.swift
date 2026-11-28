@@ -31,74 +31,54 @@ public struct FreeKeyboardGameView: View {
 
     public var body: some View {
         GeometryReader { proxy in
-            let model = FreeKeyboardRange.keyboard(
-                startingOctave: startingOctave,
-                viewportWidth: Double(proxy.size.width)
-            )
-            let octaves = FreeKeyboardRange.octaveCount(forWidth: Double(proxy.size.width))
-            let compact = octaves == 1
-            let keyHeight = FreeKeyboardSizing.keyboardHeight(
-                viewportWidth: Double(proxy.size.width),
-                viewportHeight: Double(proxy.size.height)
-            )
-            VStack(spacing: 10) {
-                controls(visibleOctaves: octaves, compact: compact)
-
-                // Center the proportionally sized piano in portrait rather than
-                // stretching the key faces to fill unused vertical space.
-                if compact {
-                    Spacer(minLength: 0)
+            let width = Double(proxy.size.width)
+            let layout = InstrumentPlaygroundLayout(width: width, height: Double(proxy.size.height))
+            let range = FreeKeyboardRange(startingOctave: startingOctave, surfaceWidth: width - 24)
+            let model = range.model
+            VStack(spacing: layout.showsHelp ? 8 : 4) {
+                PlaygroundControlStrip(showNoteNames: $showNoteNames, identifier: "playground.noteNames") {
+                    octaveControls(range)
                 }
-
-                #if os(iOS)
-                FreeKeyboardTouchSurface(
-                    model: model,
-                    showNoteNames: showNoteNames,
-                    isActive: scenePhase == .active,
-                    onNoteEvent: handleNoteEvent,
-                    onAccessibleAudition: onAccessibleAudition
-                )
-                .frame(maxWidth: .infinity)
-                .frame(height: CGFloat(keyHeight))
-                .accessibilityIdentifier("playground.keyboard")
-                #else
-                PianoKeyboardView(model: model, highlightedPitches: [], onKeyTap: { key in
-                    onAccessibleAudition(key.pitch)
-                })
-                #endif
-
-                Text(AppCopy.text("Hold keys to sustain notes. Use several fingers for chords."))
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.7)
-                    .accessibilityIdentifier("playground.help")
-
-                if compact {
-                    Spacer(minLength: 0)
+                GeometryReader { canvas in
+                    let height = layout.keyboardHeight(surfaceWidth: Double(canvas.size.width),
+                        availableHeight: Double(canvas.size.height), naturalKeyCount: range.naturalKeyCount)
+                    #if os(iOS)
+                    FreeKeyboardTouchSurface(model: model, showNoteNames: showNoteNames,
+                        isActive: scenePhase == .active, onNoteEvent: handleNoteEvent,
+                        onAccessibleAudition: onAccessibleAudition)
+                        .frame(width: canvas.size.width, height: CGFloat(height))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    #else
+                    PianoKeyboardView(model: model, highlightedPitches: [], onKeyTap: { key in
+                        onAccessibleAudition(key.pitch)
+                    })
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    #endif
+                }
+                if layout.showsHelp {
+                    Text(AppCopy.text("Hold keys to sustain notes. Use several fingers for chords."))
+                        .font(.footnote).foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center).lineLimit(2)
+                        .accessibilityIdentifier("playground.help")
                 }
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 6)
+            .padding(.vertical, layout.showsHelp ? 6 : 2)
             .onAppear { onPrepare(model.keys.map(\.pitch)) }
-            .onChange(of: startingOctave) { _, _ in
+            .onChange(of: model) { _, newModel in
                 onAllNotesOff()
-                onPrepare(model.keys.map(\.pitch))
-            }
-            .onChange(of: proxy.size.width) { _, _ in
-                onAllNotesOff()
-                onPrepare(model.keys.map(\.pitch))
+                onPrepare(newModel.keys.map(\.pitch))
             }
             .onDisappear { onAllNotesOff() }
             .onChange(of: scenePhase) { _, phase in
-                if phase != .active {
-                    onAllNotesOff()
-                }
+                if phase != .active { onAllNotesOff() }
             }
         }
         .background(ScaleClimbingPalette.canvas(for: colorScheme).ignoresSafeArea())
         .navigationTitle(AppCopy.text("Free Keyboard"))
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
 
     private func handleNoteEvent(_ event: FreeKeyboardNoteEvent) {
@@ -108,60 +88,32 @@ public struct FreeKeyboardGameView: View {
         }
     }
 
-    @ViewBuilder
-    private func controls(visibleOctaves: Int, compact: Bool) -> some View {
-        if compact {
-            // One readable control per row avoids compressed Spanish labels on
-            // portrait phones and leaves the octave controls easy to operate.
-            VStack(spacing: 6) {
-                HStack {
-                    octaveControls(visibleOctaves: visibleOctaves)
-                    Spacer(minLength: 0)
-                }
-                noteNamesToggle
-                    .frame(maxWidth: .infinity)
-            }
-            .controlSize(.regular)
-        } else {
-            HStack(spacing: 10) {
-                octaveControls(visibleOctaves: visibleOctaves)
-                Spacer(minLength: 4)
-                noteNamesToggle
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-            .controlSize(.regular)
-        }
-    }
-
-    private var noteNamesToggle: some View {
-        Toggle(AppCopy.text("Note names"), isOn: $showNoteNames)
-            .font(.subheadline)
-            .accessibilityIdentifier("playground.noteNames")
-    }
-
-    private func octaveControls(visibleOctaves: Int) -> some View {
-        HStack(spacing: 12) {
+    private func octaveControls(_ range: FreeKeyboardRange) -> some View {
+        HStack(spacing: 4) {
             Button {
-                startingOctave = max(2, startingOctave - 1)
+                if let lower = range.lowerOctave { startingOctave = lower }
             } label: {
                 Image(systemName: "minus.circle")
                     .font(.title3)
+                    .frame(minWidth: 44, minHeight: 44)
             }
-            .disabled(startingOctave <= 2)
+            .disabled(range.lowerOctave == nil)
             .accessibilityLabel(AppCopy.text("Lower octave"))
             .accessibilityIdentifier("playground.lower")
 
-            Text("C\(startingOctave)–B\(startingOctave + visibleOctaves - 1)")
+            Text(range.rangeLabel)
                 .font(.subheadline.monospacedDigit().weight(.semibold))
+                .lineLimit(1).minimumScaleFactor(0.65)
                 .accessibilityIdentifier("playground.range")
 
             Button {
-                startingOctave = min(6 - visibleOctaves + 1, startingOctave + 1)
+                if let higher = range.higherOctave { startingOctave = higher }
             } label: {
                 Image(systemName: "plus.circle")
                     .font(.title3)
+                    .frame(minWidth: 44, minHeight: 44)
             }
-            .disabled(startingOctave + visibleOctaves - 1 >= 6)
+            .disabled(range.higherOctave == nil)
             .accessibilityLabel(AppCopy.text("Higher octave"))
             .accessibilityIdentifier("playground.higher")
         }

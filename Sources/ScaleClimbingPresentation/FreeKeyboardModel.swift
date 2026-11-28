@@ -1,40 +1,46 @@
 import Foundation
 import MusicTheoryCore
 
-/// A compact, viewport-dependent keyboard range. Real device width, not a
-/// manually locked orientation, decides how many full octaves fit comfortably.
-public enum FreeKeyboardRange {
-    public static func octaveCount(forWidth width: Double) -> Int {
-        if width >= 980 { return 3 }
-        if width >= 620 { return 2 }
-        return 1
+/// A viewport-driven chromatic window. Density is determined by white-key
+/// width, not whole-octave breakpoints. Natural endpoints avoid clipped
+/// accidental keys; the high boundary shifts the window rather than stretching it.
+public struct FreeKeyboardRange: Sendable {
+    public static let targetNaturalKeyWidth = 48.0
+    private static let naturalPitches = PianoKeyboardModel.chromaticRange(
+        from: Pitch(.c, octave: 2), through: Pitch(.b, octave: 6)
+    ).keys.filter(\.isNatural).map(\.pitch)
+
+    public let naturalKeyCount: Int
+    public let model: PianoKeyboardModel
+    public let rangeLabel: String
+    public let lowerOctave: Int?
+    public let higherOctave: Int?
+
+    public init(startingOctave: Int, surfaceWidth: Double) {
+        let pitches = Self.naturalPitches
+        // Retain one octave on narrow phones so octave navigation never
+        // skips pitches. Invalid/transient zero widths get a safe fallback.
+        let count: Int
+        if surfaceWidth.isFinite && surfaceWidth > 0 {
+            let fit = min(Double(pitches.count), surfaceWidth / Self.targetNaturalKeyWidth)
+            count = max(7, Int(fit.rounded(.down)))
+        } else { count = 1 }
+        naturalKeyCount = count
+        let maxStart = pitches.count - count
+        let maxPage = min(6, 2 + (maxStart + 6) / 7)
+        let page = min(maxPage, max(2, startingOctave))
+        let start = min(maxStart, (page - 2) * 7)
+        let first = pitches[start]
+        let last = pitches[start + count - 1]
+        model = .chromaticRange(from: first, through: last)
+        rangeLabel = "\(first.description)–\(last.description)"
+        lowerOctave = page > 2 ? page - 1 : nil
+        higherOctave = page < maxPage ? page + 1 : nil
     }
 
+    /// Compatibility convenience for callers with the full padded viewport.
     public static func keyboard(startingOctave: Int, viewportWidth: Double) -> PianoKeyboardModel {
-        let octaves = octaveCount(forWidth: viewportWidth)
-        return .chromaticRange(
-            from: Pitch(.c, octave: startingOctave),
-            through: Pitch(.b, octave: startingOctave + octaves - 1)
-        )
-    }
-}
-
-
-/// Screen-aware height for the free-play canvas. Key depth is proportional to
-/// the natural-key width, not the height of the enclosing GeometryReader.
-/// The reserved area protects octave/label controls and the instruction line
-/// on compact and landscape layouts, including smaller device heights.
-public enum FreeKeyboardSizing {
-    public static func keyboardHeight(
-        viewportWidth: Double,
-        viewportHeight: Double
-    ) -> Double {
-        let octaves = FreeKeyboardRange.octaveCount(forWidth: viewportWidth)
-        let naturalKeyWidth = max(0, viewportWidth - 24) / Double(octaves * 7)
-        let preferred = naturalKeyWidth * 4.6
-        let reservedHeight: Double = octaves == 1 ? 168 : 112
-        let usableHeight = max(0, viewportHeight - reservedHeight)
-        return min(preferred, usableHeight)
+        FreeKeyboardRange(startingOctave: startingOctave, surfaceWidth: viewportWidth - 24).model
     }
 }
 

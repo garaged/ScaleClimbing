@@ -4,13 +4,16 @@ import SwiftUI
 public struct VoicingLabGameView: View {
     @StateObject private var viewModel: VoicingLabViewModel
     private let onPlayVoicing: ([Pitch]) -> Void
+    private let onPlayPitch: (Pitch) -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> VoicingLabViewModel = VoicingLabViewModel(),
-        onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in }
+        onPlayVoicing: @escaping ([Pitch]) -> Void = { _ in },
+        onPlayPitch: @escaping (Pitch) -> Void = { _ in }
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
         self.onPlayVoicing = onPlayVoicing
+        self.onPlayPitch = onPlayPitch
     }
 
     public var body: some View {
@@ -43,6 +46,7 @@ public struct VoicingLabGameView: View {
                 PianoKeyboardView(
                     model: viewModel.keyboard,
                     highlightedPitches: viewModel.selectedPitches,
+                    onKeyPreview: { onPlayPitch($0.pitch) },
                     onKeyTap: { key in viewModel.toggle(key.pitch) }
                 )
 

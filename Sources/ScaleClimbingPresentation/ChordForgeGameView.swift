@@ -52,10 +52,8 @@ public struct ChordForgeGameView: View {
         PianoKeyboardView(
             model: viewModel.keyboard,
             highlightedPitchClasses: viewModel.selectedPitchClasses,
-            onKeyTap: { key in
-                viewModel.toggle(key)
-                onPlayPitch(PianoKeyAudition.pitch(for: key))
-            }
+            onKeyPreview: { onPlayPitch(PianoKeyAudition.pitch(for: $0)) },
+            onKeyTap: { viewModel.toggle($0) }
         )
     }
 

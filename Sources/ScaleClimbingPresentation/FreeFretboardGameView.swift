@@ -30,44 +30,45 @@ public struct FreeFretboardGameView: View {
         GeometryReader { proxy in
             let width = max(0, Double(proxy.size.width) - 24)
             let window = FretboardWindow(start: start, width: width)
-            let wide = width >= 480
-            VStack(spacing: 8) {
-                if wide {
-                    HStack { rangeControls(window); Spacer(minLength: 8); noteToggle }
-                } else {
+            let layout = InstrumentPlaygroundLayout(width: Double(proxy.size.width), height: Double(proxy.size.height))
+            VStack(spacing: layout.showsHelp ? 8 : 4) {
+                PlaygroundControlStrip(showNoteNames: $showNoteNames, identifier: "fretboard.noteNames") {
                     rangeControls(window)
-                    noteToggle
                 }
-                if !wide { Spacer(minLength: 0) }
-                #if os(iOS)
-                FreeFretboardTouchSurface(window: window, showNoteNames: showNoteNames,
-                    isActive: scenePhase == .active, onEvent: handle, onAudition: onAudition)
-                    .frame(height: max(80, min(wide ? 360 : 320, proxy.size.height - (wide ? 82 : 145))))
-
-                #else
-                ScrollView {
-                    VStack(spacing: 4) {
-                        ForEach(1...6, id: \.self) { string in
-                            HStack {
-                                ForEach(Array(window.frets), id: \.self) { fret in
-                                    if let pitch = InstrumentMapping.standardGuitar.pitch(at: .fret(string: string, fret: fret)) {
-                                        Button(showNoteNames ? pitch.description : "\(fret)") { onAudition(pitch) }
-                                            .accessibilityLabel(String(format: AppCopy.text("String %d, fret %d, %@"), string, fret, pitch.description))
+                GeometryReader { canvas in
+                    let height = layout.fretboardHeight(availableHeight: Double(canvas.size.height))
+                    #if os(iOS)
+                    FreeFretboardTouchSurface(window: window, showNoteNames: showNoteNames,
+                        isActive: scenePhase == .active, onEvent: handle, onAudition: onAudition)
+                        .frame(width: canvas.size.width, height: CGFloat(height))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    #else
+                    ScrollView {
+                        VStack(spacing: 4) {
+                            ForEach(1...6, id: \.self) { string in
+                                HStack {
+                                    ForEach(Array(window.frets), id: \.self) { fret in
+                                        if let pitch = InstrumentMapping.standardGuitar.pitch(at: .fret(string: string, fret: fret)) {
+                                            Button(showNoteNames ? pitch.description : "\(fret)") { onAudition(pitch) }
+                                                .accessibilityLabel(String(format: AppCopy.text("String %d, fret %d, %@"), string, fret, pitch.description))
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    #endif
                 }
-                #endif
-                Text(AppCopy.text("Tap or hold a note. Slide across strings or frets to play."))
-                    .font(.footnote).foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .accessibilityIdentifier("fretboard.help")
-                if !wide { Spacer(minLength: 0) }
+                if layout.showsHelp {
+                    Text(AppCopy.text("Tap or hold a note. Slide across strings or frets to play."))
+                        .font(.footnote).foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center).lineLimit(2)
+                        .accessibilityIdentifier("fretboard.help")
+                }
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 4)
+            .padding(.vertical, layout.showsHelp ? 6 : 2)
             .onAppear {
                 onPrepare(InstrumentMapping.standardGuitar.positions.compactMap { InstrumentMapping.standardGuitar.pitch(at: $0) })
             }
@@ -85,26 +86,19 @@ public struct FreeFretboardGameView: View {
         #endif
     }
 
-    private var noteToggle: some View {
-        Toggle(AppCopy.text("Note names"), isOn: $showNoteNames)
-            .font(.subheadline)
-            .accessibilityIdentifier("fretboard.noteNames")
-    }
-
     private func rangeControls(_ window: FretboardWindow) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 4) {
             Button { start = window.previousStart } label: {
                 Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44)
             }
             .disabled(window.start == 0)
             .accessibilityLabel(AppCopy.text("Lower frets"))
             .accessibilityIdentifier("fretboard.lower")
-            VStack(spacing: 2) {
-                Text(String(format: AppCopy.text("Frets %d–%d"), window.start, window.frets.upperBound))
-                    .font(.subheadline.monospacedDigit().weight(.semibold))
-                    .accessibilityIdentifier("fretboard.range")
-                Text(AppCopy.text("Standard tuning")).font(.caption).foregroundStyle(.secondary)
-            }
+            Text(String(format: AppCopy.text("Frets %d–%d"), window.start, window.frets.upperBound))
+                .font(.subheadline.monospacedDigit().weight(.semibold))
+                .lineLimit(1).minimumScaleFactor(0.65)
+                .accessibilityIdentifier("fretboard.range")
+                .accessibilityHint(AppCopy.text("Standard tuning"))
             Button { start = window.nextStart } label: {
                 Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44)
             }

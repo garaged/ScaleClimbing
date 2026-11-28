@@ -16,13 +16,15 @@ public struct FretboardSelectionView: View {
     public let overlayLabels: [InstrumentPosition: String]
     public let shapePositions: Set<InstrumentPosition>
     public let onSelect: (InstrumentPosition) -> Void
+    public let onPreview: ((InstrumentPosition) -> Void)?
     private let guitar = InstrumentMapping.standardGuitar
 
     public init(window: FretboardWindow, showNames: Bool, anchor: InstrumentPosition? = nil,
                 selected: InstrumentPosition? = nil, result: Bool? = nil, locked: Bool = false,
                 selectedPositions: Set<InstrumentPosition> = [], allowedStrings: Set<Int> = Set(1...6),
                 identifierPrefix: String = "fretPractice", overlayLabels: [InstrumentPosition: String] = [:],
-                shapePositions: Set<InstrumentPosition> = [], onSelect: @escaping (InstrumentPosition) -> Void) {
+                shapePositions: Set<InstrumentPosition> = [], onPreview: ((InstrumentPosition) -> Void)? = nil,
+                onSelect: @escaping (InstrumentPosition) -> Void) {
         self.window = window
         self.showNames = showNames
         self.anchor = anchor
@@ -35,6 +37,7 @@ public struct FretboardSelectionView: View {
         self.overlayLabels = overlayLabels
         self.shapePositions = shapePositions
         self.onSelect = onSelect
+        self.onPreview = onPreview
     }
 
     public var body: some View {
@@ -69,7 +72,8 @@ public struct FretboardSelectionView: View {
         let isAnchor = position == anchor
         let overlay = overlayLabels[position]
         let isShape = shapePositions.contains(position)
-        return Button { onSelect(position) } label: {
+        return InstrumentPressButton(onPreview: onPreview.map { preview in { preview(position) } },
+            onSelect: { onSelect(position) }) {
             ZStack {
                 Rectangle().fill(Color(red: 0.25, green: 0.17, blue: 0.12))
                 Rectangle().fill(.white.opacity(0.65)).frame(height: CGFloat(string) * 0.3 + 0.6)
@@ -92,7 +96,7 @@ public struct FretboardSelectionView: View {
             .frame(maxWidth: .infinity, minHeight: 44)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain).disabled(locked || !allowedStrings.contains(string))
+        .disabled(locked || !allowedStrings.contains(string))
         .opacity(allowedStrings.contains(string) ? 1 : 0.5)
         .accessibilityLabel(String(format: AppCopy.text("String %d, fret %d, %@"), string, fret, pitch?.description ?? ""))
         .accessibilityAddTraits(isSelected || isAnchor ? [.isSelected] : [])

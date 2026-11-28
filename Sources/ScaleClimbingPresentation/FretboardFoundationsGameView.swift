@@ -8,14 +8,17 @@ public struct FretboardFoundationsGameView: View {
     @AppStorage("learningAssistanceLevel") private var assistanceRaw = LearningAssistanceLevel.standard.rawValue
     private let onGuitarAudition: (Pitch) -> Void
     private let onPianoAudition: (Pitch) -> Void
+    private let onPianoReference: (Pitch) -> Void
     private let onStopAudio: () -> Void
     @Environment(\.scenePhase) private var scenePhase
 
     public init(onGuitarAudition: @escaping (Pitch) -> Void = { _ in },
                 onPianoAudition: @escaping (Pitch) -> Void = { _ in },
+                onPianoReference: ((Pitch) -> Void)? = nil,
                 onStopAudio: @escaping () -> Void = {}) {
         self.onGuitarAudition = onGuitarAudition
         self.onPianoAudition = onPianoAudition
+        self.onPianoReference = onPianoReference ?? onPianoAudition
         self.onStopAudio = onStopAudio
     }
 
@@ -71,6 +74,7 @@ public struct FretboardFoundationsGameView: View {
                     FretboardSelectionView(window: window, showNames: namesVisible,
                         anchor: guitarAnchor, selected: session.selected?.position,
                         result: session.lastResult, locked: session.lastResult == true,
+                        onPreview: { position in if let pitch = guitar.pitch(at: position) { onGuitarAudition(pitch) } },
                         onSelect: submit)
                     if guitarAnchor != nil {
                         Text(AppCopy.text("Blue marks the starting position.")).font(.caption).foregroundStyle(.secondary)
@@ -104,8 +108,7 @@ public struct FretboardFoundationsGameView: View {
     }
 
     private func submit(_ position: InstrumentPosition) {
-        guard session.submit(position) != nil, let pitch = session.selected?.pitch else { return }
-        onGuitarAudition(pitch)
+        _ = session.submit(position)
     }
 
     private var referencePitch: Pitch? {
@@ -119,7 +122,7 @@ public struct FretboardFoundationsGameView: View {
 
     private func hearReference() {
         guard let pitch = referencePitch else { return }
-        if session.mode == .transfer { onPianoAudition(pitch) }
+        if session.mode == .transfer { onPianoReference(pitch) }
         else { onGuitarAudition(pitch) }
     }
 
@@ -132,7 +135,7 @@ public struct FretboardFoundationsGameView: View {
                 Text(String(format: AppCopy.text("Piano reference: %@"), anchor.pitch.description))
                     .font(.subheadline).accessibilityIdentifier("fretPractice.anchor")
                 PianoKeyboardView(model: .chromaticRange(from: Pitch(.c, octave: 4), through: Pitch(.b, octave: 4)),
-                    highlightedPitches: [anchor.pitch], onKeyTap: { key in onPianoAudition(key.pitch) })
+                    highlightedPitches: [anchor.pitch], onKeyPreview: { onPianoAudition($0.pitch) }, onKeyTap: { _ in })
             }
         }
     }

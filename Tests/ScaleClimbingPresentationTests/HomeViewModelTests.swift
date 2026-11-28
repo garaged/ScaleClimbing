@@ -15,11 +15,13 @@ import Testing
 }
 
 @Test func everyExerciseRouteBelongsToOnePracticeZoneButFreePlayDoesNot() {
-    for route in AppRoute.allCases where route != .learningPath && route != .freeKeyboard && route != .freeFretboard {
+    for route in AppRoute.allCases where route != .learningPath && route != .freeKeyboard && route != .freeFretboard && route != .musicAtlas {
         #expect(route.practiceZone != nil)
     }
     #expect(AppRoute.learningPath.practiceZone == nil)
     #expect(AppRoute.freeKeyboard.practiceZone == nil)
     #expect(AppRoute.freeFretboard.practiceZone == nil)
     #expect(AppRoute.freeFretboard.title == "Free Fretboard")
+    #expect(AppRoute.musicAtlas.practiceZone == nil)
+    #expect(AppRoute.musicAtlas.title == "Music Atlas")
 }

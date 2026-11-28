@@ -3,6 +3,8 @@ import SwiftUI
 
 public struct ScaleClimbingRootView: View {
     @StateObject private var viewModel: HomeViewModel
+    @State private var presentedInstrument: AppRoute?
+    @Environment(\.scenePhase) private var scenePhase
     private let onPlayChord: ([PitchClass]) -> Void
     private let onPlayPitch: (Pitch) -> Void
     private let onPlayInterval: ([Pitch]) -> Void
@@ -19,6 +21,8 @@ public struct ScaleClimbingRootView: View {
     private let onGuitarNoteOff: (Int) -> Void
     private let onGuitarPrepare: ([Pitch]) -> Void
     private let onGuitarAudition: (Pitch) -> Void
+    private let onPianoAudition: (Pitch) -> Void
+    private let onStopAuditions: () -> Void
 
     public init(
         viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel(),
@@ -37,17 +41,21 @@ public struct ScaleClimbingRootView: View {
         onGuitarNoteOn: @escaping (Int, Pitch) -> Void = { _, _ in },
         onGuitarNoteOff: @escaping (Int) -> Void = { _ in },
         onGuitarPrepare: @escaping ([Pitch]) -> Void = { _ in },
-        onGuitarAudition: @escaping (Pitch) -> Void = { _ in }
+        onGuitarAudition: @escaping (Pitch) -> Void = { _ in },
+        onPianoAudition: ((Pitch) -> Void)? = nil,
+        onStopAuditions: (() -> Void)? = nil
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())
-        self.onPlayChord = onPlayChord
-        self.onPlayPitch = onPlayPitch
-        self.onPlayInterval = onPlayInterval
-        self.onPlayVoicing = onPlayVoicing
-        self.onPlayScale = onPlayScale
-        self.onPlayProgression = onPlayProgression
-        self.onPlayRhythm = onPlayRhythm
-        self.onPlayTimbre = onPlayTimbre
+        let stopAuditions = onStopAuditions ?? onLiveAllNotesOff
+        self.onStopAuditions = stopAuditions
+        self.onPlayChord = { value in stopAuditions(); onPlayChord(value) }
+        self.onPlayPitch = { value in stopAuditions(); onPlayPitch(value) }
+        self.onPlayInterval = { value in stopAuditions(); onPlayInterval(value) }
+        self.onPlayVoicing = { value in stopAuditions(); onPlayVoicing(value) }
+        self.onPlayScale = { value in stopAuditions(); onPlayScale(value) }
+        self.onPlayProgression = { value in stopAuditions(); onPlayProgression(value) }
+        self.onPlayRhythm = { value in stopAuditions(); onPlayRhythm(value) }
+        self.onPlayTimbre = { value in stopAuditions(); onPlayTimbre(value) }
         self.onLiveNoteOn = onLiveNoteOn
         self.onLiveNoteOff = onLiveNoteOff
         self.onLiveAllNotesOff = onLiveAllNotesOff
@@ -56,13 +64,20 @@ public struct ScaleClimbingRootView: View {
         self.onGuitarNoteOff = onGuitarNoteOff
         self.onGuitarPrepare = onGuitarPrepare
         self.onGuitarAudition = onGuitarAudition
+        self.onPianoAudition = onPianoAudition ?? onPlayPitch
     }
 
     public var body: some View {
         NavigationStack {
-            HomeView(viewModel: viewModel)
+            HomeView(viewModel: viewModel, onOpenInstrument: { presentedInstrument = $0 })
                 .navigationDestination(for: AppRoute.self) { route in
                     destination(for: route)
+                        .onAppear {
+                            if [.musicAtlas, .scaleNetwork, .guitarTriads, .fretboardFoundations, .noteHunter, .chordForge, .voicingLab, .chordAtlas, .scaleExplorer].contains(route) {
+                                onLivePrepare([Pitch(.c, octave: 4)])
+                            }
+                        }
+                        .onDisappear { onStopAuditions() }
                 }
                 .toolbar {
                     ToolbarItem(placement: .automatic) {
@@ -83,6 +98,31 @@ public struct ScaleClimbingRootView: View {
                     }
                 }
         }
+        #if os(iOS)
+        // A root-only, full-screen workspace has no navigation controller
+        // history to pop. Both edge and content-area swipe-back gestures
+        // are therefore outside the instrument's touch path.
+        .fullScreenCover(item: $presentedInstrument) { route in
+            NavigationStack {
+                destination(for: route)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button {
+                                onLiveAllNotesOff()
+                                presentedInstrument = nil
+                            } label: {
+                                Label(AppCopy.text("Back"), systemImage: "chevron.backward")
+                                    .labelStyle(.iconOnly)
+                            }
+                            .accessibilityLabel(AppCopy.text("Back"))
+                            .accessibilityIdentifier("playground.back")
+                        }
+                    }
+            }
+            .interactiveDismissDisabled(true)
+        }
+        #endif
+        .onChange(of: scenePhase) { _, phase in if phase != .active { onStopAuditions() } }
     }
 
     @ViewBuilder
@@ -94,32 +134,34 @@ public struct ScaleClimbingRootView: View {
                 onNoteOff: onLiveNoteOff,
                 onAllNotesOff: onLiveAllNotesOff,
                 onPrepare: onLivePrepare,
-                onAccessibleAudition: onPlayPitch
+                onAccessibleAudition: onPianoAudition
             )
         case .freeFretboard:
             FreeFretboardGameView(onNoteOn: onGuitarNoteOn, onNoteOff: onGuitarNoteOff,
                 onAllNotesOff: onLiveAllNotesOff, onPrepare: onGuitarPrepare, onAudition: onGuitarAudition)
+        case .musicAtlas:
+            MusicAtlasGameView(onPiano: onPianoAudition, onGuitar: onGuitarAudition, onSequence: onPlayScale, onChord: onPlayVoicing, onStop: onStopAuditions)
         case .scaleNetwork:
-            ScaleNetworkGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
+            ScaleNetworkGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onStopAuditions)
         case .guitarTriads:
-            GuitarTriadsGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onLiveAllNotesOff)
+            GuitarTriadsGameView(onNote: onGuitarAudition, onChord: onPlayVoicing, onStop: onStopAuditions)
         case .fretboardFoundations:
-            FretboardFoundationsGameView(onGuitarAudition: onGuitarAudition, onPianoAudition: onPlayPitch,
-                onStopAudio: onLiveAllNotesOff)
+            FretboardFoundationsGameView(onGuitarAudition: onGuitarAudition, onPianoAudition: onPianoAudition,
+                onPianoReference: onPlayPitch, onStopAudio: onStopAuditions)
         case .noteHunter:
-            NoteHunterGameView(onPlayPitch: onPlayPitch)
+            NoteHunterGameView(onPlayPitch: onPianoAudition)
         case .chordForge:
-            ChordForgeGameView(onPlayChord: onPlayChord, onPlayPitch: onPlayPitch)
+            ChordForgeGameView(onPlayChord: onPlayChord, onPlayPitch: onPianoAudition)
         case .earTraining:
             EarTrainingGameView(onPlayChord: onPlayChord)
         case .intervalTrail:
             IntervalTrailGameView(onPlayInterval: onPlayInterval)
         case .voicingLab:
-            VoicingLabGameView(onPlayVoicing: onPlayVoicing)
+            VoicingLabGameView(onPlayVoicing: onPlayVoicing, onPlayPitch: onPianoAudition)
         case .chordAtlas:
-            ChordAtlasGameView(onPlayVoicing: onPlayVoicing, onPlayPitch: onPlayPitch)
+            ChordAtlasGameView(onPlayVoicing: onPlayVoicing, onPlayPitch: onPianoAudition)
         case .scaleExplorer:
-            ScaleExplorerGameView(onPlayScale: onPlayScale)
+            ScaleExplorerGameView(onPlayScale: onPlayScale, onPlayPitch: onPianoAudition)
         case .harmonyPath:
             HarmonyPathGameView(onPlayProgression: onPlayProgression)
         case .rhythmTrail:
@@ -139,9 +181,19 @@ public struct ScaleClimbingRootView: View {
 
 private struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
+    let onOpenInstrument: (AppRoute) -> Void
     @Environment(\.colorScheme) private var colorScheme
 
     private let columns = [GridItem(.adaptive(minimum: 155), spacing: 12)]
+
+    @ViewBuilder
+    private func instrumentLink<Label: View>(_ route: AppRoute, @ViewBuilder label: () -> Label) -> some View {
+        #if os(iOS)
+        Button { onOpenInstrument(route) } label: { label() }
+        #else
+        NavigationLink(value: route, label: label)
+        #endif
+    }
 
     var body: some View {
         ScrollView {
@@ -161,7 +213,7 @@ private struct HomeView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("home.route.\(viewModel.featuredRoute.rawValue)")
 
-                NavigationLink(value: AppRoute.freeKeyboard) {
+                instrumentLink(.freeKeyboard) {
                     HStack(spacing: 14) {
                         Image(systemName: "pianokeys")
                             .font(.title2.weight(.medium))
@@ -189,7 +241,7 @@ private struct HomeView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("home.route.freeKeyboard")
 
-                NavigationLink(value: AppRoute.freeFretboard) {
+                instrumentLink(.freeFretboard) {
                     HStack(spacing: 14) {
                         Image(systemName: "guitars")
                             .font(.title2.weight(.medium))
@@ -216,6 +268,12 @@ private struct HomeView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("home.route.freeFretboard")
+
+                NavigationLink(value: AppRoute.musicAtlas) {
+                    RouteCard(route: .musicAtlas)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("home.route.musicAtlas")
 
                 ForEach(viewModel.practiceZones) { zone in
                     VStack(alignment: .leading, spacing: 12) {

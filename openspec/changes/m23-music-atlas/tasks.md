@@ -1,0 +1,42 @@
+# M23 tasks
+
+- [x] Intent, spec and test source before implementation (red execution unverified).
+- [x] Shared atlas domain, presentation, navigation and localization.
+- [x] Retained requirements, automated test source and manual checklist.
+- [ ] Current-head CI and main post-merge validation.
+- [ ] Owner manual acceptance and merge approval.
+- [x] Specify owner-reported physical landscape layout defect and add regression test source.
+- [x] Implement shared measured layout, range clamping, landscape UI regression test and device checklist.
+- [ ] Verify current-head CI and repeat physical-device playground acceptance.
+- [x] Specify recurring physical-device retrigger click and write render-envelope regression tests.
+- [x] Implement sample-continuous live audio and render-acknowledged release reservation.
+- [ ] Verify current-head CI and real-device rapid-tap audio, polyphony, latency, route transitions and background/foreground behavior.
+- [x] Capture physical chord vibration regression and specify linear polyphonic mix tests.
+- [x] Implement fixed-headroom precomputed oscillator mix, actual-output-rate setup and source mixer tests.
+- [ ] Verify fresh CI and physical chord/retrigger acceptance.
+- [x] Record residual polyphonic vibration and passing 185-test package validation at 4ec2d1b.
+- [x] Add production source-node offline graph regression and route/tone diagnostic procedure, without changing tone behavior.
+- [ ] Verify graph test CI and collect physical diagnostic results before further sound-design changes.
+- [x] Reproduce owner's exact offline graph error numerically as a fixed -3 dB gain; constrain reference comparison to unity or sqrt(0.5) with unchanged residual tolerance.
+- [ ] Verify revised graph test on CI and owner's Mac.
+- [x] Record owner-approved direction for natural generated piano sound; specify tone, decay and spectral tests.
+- [x] Implement bounded additive piano profile on shared render path and extend offline graph tests.
+- [ ] Verify current-head CI and physical piano tone, chord, retrigger, and existing audio regression acceptance.
+- [x] Record owner audio listening pass and specify partial-octave density regression.
+- [x] Implement density-driven range with partial octaves, natural endpoints, exact labels, bounded navigation and simulator key-width assertions.
+- [ ] Verify fresh CI and physical iPhone density/rotation acceptance; reconfirm previously accepted audio unchanged.
+- [x] Record owner approval for two-stage decay and write held-note/retrigger regression tests.
+- [x] Implement shared precomputed two-stage decay profiles, remove fixed held-guitar cutoff, and extend production source graph regression to guitar.
+- [ ] Verify current-head CI and physical natural decay, retriggers, independent chords and layout acceptance.
+- [x] Record owner's accepted held-note sound and specify expressive release and overlap regressions.
+- [x] Implement instrument-specific release curves, 16-slot pool with ten-held-note cap, and quick cleanup of existing tails; update acoustic and graph regressions.
+- [ ] Verify current-head CI and physical musical phrasing, retriggers, cleanup and previous layout acceptance.
+- [x] Specify touch-down preview vs committed selection, and audit instrument routes.
+- [x] Wire shared press preview and native selection activation across Music Atlas, piano practice and fretboard practice; add natural piano audition and cleanup.
+- [ ] Verify current-head CI and physical press timing, cancellation, accessibility and listening acceptance across routes.
+- [x] Compare cross-route changes against musical-release baseline; specify stronger short-tap energy and scoped preview cleanup regressions.
+- [x] Implement scoped preview cleanup and smoothstep musical release; strengthen RMS and voice ownership regressions.
+- [ ] Verify current-head CI and physical free-instrument decay and cross-route playback acceptance.
+- [x] Specify gesture isolation and add cross-orientation navigation regression test source.
+- [x] Present iOS free instruments as isolated full-screen root workspaces with localized explicit Back and unchanged touch/audio paths.
+- [ ] Verify current-head CI and physical glissando, navigation and audio cleanup acceptance.

@@ -42,10 +42,9 @@ public struct GuitarTriadsGameView: View {
                     FretboardSelectionView(window: window, showNames: true, result: session.lastResult,
                         locked: session.lastResult == true, selectedPositions: Set(session.selection),
                         allowedStrings: Set(session.round.reference.firstString...session.round.reference.firstString + 2),
-                        identifierPrefix: "guitarTriad", onSelect: { position in
-                            session.toggle(position)
-                            if session.selection.contains(position), let pitch = InstrumentMapping.standardGuitar.pitch(at: position) { onNote(pitch) }
-                        })
+                        identifierPrefix: "guitarTriad",
+                         onPreview: { position in if let pitch = InstrumentMapping.standardGuitar.pitch(at: position) { onNote(pitch) } },
+                         onSelect: { session.toggle($0) })
                     Text(session.pitches.map(\.description).joined(separator: " · ")).accessibilityIdentifier("guitarTriad.selection")
                     Text(feedback).practiceFeedbackCard().accessibilityIdentifier("guitarTriad.feedback")
                     HStack {
